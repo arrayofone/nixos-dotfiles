@@ -1,0 +1,63 @@
+{
+  pkgs,
+  ...
+}:
+{
+  imports = [
+    ./editor.nix
+    ./env.nix
+    ./fonts.nix
+    ./secrets.nix
+    ./shell.nix
+    ./theme.nix
+  ];
+
+  home.packages = with pkgs; [
+    age
+    bash
+    bat
+    btop
+    gcc
+    gh
+    git
+    gnupg
+    gnumake
+    htop
+    jq
+    lf
+    lsof
+    neofetch
+    neovim
+    netcat
+    openssl
+    protols
+    ripgrep
+    sops
+    tmux
+    vim-full
+    wget
+    wireguard-tools
+    zellij
+
+    # TODO: are these needed for all systems? - probably not
+    awscli2
+    docker
+    docker-compose
+    emacs
+    k9s
+    kotlin-language-server
+    kubectl
+    kubectx
+    kubernetes-helm
+    lazydocker
+    lazysql
+    minikube
+    nil
+    nixfmt-rfc-style
+    oxker
+    podman
+    podman-compose
+    podman-tui
+    protobuf
+  ];
+}

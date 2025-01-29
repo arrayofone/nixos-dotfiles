@@ -1,0 +1,11 @@
+keys:
+  - &baradur age1fe2alznmwldqrnlx09n4e7hfc3kflm2h9lmgem54kcadze5kp53qjuyrqy
+  - &arrayofone age19r87m08mt03zg8ustzlx733s4m4wph6vvkd0qxlequfje5k0mawsy68vp2
+  - &db age1smv5elusy6hpywadnyfvcf0gph8yqpjyeqcf7spvfgrghd3u55qq6lc9aw
+creation_rules:
+  - path_regex: secrets/fellowship.yaml$
+    key_groups:
+      - age:
+          - *baradur
+          - *arrayofone
+          - *db

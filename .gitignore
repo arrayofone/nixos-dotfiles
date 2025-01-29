@@ -5,6 +5,8 @@
 !.vscode/extensions.json
 !.vscode/*.code-snippets
 
+# modules/nixos/networking/wg/keys
+
 # Local History for Visual Studio Code
 .history/
 

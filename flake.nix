@@ -1,9 +1,12 @@
 {
-  description = "Arrayofone's systems flake";
-
   inputs = {
     nixpkgs = {
       url = "github:nixos/nixpkgs/nixos-unstable";
+    };
+
+    snowfall-lib = {
+      url = "github:snowfallorg/lib";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     home-manager = {
@@ -12,6 +15,13 @@
     };
 
     sops-nix.url = "github:Mic92/sops-nix";
+
+    # headscale.url = "github:juanfont/headscale";
+
+    stylix = {
+      url = "github:danth/stylix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     hyprland.url = "github:hyprwm/Hyprland";
     hypridle.url = "github:hyprwm/hypridle";
@@ -25,65 +35,129 @@
 
     nixos-wsl.url = "github:nix-community/NixOS-WSL";
 
-    # darwin = {
-    #   url = "github:lnl7/nix-darwin";
-    #   inputs.nixpkgs.follows = "nixpkgs";
-    # };
-  };
+    ethereum-nix = {
+      url = "github:nix-community/ethereum.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
-  outputs = { 
-    self, 
-    nixpkgs,
-    home-manager,
-    hyprland,
-    hypridle,
-    hyprlock,
-    hyprland-plugins,
-    catppuccin,
-    nixos-wsl,
-    sops-nix,
-    # darwin,
-    ... 
-  } @ inputs: let
-    inherit (self) outputs;
+    # ###### #
+    # DARWIN #
+    # ###### #
 
-    sharedModules = [
-      home-manager.nixosModules.home-manager
-      sops-nix.nixosModules.sops
-      
-      ./users
-      ./modules/shared/fonts
-      ./modules/shared/system
-      ./modules/shared/home-manager
-    ];
+    darwin = {
+      url = "github:nix-darwin/nix-darwin";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
-    baradurModules = sharedModules ++ [
-      catppuccin.nixosModules.catppuccin
-      ./modules/gui/desktop
-      ./modules/gui/applications/firefox
-    ];
-    wslModules = sharedModules ++ [];
+    nix-rosetta-builder = {
+      url = "github:cpick/nix-rosetta-builder";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
-    # darwinModules = [
-    #   home-manager.darwinModules.home-manager
-    # ];
-  in {
-    # darwinConfigurations = {
-    #   darwin = darwin.lib.darwinSystem {
-    #     specialArgs = {inherit inputs outputs;};
-    #     modules = darwinModules ++ [./hosts/darwin]; # todo: this
-    #   };
-    # };
+    nix-homebrew.url = "github:zhaofengli/nix-homebrew";
 
-    nixosConfigurations = {
-      baradur = nixpkgs.lib.nixosSystem {
-        specialArgs = {inherit inputs outputs;};
-        modules = baradurModules ++ [./hosts/baradur];
-      };
-      wsl = nixpkgs.lib.nixosSystem {
-        specialArgs = {inherit inputs outputs;};
-        modules = wslModules ++ [./hosts/wsl]; # todo: this
-      };
+    # Optional: Declarative tap management
+    homebrew-core = {
+      url = "github:homebrew/homebrew-core";
+      flake = false;
+    };
+
+    homebrew-cask = {
+      url = "github:homebrew/homebrew-cask";
+      flake = false;
+    };
+
+    homebrew-bun = {
+      url = "github:oven-sh/homebrew-bun";
+      flake = false;
     };
   };
+
+  outputs =
+    inputs:
+    let
+      lib = inputs.snowfall-lib.mkLib {
+        inherit inputs;
+
+        src = ./.;
+
+        snowfall = {
+          namespace = "fellowship";
+
+          meta = {
+            name = "fellowship";
+            title = "arrayofone's dotfiles";
+          };
+        };
+      };
+    in
+    lib.mkFlake {
+      src = ./.;
+
+      shells = {
+        default = "digits";
+      };
+
+      channels-config = {
+        allowUnfree = true;
+        permittedInsecurePackages = [ ];
+      };
+
+      systems.hosts.baradur.modules = with inputs; [
+        ethereum-nix.nixosModules.default
+        (
+          { pkgs, system, ... }:
+          {
+            environment.systemPackages = (
+              with ethereum-nix.packages.x86_64-linux;
+              [
+                #teku
+                #lighthouse
+              ]
+            );
+          }
+        )
+      ];
+
+      systems.hosts.digibook.modules = with inputs; [
+        #   # An existing Linux builder is needed to initially bootstrap `nix-rosetta-builder`.
+        #   # If one isn't already available: comment out the `nix-rosetta-builder` module below,
+        #   # uncomment this `linux-builder` module, and run `darwin-rebuild switch`:
+        # { nix.linux-builder.enable = true; }
+        #   # Then: uncomment `nix-rosetta-builder`, remove `linux-builder`, and `darwin-rebuild switch`
+        #   # a second time. Subsequently, `nix-rosetta-builder` can rebuild itself.
+        nix-rosetta-builder.darwinModules.default
+        {
+          nix-rosetta-builder.enable = true;
+          # see available options in module.nix's `options.nix-rosetta-builder`
+          nix-rosetta-builder.onDemand = true;
+        }
+        nix-homebrew.darwinModules.nix-homebrew
+        {
+          nix-homebrew = {
+            # Install Homebrew under the default prefix
+            enable = true;
+
+            # Apple Silicon Only: Also install Homebrew under the default Intel prefix for Rosetta 2
+            enableRosetta = true;
+
+            # User owning the Homebrew prefix
+            user = "db";
+
+            # Optional: Declarative tap management
+            taps = {
+              # "oven-sh/bun" = homebrew-bun;
+              "oven-sh/homebrew-bun" = homebrew-bun;
+              "homebrew/homebrew-core" = homebrew-core;
+              "homebrew/homebrew-cask" = homebrew-cask;
+            };
+
+            # Optional: Enable fully-declarative tap management
+            #
+            # With mutableTaps disabled, taps can no longer be added imperatively with `brew tap`.
+            mutableTaps = false;
+          };
+        }
+      ];
+    };
 }
