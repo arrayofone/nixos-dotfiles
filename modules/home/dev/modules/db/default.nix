@@ -18,8 +18,8 @@ in
       packages = with pkgs; [
         sqlc
         sqlite
-        pgcli
-        postgresql
+        # pgcli
+        # postgresql
         # mongodb
       ];
     };

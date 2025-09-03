@@ -2,80 +2,110 @@ version: "3"
 
 vars:
   FLAKE_DIR: "{{.USER_WORKING_DIR}}"
-  NIXOS_HOST: "baradur"
-  DARWIN_HOST: "digibook"
-  NIXOS_USER: "arrayofone"
-  DARWIN_USER: "db"
+  # System users
+  BARADUR_USER: "arrayofone"
+  DIGIBOOK_USER: "db"
+  K3S_NODE_USER: "admin"
 
 tasks:
   # =============================================================================
-  # SYSTEM OPERATIONS
+  # BARADUR (NixOS)
   # =============================================================================
 
-  build:nixos:
-    desc: "Build NixOS system configuration"
+  baradur:build:
+    desc: "Build Baradur NixOS configuration"
     cmds:
-      - sudo nixos-rebuild build --flake {{.FLAKE_DIR}}#{{.NIXOS_HOST}}
+      - sudo nixos-rebuild build --flake {{.FLAKE_DIR}}#baradur
 
-  build:darwin:
-    desc: "Build Darwin system configuration"
+  baradur:switch:
+    desc: "Switch Baradur to new configuration"
     cmds:
-      - darwin-rebuild build --flake {{.FLAKE_DIR}}#{{.DARWIN_HOST}}
+      - sudo nixos-rebuild switch --flake {{.FLAKE_DIR}}#baradur
 
-  switch:nixos:
-    desc: "Switch to new NixOS configuration"
+  baradur:test:
+    desc: "Test Baradur configuration"
     cmds:
-      - sudo nixos-rebuild switch --flake {{.FLAKE_DIR}}#{{.NIXOS_HOST}}
+      - sudo nixos-rebuild test --flake {{.FLAKE_DIR}}#baradur
 
-  switch:darwin:
-    desc: "Switch to new Darwin configuration"
+  baradur:home:
+    desc: "Switch Baradur Home Manager configuration"
     cmds:
-      - darwin-rebuild switch --flake {{.FLAKE_DIR}}#{{.DARWIN_HOST}}
+      - home-manager switch --flake {{.FLAKE_DIR}}#{{.BARADUR_USER}}@baradur
 
-  test:nixos:
-    desc: "Test NixOS configuration (activate without adding to bootloader)"
+  baradur:deploy:
+    desc: "Full Baradur deployment (build + switch + home)"
     cmds:
-      - sudo nixos-rebuild test --flake {{.FLAKE_DIR}}#{{.NIXOS_HOST}}
-
-  boot:nixos:
-    desc: "Add NixOS configuration to bootloader without activating"
-    cmds:
-      - sudo nixos-rebuild boot --flake {{.FLAKE_DIR}}#{{.NIXOS_HOST}}
-
-  dry-run:nixos:
-    desc: "Show what would change in NixOS without applying"
-    cmds:
-      - sudo nixos-rebuild dry-run --flake {{.FLAKE_DIR}}#{{.NIXOS_HOST}}
-
-  vm:nixos:
-    desc: "Build and run NixOS configuration in VM"
-    cmds:
-      - sudo nixos-rebuild build-vm --flake {{.FLAKE_DIR}}#{{.NIXOS_HOST}}
-      - echo "VM built! Run: ./result/bin/run-{{.NIXOS_HOST}}-vm"
+      - task: check
+      - task: baradur:build
+      - task: baradur:switch
+      - task: baradur:home
+      - echo "🚀 Baradur deployment completed!"
 
   # =============================================================================
-  # HOME MANAGER OPERATIONS
+  # DIGIBOOK (Darwin)
   # =============================================================================
 
-  home:nixos:
-    desc: "Switch Home Manager configuration (NixOS)"
+  digibook:build:
+    desc: "Build Digibook Darwin configuration"
     cmds:
-      - home-manager switch --flake {{.FLAKE_DIR}}#{{.NIXOS_USER}}@{{.NIXOS_HOST}}
+      - darwin-rebuild build --flake {{.FLAKE_DIR}}#digibook
 
-  home:darwin:
-    desc: "Switch Home Manager configuration (Darwin)"
+  digibook:switch:
+    desc: "Switch Digibook to new configuration"
     cmds:
-      - home-manager switch --flake {{.FLAKE_DIR}}#{{.DARWIN_USER}}@{{.DARWIN_HOST}}
+      - darwin-rebuild switch --flake {{.FLAKE_DIR}}#digibook
 
-  home:build:nixos:
-    desc: "Build Home Manager configuration (NixOS)"
+  digibook:test:
+    desc: "Test Digibook configuration"
     cmds:
-      - home-manager build --flake {{.FLAKE_DIR}}#{{.NIXOS_USER}}@{{.NIXOS_HOST}}
+      - darwin-rebuild check --flake {{.FLAKE_DIR}}#digibook
 
-  home:build:darwin:
-    desc: "Build Home Manager configuration (Darwin)"
+  digibook:home:
+    desc: "Switch Digibook Home Manager configuration"
     cmds:
-      - home-manager build --flake {{.FLAKE_DIR}}#{{.DARWIN_USER}}@{{.DARWIN_HOST}}
+      - home-manager switch --flake {{.FLAKE_DIR}}#{{.DIGIBOOK_USER}}@digibook
+
+  digibook:deploy:
+    desc: "Full Digibook deployment (build + switch + home)"
+    cmds:
+      - task: check
+      - task: digibook:build
+      - task: digibook:switch
+      - task: digibook:home
+      - echo "🚀 Digibook deployment completed!"
+
+  # =============================================================================
+  # K3S-NODE (NixOS)
+  # =============================================================================
+
+  k3s-node:build:
+    desc: "Build k3s-node NixOS configuration"
+    cmds:
+      - sudo nixos-rebuild build --flake {{.FLAKE_DIR}}#k3s-node
+
+  k3s-node:switch:
+    desc: "Switch k3s-node to new configuration"
+    cmds:
+      - sudo nixos-rebuild switch --flake {{.FLAKE_DIR}}#k3s-node
+
+  k3s-node:test:
+    desc: "Test k3s-node configuration"
+    cmds:
+      - sudo nixos-rebuild test --flake {{.FLAKE_DIR}}#k3s-node
+
+  k3s-node:home:
+    desc: "Switch k3s-node Home Manager configuration"
+    cmds:
+      - home-manager switch --flake {{.FLAKE_DIR}}#{{.K3S_NODE_USER}}@k3s-node
+
+  k3s-node:deploy:
+    desc: "Full k3s-node deployment (build + switch + home)"
+    cmds:
+      - task: check
+      - task: k3s-node:build
+      - task: k3s-node:switch
+      - task: k3s-node:home
+      - echo "🚀 k3s-node deployment completed!"
 
   # =============================================================================
   # FLAKE MANAGEMENT
@@ -87,13 +117,6 @@ tasks:
       - nix flake update {{.FLAKE_DIR}}
       - echo "✅ Flake inputs updated!"
 
-  update:input:
-    desc: "Update specific flake input"
-    cmds:
-      - nix flake lock --update-input {{.CLI_ARGS}} {{.FLAKE_DIR}}
-    requires:
-      vars: [CLI_ARGS]
-
   check:
     desc: "Check flake for errors"
     cmds:
@@ -104,13 +127,8 @@ tasks:
     cmds:
       - nix flake show {{.FLAKE_DIR}}
 
-  metadata:
-    desc: "Show flake metadata"
-    cmds:
-      - nix flake metadata {{.FLAKE_DIR}}
-
   # =============================================================================
-  # DEVELOPMENT WORKFLOW
+  # DEVELOPMENT
   # =============================================================================
 
   dev:
@@ -119,235 +137,39 @@ tasks:
       - nix develop {{.FLAKE_DIR}}#digits
     interactive: true
 
-  dev:command:
-    desc: "Run command in development shell"
-    cmds:
-      - nix develop {{.FLAKE_DIR}}#digits --command {{.CLI_ARGS}}
-    requires:
-      vars: [CLI_ARGS]
-
-  shell:
-    desc: "Enter specific shell environment"
-    cmds:
-      - nix develop {{.FLAKE_DIR}}#{{.CLI_ARGS | default "digits"}}
-    interactive: true
-
   # =============================================================================
-  # PACKAGES & BUILDING
+  # MAINTENANCE
   # =============================================================================
 
-  build:package:
-    desc: "Build custom package"
+  gc:
+    desc: "Run garbage collection and optimize store"
     cmds:
-      - nix build {{.FLAKE_DIR}}#{{.CLI_ARGS}}
-    requires:
-      vars: [CLI_ARGS]
+      - sudo nix-collect-garbage -d
+      - nix-store --optimise
+      - echo "🗑️ Garbage collection completed!"
 
-  run:package:
-    desc: "Run custom package"
+  # =============================================================================
+  # ISO GENERATION
+  # =============================================================================
+
+  iso:
+    desc: "Generate SD card image for Raspberry Pi"
     cmds:
-      - nix run {{.FLAKE_DIR}}#{{.CLI_ARGS}}
-    requires:
-      vars: [CLI_ARGS]
+      - nix run github:nix-community/nixos-generators -- -f sd-aarch64 -c {{.FLAKE_DIR}}#nixosConfigurations.{{.CLI_ARGS | default "k3s-node"}}
+      - echo "✅ SD card image generated!"
+      - 'echo "📝 Flash with: dd if=./result/sd-image/*.img of=/dev/sdX bs=4M status=progress"'
 
   # =============================================================================
   # SECRETS MANAGEMENT
   # =============================================================================
 
-  secrets:edit:
+  secrets:
     desc: "Edit secrets file with SOPS"
     cmds:
       - sops {{.FLAKE_DIR}}/secrets/fellowship.yaml
 
-  secrets:decrypt:
-    desc: "Decrypt and show secrets"
-    cmds:
-      - sops -d {{.FLAKE_DIR}}/secrets/fellowship.yaml
-
-  secrets:encrypt:
-    desc: "Re-encrypt secrets with current keys"
-    cmds:
-      - sops updatekeys {{.FLAKE_DIR}}/secrets/fellowship.yaml
-
-  age:keygen:
-    desc: "Generate new age key"
-    cmds:
-      - mkdir -p ~/.config/age
-      - age-keygen -o ~/.config/age/keys.txt
-      - echo "Public key:"
-      - age-keygen -y ~/.config/age/keys.txt
-
   # =============================================================================
-  # MAINTENANCE & CLEANUP
-  # =============================================================================
-
-  gc:
-    desc: "Run garbage collection"
-    cmds:
-      - sudo nix-collect-garbage -d
-      - nix-store --optimise
-      - echo "🗑️  Garbage collection completed!"
-
-  gc:old:
-    desc: "Clean generations older than specified days (default: 7)"
-    cmds:
-      - sudo nix-collect-garbage --delete-older-than {{.CLI_ARGS | default "7d"}}
-      - echo "🗑️  Cleaned generations older than {{.CLI_ARGS | default "7d"}}"
-
-  optimize:
-    desc: "Optimize Nix store"
-    cmds:
-      - nix-store --optimise
-      - echo "⚡ Store optimization completed!"
-
-  generations:nixos:
-    desc: "List NixOS system generations"
-    cmds:
-      - sudo nix-env --list-generations --profile /nix/var/nix/profiles/system
-
-  generations:home:
-    desc: "List Home Manager generations"
-    cmds:
-      - home-manager generations
-
-  rollback:nixos:
-    desc: "Rollback NixOS to previous generation"
-    cmds:
-      - sudo nixos-rebuild switch --rollback
-
-  # =============================================================================
-  # SYSTEM INFORMATION
-  # =============================================================================
-
-  info:system:
-    desc: "Show system information"
-    cmds:
-      - echo "=== System Information ==="
-      - uname -a
-      - echo ""
-      - echo "=== NixOS Version ==="
-      - nixos-version 2>/dev/null || echo "Not on NixOS"
-      - echo ""
-      - echo "=== Nix Version ==="
-      - nix --version
-      - echo ""
-      - echo "=== Home Manager Version ==="
-      - home-manager --version 2>/dev/null || echo "Home Manager not available"
-
-  info:flake:
-    desc: "Show flake information"
-    cmds:
-      - echo "=== Flake Metadata ==="
-      - nix flake metadata {{.FLAKE_DIR}}
-      - echo ""
-      - echo "=== Flake Show ==="
-      - nix flake show {{.FLAKE_DIR}}
-
-  # =============================================================================
-  # SERVICES MANAGEMENT
-  # =============================================================================
-
-  service:ollama:
-    desc: "Check Ollama service status"
-    cmds:
-      - systemctl status ollama
-
-  service:restart:
-    desc: "Restart system service"
-    cmds:
-      - sudo systemctl restart {{.CLI_ARGS}}
-    requires:
-      vars: [CLI_ARGS]
-
-  service:status:
-    desc: "Check service status"
-    cmds:
-      - systemctl status {{.CLI_ARGS}}
-    requires:
-      vars: [CLI_ARGS]
-
-  # =============================================================================
-  # QUICK WORKFLOWS
-  # =============================================================================
-
-  deploy:nixos:
-    desc: "Full NixOS deployment workflow"
-    cmds:
-      - task: check
-      - task: build:nixos
-      - task: switch:nixos
-      - task: home:nixos
-      - echo "🚀 NixOS deployment completed!"
-
-  deploy:darwin:
-    desc: "Full Darwin deployment workflow"
-    cmds:
-      - task: check
-      - task: build:darwin
-      - task: switch:darwin
-      - task: home:darwin
-      - echo "🚀 Darwin deployment completed!"
-
-  update:deploy:nixos:
-    desc: "Update and deploy NixOS"
-    cmds:
-      - task: update
-      - task: deploy:nixos
-      - echo "✅ Update and deployment completed!"
-
-  update:deploy:darwin:
-    desc: "Update and deploy Darwin"
-    cmds:
-      - task: update
-      - task: deploy:darwin
-      - echo "✅ Update and deployment completed!"
-
-  maintenance:
-    desc: "Weekly maintenance routine"
-    cmds:
-      - echo "🔄 Starting maintenance routine..."
-      - task: update
-      - task: gc:old -- 14d
-      - task: optimize
-      - echo "✨ Maintenance completed!"
-
-  # =============================================================================
-  # DEVELOPMENT HELPERS
-  # =============================================================================
-
-  fmt:
-    desc: "Format Nix files"
-    cmds:
-      - find {{.FLAKE_DIR}} -name "*.nix" -exec nixfmt {} \;
-      - echo "📝 Nix files formatted!"
-
-  lint:
-    desc: "Lint Nix files"
-    cmds:
-      - nix develop {{.FLAKE_DIR}}#digits --command statix check {{.FLAKE_DIR}}
-
-  # =============================================================================
-  # TROUBLESHOOTING
-  # =============================================================================
-
-  debug:nixos:
-    desc: "Debug NixOS build with verbose output"
-    cmds:
-      - sudo nixos-rebuild switch --flake {{.FLAKE_DIR}}#{{.NIXOS_HOST}} --show-trace --verbose
-
-  debug:home:
-    desc: "Debug Home Manager build"
-    cmds:
-      - home-manager switch --flake {{.FLAKE_DIR}}#{{.NIXOS_USER}}@{{.NIXOS_HOST}} --show-trace
-
-  clean:result:
-    desc: "Clean build results"
-    cmds:
-      - rm -f {{.FLAKE_DIR}}/result*
-      - echo "🧹 Build results cleaned!"
-
-  # =============================================================================
-  # HELP & SHORTCUTS
+  # HELP
   # =============================================================================
 
   help:

@@ -7,6 +7,9 @@
     ./users.nix
   ];
 
+  # This is temporary
+  nixpkgs.config.allowBroken = true;
+
   system = {
     activationScripts.extraActivation.text = ''
       test -d /usr/libexec/rosetta || softwareupdate --install-rosetta --agree-to-license
