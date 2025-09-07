@@ -1,4 +1,5 @@
 {
+  lib,
   pkgs,
   ...
 }:
@@ -14,9 +15,23 @@
         monospace = [ pkgs.nerd-fonts.intone-mono.name ];
       };
 
-      hinting = "full";
-
-      # subpixelRendering = "rgb";
+      hinting = {
+        autohint = true;
+        enable = true;
+      };
     };
+
+    packages =
+      with pkgs;
+      [
+        dina-font
+        fontconfig
+
+        noto-fonts
+        noto-fonts-color-emoji
+
+        proggyfonts
+      ]
+      ++ builtins.filter lib.attrsets.isDerivation (builtins.attrValues pkgs.nerd-fonts);
   };
 }

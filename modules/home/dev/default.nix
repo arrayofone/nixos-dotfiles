@@ -15,19 +15,16 @@ in
 
   config = lib.mkIf cfg.enable {
     ${namespace}.home.dev_modules = {
-      db.enable = true;
+      db.enable = false;
       go.enable = true;
       gql.enable = true;
-      java = {
-        temurin.enable = true;
-        jdk21.enable = false;
-      };
       js.enable = true;
+      flutter.enable = false;
     };
 
     home = {
       packages = with pkgs; [
-        # nixd
+        nixd
         parallel
       ];
     };

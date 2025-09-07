@@ -1,17 +1,17 @@
 { pkgs, ... }:
 let
-  nixosVSCodeServer = {
-    url = "https://github.com/msteen/nixos-vscode-server/tarball/master";
-    sha256 = "1rdn70jrg5mxmkkrpy2xk8lydmlc707sk0zb35426v1yxxka10by";
-  };
+  # nixosVSCodeServer = {
+  #   url = "https://github.com/msteen/nixos-vscode-server/tarball/master";
+  #   sha256 = "1rdn70jrg5mxmkkrpy2xk8lydmlc707sk0zb35426v1yxxka10by";
+  # };
 in
 {
   imports = [
-    "${fetchTarball nixosVSCodeServer}/modules/vscode-server/home.nix"
+    # "${fetchTarball nixosVSCodeServer}/modules/vscode-server/home.nix"
   ];
 
   services = {
-    vscode-server.enable = true;
+    # vscode-server.enable = false;
     gpg-agent = {
       enable = true;
       pinentry.package = pkgs.pinentry-curses;
@@ -31,7 +31,7 @@ in
       programs = {
         brave.enable = true;
         firefox.enable = true;
-        librewolf.enable = true;
+        librewolf.enable = false;
         dbeaver.enable = true;
         element.enable = true;
         gparted.enable = true;
@@ -50,7 +50,7 @@ in
     packages = with pkgs; [
       clipse
       fontconfig
-      # nixd
+      nixd
       pinentry-curses
     ];
 

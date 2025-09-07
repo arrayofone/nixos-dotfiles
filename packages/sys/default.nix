@@ -1,9 +1,14 @@
-{writeShellScriptBin, ...}:
+{ writeShellScriptBin, ... }:
 writeShellScriptBin "sys" ''
 
   cmd_rebuild() {
+      local flake_name=".#"
+      if [[ -n $1 ]]; then
+          flake_name=$1
+      fi
+
       echo "🔨 Building system configuration with $REBUILD_COMMAND"
-      $REBUILD_COMMAND switch --flake .#
+      $REBUILD_COMMAND switch --flake "$flake_name"
   }
 
   cmd_test() {
@@ -26,7 +31,7 @@ writeShellScriptBin "sys" ''
   cmd_usage() {
       cat <<-_EOF
   Usage:
-      $PROGRAM rebuild
+      $PROGRAM rebuild [flake_name]
           Rebuild the system. (You must be in the system flake directory!)
           Must be run as root.
       $PROGRAM test
@@ -53,7 +58,7 @@ writeShellScriptBin "sys" ''
   PROGRAM=sys
   COMMAND="$1"
   case "$1" in
-      rebuild|r) shift;       cmd_rebuild ;;
+      rebuild|r) shift;       cmd_rebuild "$@" ;;
       test|t) shift;          cmd_test ;;
       update|u) shift;        cmd_update ;;
       clean|c) shift;         cmd_clean ;;

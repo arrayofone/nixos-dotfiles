@@ -1,4 +1,4 @@
-{ ... }:
+{ config, namespace, ... }:
 {
   imports = [
     ./homebrew.nix
@@ -16,10 +16,26 @@
     stateVersion = 6;
   };
 
+  ${namespace} = {
+    system.name = "digibook";
+    networking.wireguard.server = {
+      enable = true;
+      interface = "wg0";
+      ips = [ "10.20.255.252/32" ];
+      privateKeyFile = config.sops.secrets."vpn/wg/privateKey".path;
+      peers = [
+        {
+          publicKey = "4N2292pRHaViKm4TCSuDHa8x48ARn8tNZv1dSHWRuhA=";
+          endpoint = "wg.arrayof.one:443";
+        }
+      ];
+    };
+  };
+
   homebrew = {
     taps = [ ];
     brews = [
-      "bun@1.2.7"
+      "bun@1.2.19"
       "gettext"
       "ghostscript"
       "git-lfs"

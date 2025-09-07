@@ -1,18 +1,20 @@
-{ pkgs, ... }:
 {
-  fellowship.home.dev.enable = true;
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+{
+  fellowship.home = {
+    dev.enable = true;
+    dev_modules.go.enable = lib.mkForce false;
+    dev_modules.flutter.enable = lib.mkForce false;
+  };
 
-  programs.zsh.envExtra = ''
-    export JAVA_HOME="$(/usr/libexec/java_home -v 21)"
-    export GCP_ACCOUNT_EMAIL=darren@digits.com
-    export DIGITS_REPO_PATH=$HOME/digits
-  '';
+  programs.zsh.envExtra = '''';
 
   home = {
-    packages = with pkgs; [
-      google-cloud-sdk
-      claude-code
-    ];
+    packages = with pkgs; [ ];
     stateVersion = "24.05";
   };
 }

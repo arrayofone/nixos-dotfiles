@@ -1,16 +1,46 @@
-{ pkgs, ... }:
+{
+  config,
+  namespace,
+  pkgs,
+  ...
+}:
 {
   imports = [
     ./hardware-configuration.nix
-    # pkgs.fetchTarball awsVpnClient
   ];
+
+  nix = {
+    settings = {
+      auto-optimise-store = true;
+      experimental-features = "nix-command flakes";
+      trusted-users = [ "@wheel" ];
+    };
+
+    gc = {
+      automatic = true;
+      dates = [ "05:00" ];
+    };
+  };
 
   networking.hostName = "baradur";
 
   boot = {
+    kernelPackages = pkgs.linuxPackages_6_6;
+
     loader = {
-      systemd-boot.enable = true;
-      efi.canTouchEfiVariables = true;
+      systemd-boot.enable = false;
+
+      efi = {
+        canTouchEfiVariables = true;
+        efiSysMountPoint = "/boot";
+      };
+
+      grub = {
+        enable = true;
+        device = "nodev";
+        useOSProber = true;
+        efiSupport = true;
+      };
     };
   };
 
@@ -30,7 +60,7 @@
     users.arrayofone = {
       isNormalUser = true;
       group = "arrayofone";
-      initialPassword = "letmein";
+      hashedPasswordFile = config.sops.secrets."system/users/arrayofone/password".path;
       description = "primordial devboi";
       shell = pkgs.zsh;
       extraGroups = [
@@ -61,36 +91,49 @@
     programs.ethereum.geth.sepolia = {
       enable = false;
     };
-    networking = {
-      # headscale.enable = false;
-      # tailscale.enable = false;
-      wireguard.server = {
-        enable = false;
-        externalInterface = "enp42s0";
-      };
+
+    networking.wireguard.server = {
+      dns = [ "1.1.1.1" ];
+      enable = true;
+      interface = "wg0";
+      ips = [
+        "10.200.255.254/32"
+        "fd3c:fd4c:b4e7:74d1:ffff:ffff:ffff:fffe/128"
+      ];
+      peers = [
+        {
+          publicKey = "4N2292pRHaViKm4TCSuDHa8x48ARn8tNZv1dSHWRuhA=";
+          endpoint = "wg.arrayof.one:443";
+          allowedIPs = [
+            "0.0.0.0/0"
+            "::/0"
+          ];
+        }
+      ];
+      privateKeyFile = config.sops.secrets."vpn/wg/privateKey".path;
     };
   };
 
   environment = {
-    systemPackages = with pkgs; [
-      alacritty
-      dconf
-      foot
-      ghostty
-      kitty
-      libqalculate
-      mdadm
-      pciutils
-      proton-pass
-      qalculate-gtk
-      shotman
-      usbutils
-      nixfmt
-      libsecret
-      gimp
-      zip
-      unzip
-    ];
+    systemPackages =
+      with pkgs;
+      [
+        dconf
+        libqalculate
+        mdadm
+        pciutils
+        proton-pass
+        qalculate-gtk
+        shotman
+        usbutils
+        libsecret
+        gimp
+        cherry-studio
+        nvitop
+      ]
+      ++ [
+        pkgs.${namespace}.sys
+      ];
 
     sessionVariables = {
       DEFAULT_BROWSER = "${pkgs.firefox}/bin/firefox"; # Set default browser
@@ -98,14 +141,6 @@
   };
 
   hardware = { };
-
-  nix = {
-    settings.experimental-features = "nix-command flakes";
-    gc = {
-      automatic = true;
-      dates = "03:15";
-    };
-  };
 
   services = {
     pulseaudio = {
@@ -142,13 +177,39 @@
 
     ollama = {
       enable = true;
-      acceleration = "cuda";
+
       loadModels = [
-        "deepseek-r1"
-        "incept5/llama3.1-claude"
+        # general models
+        "deepseek-r1:14b"
+        "gemma3:12b"
+        "gpt-oss:20b"
+        "phi3:14b"
       ];
+      # environmentVariables = ;
+      # group = ;
+      # home = ;
+      # host = ;
+      # models = ;
+      # openFirewall = ;
+      package = pkgs.ollama-cuda;
+      # port = ;
+      # rocmOverrideGfx = ;
+      # user = ;
     };
-    open-webui.enable = false;
+
+    open-webui = {
+      enable = true;
+      environment = {
+        "WEBUI_AUTH" = "False";
+      };
+      # environmentFile = ;
+      host = "0.0.0.0";
+      # openFirewall = ;
+      # package = ;
+      port = 1111;
+      # stateDir = ;
+    };
+
     vsftpd = {
       # allowWriteableChroot
       # anonymousMkdirEnable
@@ -230,11 +291,14 @@
   networking.firewall = {
     enable = true;
     allowedTCPPorts = [
+      11434
       8082
       5432
       5433
       5434
       3000
+      1111
+      443
       21
       20
     ];
@@ -245,6 +309,7 @@
   # networking.firewall.allowedTCPPorts = [ ... ];
   # networking.firewall.allowedUDPPorts = [ ... ];
   # Or disable the firewall altogether.
+  #
 
   system.stateVersion = "24.05"; # Did you read the comment?
 

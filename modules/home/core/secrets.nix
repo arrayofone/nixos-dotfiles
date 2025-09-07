@@ -2,8 +2,6 @@
   config,
   inputs,
   lib,
-  namespace,
-  pkgs,
   ...
 }:
 let
@@ -16,7 +14,7 @@ in
     # age.keyFile = "/home/${config.snowfallorg.user.name}/.age-key.txt"; # must have no password!
     # It's also possible to use a ssh key, but only when it has no password:
     age.sshKeyPaths = [ "/home/${config.snowfallorg.user.name}/.ssh/sops-nix" ];
-    defaultSopsFile = "${secrets}/${namespace}.yaml";
+    defaultSopsFile = "${secrets}/${config.snowfallorg.user.name}.yaml";
     # secrets.test = {
     #   # sopsFile = ./secrets.yml.enc; # optionally define per-secret files
 
@@ -32,8 +30,13 @@ in
       "git/gh/ssh-private" = { };
       "git/gh/ssh-public" = { };
       "ai/anthropic/api-key" = { };
+      "ai/gemini/api-key" = { };
     };
   };
+
+  programs.zsh.initContent = ''
+    export GEMINI_API_KEY="$(cat ${config.sops.secrets."ai/gemini/api-key".path})"
+  '';
 
   systemd.user.services.mbsync.unitConfig.After = [ "sops-nix.service" ];
 }

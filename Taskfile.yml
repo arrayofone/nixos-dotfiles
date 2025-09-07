@@ -47,11 +47,11 @@ tasks:
     cmds:
       - sudo nixos-rebuild dry-run --flake {{.FLAKE_DIR}}#{{.NIXOS_HOST}}
 
-  vm:nixos:
-    desc: "Build and run NixOS configuration in VM"
-    cmds:
-      - sudo nixos-rebuild build-vm --flake {{.FLAKE_DIR}}#{{.NIXOS_HOST}}
-      - echo "VM built! Run: ./result/bin/run-{{.NIXOS_HOST}}-vm"
+  # vm:nixos:
+  #   desc: "Build and run NixOS configuration in VM"
+  #   cmds:
+  #     - sudo nixos-rebuild build-vm --flake {{.FLAKE_DIR}}#{{.NIXOS_HOST}}
+  #     - echo "VM built! Run: ./result/bin/run-{{.NIXOS_HOST}}-vm"
 
   # =============================================================================
   # HOME MANAGER OPERATIONS
@@ -168,6 +168,26 @@ tasks:
     desc: "Re-encrypt secrets with current keys"
     cmds:
       - sops updatekeys {{.FLAKE_DIR}}/secrets/fellowship.yaml
+
+  sops:user:ssh-gen-private:
+    cmds:
+      - nix run nixpkgs#ssh-to-age -- -private-key -i ~/.ssh/sops-nix > ~/.config/sops/age/keys.txt
+
+  sops:user:gen-public:
+    cmds:
+      - nix run nixpkgs#age-keygen -y ~/.config/sops/age/keys.txt
+
+  sops:system:ssh-gen-private:
+    cmds:
+      - ssh-keygen -A
+      - mkdir -p /var/lib/sops-nix
+      # - rm -rf /var/lib/sops-nix/key.txt
+      # - touch /var/lib/sops-nix/key.txt
+      - nix run nixpkgs#ssh-to-age -- -private-key -i /etc/ssh/ssh_host_ed25519_key > /var/lib/sops-nix/key.txt
+
+  sops:system:gen-public:
+    cmds:
+      - nix shell nixpkgs#age -c age-keygen -y /var/lib/sops-nix/key.txt
 
   age:keygen:
     desc: "Generate new age key"

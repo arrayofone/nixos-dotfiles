@@ -4,13 +4,20 @@
 }:
 {
   imports = [
-    ./editor.nix
+    # ./editor.nix
     ./env.nix
     ./fonts.nix
     ./secrets.nix
     ./shell.nix
+    ./terminal.nix
     ./theme.nix
+    ./zeditor.nix
   ];
+
+  home.file.".zed_server" = {
+    source = "${pkgs.zed-editor.remote_server}/bin";
+    recursive = true;
+  };
 
   home.packages = with pkgs; [
     age
@@ -18,6 +25,7 @@
     bat
     btop
     gcc
+    gemini-cli
     gh
     git
     gnupg
@@ -26,7 +34,7 @@
     jq
     lf
     lsof
-    neofetch
+    #neofetch
     neovim
     netcat
     openssl
@@ -40,12 +48,12 @@
     zellij
 
     # TODO: are these needed for all systems? - probably not
-    awscli2
+    # awscli2
     docker
     docker-compose
     emacs
     k9s
-    kotlin-language-server
+    # kotlin-language-server
     kubectl
     kubectx
     kubernetes-helm
@@ -59,5 +67,16 @@
     podman-compose
     podman-tui
     protobuf
+
+    alacritty
+    # foot
+    ghostty
+    kitty
+    nixfmt
+    zip
+    unzip
+
+    claude-code
+    claude-monitor
   ];
 }

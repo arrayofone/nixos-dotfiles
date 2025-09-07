@@ -148,5 +148,5 @@ pkgs.stdenv.mkDerivation {
     TranslateVirtualKeyboardButton=""
     ## These don't necessarily need to translate anything. You can enter whatever you want here.
     " > $out/theme.conf
-   '';
+  '';
 }

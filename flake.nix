@@ -16,8 +16,6 @@
 
     sops-nix.url = "github:Mic92/sops-nix";
 
-    # headscale.url = "github:juanfont/headscale";
-
     stylix = {
       url = "github:danth/stylix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -94,10 +92,6 @@
     lib.mkFlake {
       src = ./.;
 
-      shells = {
-        default = "digits";
-      };
-
       channels-config = {
         allowUnfree = true;
         permittedInsecurePackages = [ ];
@@ -119,7 +113,7 @@
         )
       ];
 
-      systems.hosts.digibook.modules = with inputs; [
+      systems.hosts.dbook.modules = with inputs; [
         #   # An existing Linux builder is needed to initially bootstrap `nix-rosetta-builder`.
         #   # If one isn't already available: comment out the `nix-rosetta-builder` module below,
         #   # uncomment this `linux-builder` module, and run `darwin-rebuild switch`:

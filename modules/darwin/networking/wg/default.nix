@@ -2,34 +2,25 @@
   lib,
   config,
   namespace,
-  pkgs,
   ...
 }:
 {
   options.${namespace}.networking.wireguard.server = {
-    dns = lib.mkOption {
-      description = "DNS addresses for the wireguard interface";
-      type = lib.types.listOf lib.types.str;
-      default = [ "1.1.1.1" ];
-    };
     enable = lib.mkEnableOption "enable wireguard server";
     interface = lib.mkOption {
       description = "WireGuard interface name";
       type = lib.types.str;
       default = "wg0";
     };
-
     ips = lib.mkOption {
       description = "IP addresses and subnets for the WireGuard interface";
       type = lib.types.listOf lib.types.str;
       default = [ "10.20.0.2/24" ];
     };
-
     privateKeyFile = lib.mkOption {
       description = "Path to the private key file";
       type = lib.types.nullOr lib.types.path;
     };
-
     peers = lib.mkOption {
       description = "WireGuard peers configuration";
       type = lib.types.listOf (
@@ -70,13 +61,13 @@
 
     # networking.firewall = {
     #   enable = lib.mkForce false;
-    # allowedUDPPorts = [ config.${namespace}.networking.wireguard.server.port ];
+    #   allowedUDPPorts = [ config.${namespace}.networking.wireguard.server.port ];
     # };
 
     networking.wg-quick.interfaces = {
       ${config.${namespace}.networking.wireguard.server.interface} = {
         address = config.${namespace}.networking.wireguard.server.ips;
-        dns = config.${namespace}.networking.wireguard.server.dns;
+        dns = [ "9.9.9.9" ];
         privateKeyFile = config.${namespace}.networking.wireguard.server.privateKeyFile;
 
         peers = map (

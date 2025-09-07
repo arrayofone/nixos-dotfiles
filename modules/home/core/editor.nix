@@ -4,9 +4,13 @@
   ...
 }:
 {
+  sessionVariables = {
+    EDITOR = "zeditor";
+  };
+
   programs = {
     vscode = {
-      enable = true;
+      enable = false;
       package = pkgs.vscode;
 
       profiles.default = {
@@ -156,7 +160,6 @@
           };
 
           "editor.suggestSelection" = "first";
-          "editor.fontFamily" = "Intel One Mono";
           "editor.fontLigatures" = true;
           "editor.wordWrap" = "on";
           "editor.tabSize" = 2;

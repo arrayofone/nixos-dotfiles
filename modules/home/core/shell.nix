@@ -49,7 +49,7 @@
         # strategy
       };
       # cdpath
-      completionInit = "autoload -U compinit && compinit -i";
+      # completionInit = "autoload -U compinit && compinit -i";
       # defaultKeymap
       # dirHashes
       dotDir = config.home.homeDirectory + "/.config/zsh";
@@ -71,14 +71,14 @@
       };
       historySubstringSearch = {
         enable = true;
-        # searchDownKey
-        # searchUpKey
+        searchDownKey = "$key[Down]";
+        searchUpKey = "$key[Up]";
       };
+      # initcontent
+      # export LANG=C.UTF-8
       initContent = ''
         export PATH=$PATH:~/go/bin
-        export LANG=C.UTF-8
         ZLE_PROMPT_INDENT=0
-
         autopair-init
       '';
       # localVariables
@@ -89,10 +89,7 @@
         # package
         # custom
         # extraConfig
-        plugins = [
-          "history"
-          "sudo"
-        ];
+        plugins = [ ];
         # theme = "half-life";
       };
       plugins = [
@@ -108,33 +105,12 @@
         }
 
         {
-          name = "zsh-syntax-highlighting";
-          src = pkgs.fetchFromGitHub {
-            owner = "zsh-users";
-            repo = "zsh-syntax-highlighting";
-            rev = "0.8.0";
-            hash = "sha256-iJdWopZwHpSyYl5/FQXEW7gl/SrKaYDEtTH9cGP7iPo=";
-          };
-          file = "zsh-syntax-highlighting.zsh";
-        }
-
-        {
           name = "zsh-completions";
           src = pkgs.fetchFromGitHub {
             owner = "zsh-users";
             repo = "zsh-completions";
             rev = "0.35.0";
             hash = "sha256-GFHlZjIHUWwyeVoCpszgn4AmLPSSE8UVNfRmisnhkpg=";
-          };
-        }
-
-        {
-          name = "zsh-history-substring-search";
-          src = pkgs.fetchFromGitHub {
-            owner = "zsh-users";
-            repo = "zsh-history-substring-search";
-            rev = "400e58a";
-            hash = "sha256-GSEvgvgWi1rrsgikTzDXokHTROoyPRlU0FVpAoEmXG4=";
           };
         }
 
@@ -171,81 +147,81 @@
           file = "autopair.zsh";
         }
       ];
-      prezto = {
-        enable = false;
-        # package
-        autosuggestions = {
-          # color
-        };
-        # caseSensitive
-        # color
-        completions = {
-          # ignoredHosts
-        };
-        editor = {
-          # dotExpansion
-          # keymap
-          # promptContext
-        };
-        # extraConfig
-        # extraFunctions
-        # extraModules
-        git = {
-          # submoduleIgnore
-        };
-        gnuUtility = {
-          # prefix
-        };
-        historySubstring = {
-          # foundColor
-          # globbingFlags
-          # notFoundColor
-        };
-        macOS = {
-          # dashKeyword
-        };
-        # pmoduleDirs
-        # pmodules
-        prompt = {
-          # pwdLength
-          # showReturnVal
-          # theme
-        };
-        python = {
-          # virtualenvAutoSwitch
-          # virtualenvInitialize
-        };
-        ruby = {
-          # chrubyAutoSwitch
-        };
-        screen = {
-          # autoStartLocal
-          # autoStartRemote
-        };
-        ssh = {
-          # identities
-        };
-        syntaxHighlighting = {
-          # highlighters
-          # pattern
-          # styles
-        };
-        terminal = {
-          # autoTitle
-          # multiplexerTitleFormat
-          # tabTitleFormat
-          # windowTitleFormat
-        };
-        tmux = {
-          # autoStartLocal
-          # autoStartRemote
-          # defaultSessionName
-          # itermIntegration
-        };
-        utility = {
-          # safeOps
-        };
-      };
+      # prezto = {
+      #   enable = false;
+      #   # package
+      #   autosuggestions = {
+      #     # color
+      #   };
+      #   # caseSensitive
+      #   # color
+      #   completions = {
+      #     # ignoredHosts
+      #   };
+      #   editor = {
+      #     # dotExpansion
+      #     # keymap
+      #     # promptContext
+      #   };
+      #   # extraConfig
+      #   # extraFunctions
+      #   # extraModules
+      #   git = {
+      #     # submoduleIgnore
+      #   };
+      #   gnuUtility = {
+      #     # prefix
+      #   };
+      #   historySubstring = {
+      #     # foundColor
+      #     # globbingFlags
+      #     # notFoundColor
+      #   };
+      #   macOS = {
+      #     # dashKeyword
+      #   };
+      #   # pmoduleDirs
+      #   # pmodules
+      #   prompt = {
+      #     # pwdLength
+      #     # showReturnVal
+      #     # theme
+      #   };
+      #   python = {
+      #     # virtualenvAutoSwitch
+      #     # virtualenvInitialize
+      #   };
+      #   ruby = {
+      #     # chrubyAutoSwitch
+      #   };
+      #   screen = {
+      #     # autoStartLocal
+      #     # autoStartRemote
+      #   };
+      #   ssh = {
+      #     # identities
+      #   };
+      #   syntaxHighlighting = {
+      #     # highlighters
+      #     # pattern
+      #     # styles
+      #   };
+      #   terminal = {
+      #     # autoTitle
+      #     # multiplexerTitleFormat
+      #     # tabTitleFormat
+      #     # windowTitleFormat
+      #   };
+      #   tmux = {
+      #     # autoStartLocal
+      #     # autoStartRemote
+      #     # defaultSessionName
+      #     # itermIntegration
+      #   };
+      #   utility = {
+      #     # safeOps
+      #   };
+      # };
       # profileExtra
       # sessionVariables
       shellAliases = {
@@ -310,13 +286,13 @@
         csys = "c ~/.sys";
       };
       # shellGlobalAliases
-      # syntaxHighlighting = {
-      #   enable
-      #   package
-      #   highlighters
-      #   patterns
-      #   styles
-      # };
+      syntaxHighlighting = {
+        enable = true;
+        #   package
+        #   highlighters
+        #   patterns
+        #   styles
+      };
       # zplug = {
       #   enable
       #   plugins = {

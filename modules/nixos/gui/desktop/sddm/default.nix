@@ -1,8 +1,16 @@
-{ inputs, lib, pkgs, config, namespace, ... }:
+{
+  inputs,
+  lib,
+  pkgs,
+  config,
+  namespace,
+  ...
+}:
 let
   cfg = config.${namespace}.gui.desktop.sddm;
   theme = pkgs.${namespace}.sddm_theme;
-in {
+in
+{
   options.${namespace}.gui.desktop.sddm = {
     enable = lib.mkEnableOption "sddm";
   };
