@@ -27,7 +27,7 @@ in
 
     home = {
       packages = with pkgs; [
-        # nixd
+        nixd
         parallel
       ];
     };

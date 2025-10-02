@@ -5,7 +5,7 @@
   ...
 }:
 {
-  imports = [ inputs.sops-nix.nixosModules.sops ];
+  imports = [ inputs.sops-nix.darwinModules.sops ];
 
   sops = {
     defaultSopsFile = "${lib.snowfall.fs.get-file "secrets"}/${config.system.name}.yaml";
@@ -16,12 +16,6 @@
       generateKey = true;
     };
 
-    secrets = {
-      "vpn/wg/endpoint" = { };
-      "vpn/wg/endpoint-ip" = { };
-      "vpn/wg/endpoint-ip-port" = { };
-      "vpn/wg/port" = { };
-      "vpn/wg/privateKey" = { };
-    };
+    secrets = { };
   };
 }

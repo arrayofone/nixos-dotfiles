@@ -8,39 +8,47 @@
 {
   imports = [ inputs.stylix.homeModules.stylix ];
 
+  home.packages = [
+    pkgs.font-awesome
+  ]
+  ++ lib.optionals (builtins.elem host pkgs.bibata-cursors.meta.platforms) [
+    pkgs.bibata-cursors
+  ]
+  ++ lib.optionals (builtins.elem host pkgs.papirus-icon-theme.meta.platforms) [
+    pkgs.papirus-icon-theme
+  ];
+
   stylix = {
     enable = true;
 
     autoEnable = true;
+
+    opacity = {
+      applications = 0.95;
+      desktop = 1.0;
+      popups = 0.95;
+      terminal = 0.95;
+    };
+
     base16Scheme = ./theme/base16/catppuccin/mocha.yaml;
-    cursor = {
+
+    cursor = lib.mkIf (builtins.elem host pkgs.bibata-cursors.meta.platforms) {
       package = pkgs.bibata-cursors;
-      name = "Bibata-Original-Ice";
-      size = 24;
+      name = "Bibata-Modern-Ice";
+      size = 32;
     };
 
     fonts = {
-      monospace = {
-        package = pkgs.intel-one-mono;
-        name = "Intel One Mono";
-      };
-      sansSerif = {
-        package = pkgs.ubuntu_font_family;
-        name = "Ubuntu";
-      };
-      serif = {
-        package = pkgs.ubuntu_font_family;
-        name = "Ubuntu";
-      };
-      emoji = {
-        package = pkgs.noto-fonts-emoji;
-        name = "Noto Color Emoji";
-      };
+      monospace.package = lib.mkDefault pkgs.nerd-fonts.intone-mono;
+      sansSerif.package = lib.mkDefault pkgs.nerd-fonts.ubuntu-sans;
+      serif.package = lib.mkDefault pkgs.nerd-fonts.ubuntu;
+      emoji.package = lib.mkDefault pkgs.noto-fonts-emoji;
+
       sizes = {
-        applications = 12;
-        desktop = 10;
-        popups = 10;
-        terminal = 12;
+        applications = 8;
+        desktop = 8;
+        popups = 8;
+        terminal = 8;
       };
     };
 
@@ -51,22 +59,33 @@
       dark = "Papirus-Dark";
     };
 
+    override = {
+      base00 = "1e1e2e"; # base - Catppuccin Mocha
+      base01 = "181825"; # mantle
+      base02 = "313244"; # surface0
+      base03 = "45475a"; # surface1
+      base04 = "585b70"; # surface2
+      base05 = "cdd6f4"; # text
+      base06 = "f5e0dc"; # rosewater
+      base07 = "b4befe"; # lavender
+      base08 = "f38ba8"; # red
+      base09 = "fab387"; # peach
+      base0A = "f9e2af"; # yellow
+      base0B = "a6e3a1"; # green
+      base0C = "94e2d5"; # teal
+      base0D = "89b4fa"; # blue
+      base0E = "cba6f7"; # mauve
+      base0F = "f2cdcd"; # flamingo
+    };
+
     image = ./theme/wallpapers/rx7.png;
 
     polarity = "dark";
+
     targets = {
-      kitty.enable = false;
-      waybar.enable = true;
-      hyprlock.enable = false;
-      neovim.enable = false;
-
-      zed.enable = false;
-
-      vscode.profileNames = [ "default" ];
+      #   vscode.profileNames = [ "default" ];
       firefox.profileNames = [ "default" ];
       librewolf.profileNames = [ "default" ];
-
-      # cavalier.enable = false;
     };
   };
 }

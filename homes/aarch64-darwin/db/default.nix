@@ -1,10 +1,10 @@
-{ pkgs, ... }:
+{ config, pkgs, ... }:
 {
   fellowship.home.dev.enable = true;
 
   programs.zsh.envExtra = ''
     export JAVA_HOME="$(/usr/libexec/java_home -v 21)"
-    export GCP_ACCOUNT_EMAIL=darren@digits.com
+    export GCP_ACCOUNT_EMAIL=$(cat ${config.sops.secrets."digits/email".path})
     export DIGITS_REPO_PATH=$HOME/digits
   '';
 

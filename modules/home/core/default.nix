@@ -4,12 +4,13 @@
 }:
 {
   imports = [
-    ./editor.nix
     ./env.nix
     ./fonts.nix
     ./secrets.nix
     ./shell.nix
     ./theme.nix
+    ./vscode.nix
+    ./zeditor.nix
   ];
 
   home.packages = with pkgs; [
@@ -52,9 +53,9 @@
     lazydocker
     lazysql
     minikube
-    nil
+    # nil
     nixfmt-rfc-style
-    oxker
+    # oxker
     podman
     podman-compose
     podman-tui

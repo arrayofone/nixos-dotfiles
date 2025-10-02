@@ -1,7 +1,6 @@
 {
   config,
   lib,
-  inputs,
   pkgs,
   namespace,
   ...
@@ -15,10 +14,10 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    # nix.settings = {
-    #   substituters = ["https://hyprland.cachix.org"];
-    #   trusted-public-keys = ["hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="];
-    # };
+    nix.settings = {
+      substituters = [ "https://hyprland.cachix.org" ];
+      trusted-public-keys = [ "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc=" ];
+    };
 
     wayland.windowManager.hyprland = {
       enable = true;
@@ -68,17 +67,17 @@ in
         ];
 
         general = {
-          border_size = 1;
+          border_size = 2;
           no_border_on_floating = false;
-          gaps_in = 2;
-          gaps_out = 10;
+          gaps_in = 5;
+          gaps_out = 15;
           float_gaps = 0;
           gaps_workspaces = 0;
 
-          "col.inactive_border" = lib.mkDefault "0xff444444";
-          "col.active_border" = lib.mkDefault "0xffffffff";
-          "col.nogroup_border" = lib.mkDefault "0xffffaaff";
-          "col.nogroup_border_active" = lib.mkDefault "0xffff00ff";
+          "col.inactive_border" = lib.mkDefault "0x66333333";
+          "col.active_border" = lib.mkDefault "rgba(ca9ee6ff) rgba(f2d5cfff) 45deg";
+          "col.nogroup_border" = lib.mkDefault "0x66ae8b2d";
+          "col.nogroup_border_active" = lib.mkDefault "0xffe78284";
 
           layout = "dwindle";
           no_focus_fallback = false;
@@ -89,22 +88,22 @@ in
           resize_corner = 0;
 
           snap = {
-            enabled = false;
-            window_gap = 10;
-            monitor_gap = 10;
-            border_overlap = false;
-            respect_gaps = false;
+            enabled = true;
+            window_gap = 15;
+            monitor_gap = 20;
+            border_overlap = true;
+            respect_gaps = true;
           };
         };
 
         decoration = {
-          rounding = 6;
+          rounding = 10;
           rounding_power = 2.0;
           active_opacity = 1.0;
-          inactive_opacity = 1.0;
+          inactive_opacity = 0.95;
           fullscreen_opacity = 1.0;
-          dim_inactive = false;
-          dim_strength = 0.5;
+          dim_inactive = true;
+          dim_strength = 0.15;
           dim_special = 0.2;
           dim_around = 0.4;
           screen_shader = "";
@@ -112,33 +111,33 @@ in
 
           blur = {
             enabled = true;
-            size = 3;
-            passes = 1;
-            ignore_opacity = true;
+            size = 8;
+            passes = 3;
+            ignore_opacity = false;
             new_optimizations = true;
             xray = false;
             noise = 0.0117;
-            contrast = 0.8916;
-            brightness = 0.8172;
-            vibrancy = 0.1696;
-            vibrancy_darkness = 0.0;
-            special = false;
-            popups = false;
-            popups_ignorealpha = 0.2;
-            input_methods = false;
-            input_methods_ignorealpha = 0.2;
+            contrast = 1.1;
+            brightness = 1.0;
+            vibrancy = 0.2;
+            vibrancy_darkness = 0.2;
+            special = true;
+            popups = true;
+            popups_ignorealpha = 0.6;
+            input_methods = true;
+            input_methods_ignorealpha = 0.6;
           };
 
           shadow = {
             enabled = true;
-            range = 4;
+            range = 12;
             render_power = 3;
             sharp = false;
             ignore_window = true;
-            color = lib.mkDefault "1a1a1aee";
+            color = lib.mkDefault "0xcc000000";
             # color_inactive = ""; # unset
-            offset = "0 0";
-            scale = 1.0;
+            offset = "0 8";
+            scale = 0.97;
           };
         };
 
@@ -147,30 +146,33 @@ in
           workspace_wraparound = false;
 
           bezier = [
-            "easeOutQuint,0.23,1,0.32,1"
-            "easeInOutCubic,0.65,0.05,0.36,1"
+            "fluent_decel,0.1, 1, 0, 1"
+            "easeOutCirc,0, 0.55, 0.45, 1"
+            "easeOutCubic,0.33, 1, 0.68, 1"
+            "easeInOutQuart,0.76, 0, 0.24, 1"
             "linear,0,0,1,1"
             "almostLinear,0.5,0.5,0.75,1.0"
             "quick,0.15,0,0.1,1"
           ];
 
           animation = [
-            "global, 1, 10, default"
-            "border, 1, 5.39, easeOutQuint"
-            "windows, 1, 4.79, easeOutQuint"
-            "windowsIn, 1, 4.1, easeOutQuint, popin 87%"
-            "windowsOut, 1, 1.49, linear, popin 87%"
-            "fadeIn, 1, 1.73, almostLinear"
-            "fadeOut, 1, 1.46, almostLinear"
-            "fade, 1, 3.03, quick"
-            "layers, 1, 3.81, easeOutQuint"
-            "layersIn, 1, 4, easeOutQuint, fade"
-            "layersOut, 1, 1.5, linear, fade"
-            "fadeLayersIn, 1, 1.79, almostLinear"
-            "fadeLayersOut, 1, 1.39, almostLinear"
-            "workspaces, 1, 1.94, almostLinear, fade"
-            "workspacesIn, 1, 1.21, almostLinear, fade"
-            "workspacesOut, 1, 1.94, almostLinear, fade"
+            "global, 1, 8, default"
+            "border, 1, 6, fluent_decel"
+            "borderangle, 1, 30, fluent_decel, once"
+            "windows, 1, 5, fluent_decel, popin 60%"
+            "windowsIn, 1, 5, fluent_decel, slide"
+            "windowsOut, 1, 4, easeInOutQuart, slide"
+            "windowsMove, 1, 4, fluent_decel, slide"
+            "fadeIn, 1, 3, easeOutCirc"
+            "fadeOut, 1, 3, easeOutCirc"
+            "fade, 1, 8, easeOutCirc"
+            "layers, 1, 4, easeOutCirc, fade"
+            "layersIn, 1, 4, easeOutCirc, slide"
+            "layersOut, 1, 4, easeOutCirc, slide"
+            "workspaces, 1, 4, easeOutCubic, slide"
+            "workspacesIn, 1, 4, easeOutCubic, slidefade 15%"
+            "workspacesOut, 1, 4, easeInOutQuart, slidefade 15%"
+            "specialWorkspace, 1, 3, easeOutCirc, slidevert"
           ];
         };
 
@@ -239,9 +241,9 @@ in
         };
 
         gestures = {
-          workspace_swipe = false;
-          workspace_swipe_fingers = 3;
-          workspace_swipe_min_fingers = false;
+          # workspace_swipe = false;
+          # workspace_swipe_fingers = 3;
+          # workspace_swipe_min_fingers = false;
           workspace_swipe_distance = 300;
           workspace_swipe_touch = false;
           workspace_swipe_invert = true;
@@ -265,19 +267,19 @@ in
           merge_floated_into_tiled_on_groupbar = false;
           group_on_movetoworkspace = false;
 
-          "col.border_active" = lib.mkDefault "0x66ffff00";
-          "col.border_inactive" = lib.mkDefault "0x66777700";
-          "col.border_locked_active" = lib.mkDefault "0x66ff5500";
-          "col.border_locked_inactive" = lib.mkDefault "0x66775500";
+          "col.border_active" = lib.mkDefault "rgba(ca9ee6ff)";
+          "col.border_inactive" = lib.mkDefault "0x66414559";
+          "col.border_locked_active" = lib.mkDefault "rgba(e78284ff)";
+          "col.border_locked_inactive" = lib.mkDefault "0x66626880";
 
           groupbar = {
             enabled = true;
             font_family = "";
-            font_size = 8;
+            font_size = 10;
             font_weight_active = "normal";
             font_weight_inactive = "normal";
             gradients = false;
-            height = 14;
+            height = 16;
             indicator_gap = 0;
             indicator_height = 3;
             stacked = false;
@@ -285,18 +287,18 @@ in
             render_titles = true;
             text_offset = 0;
             scrolling = true;
-            rounding = 1;
+            rounding = 6;
             gradient_rounding = 2;
             round_only_edges = true;
             gradient_round_only_edges = true;
-            text_color = lib.mkDefault "0xffffffff";
+            text_color = lib.mkDefault "0xffc6d0f5";
             # text_color_inactive = null; # unset
             # text_color_locked_active = null; # unset
             # text_color_locked_inactive = null; # unset
-            "col.active" = lib.mkDefault "0x66ffff00";
-            "col.inactive" = lib.mkDefault "0x66777700";
-            "col.locked_active" = lib.mkDefault "0x66ff5500";
-            "col.locked_inactive" = lib.mkDefault "0x66775500";
+            "col.active" = lib.mkDefault "0x80ca9ee6";
+            "col.inactive" = lib.mkDefault "0x80414559";
+            "col.locked_active" = lib.mkDefault "0x80e78284";
+            "col.locked_inactive" = lib.mkDefault "0x80626880";
             gaps_in = 2;
             gaps_out = 2;
             keep_upper_gap = true;
@@ -316,8 +318,8 @@ in
           key_press_enables_dpms = false;
           always_follow_on_dnd = true;
           layers_hog_keyboard_focus = true;
-          animate_manual_resizes = false;
-          animate_mouse_windowdragging = false;
+          animate_manual_resizes = true;
+          animate_mouse_windowdragging = true;
           disable_autoreload = false;
           enable_swallow = false;
           swallow_regex = "";
@@ -326,7 +328,7 @@ in
           mouse_move_focuses_monitor = true;
           allow_session_lock_restore = false;
           # session_lock_xray = false; # does not exist. Bug in documentation?
-          background_color = lib.mkDefault "0x111111";
+          background_color = lib.mkDefault "0x1e1e2e";
           close_special_on_empty = true;
           new_window_takes_over_fullscreen = 0;
           exit_window_retains_fullscreen = false;
@@ -431,23 +433,32 @@ in
 
         dwindle = {
           pseudotile = true;
-          force_split = 0;
+          force_split = 2;
           preserve_split = true;
-          smart_split = false;
+          smart_split = true;
           smart_resizing = true;
           permanent_direction_override = false;
-          special_scale_factor = 1;
+          special_scale_factor = 0.8;
           split_width_multiplier = 1.0;
           use_active_for_splits = true;
-          default_split_ratio = 1.0;
+          default_split_ratio = 1.618; # Golden ratio for elegant proportions
           split_bias = 0;
-          precise_mouse_move = false;
-          single_window_aspect_ratio = "0 0";
-          single_window_aspect_ratio_tolerance = 0.1;
+          precise_mouse_move = true;
+          single_window_aspect_ratio = "16 10";
+          single_window_aspect_ratio_tolerance = 0.15;
         };
 
         master = {
+          allow_small_split = true;
           new_status = "master";
+          new_on_active = "after";
+          new_on_top = false;
+          orientation = "left";
+          inherit_fullscreen = true;
+          smart_resizing = true;
+          drop_at_cursor = true;
+          mfact = 0.618; # Golden ratio for master area
+          special_scale_factor = 0.8;
         };
 
         device = {
@@ -541,9 +552,14 @@ in
           "$ws_3, monitor:DP-2, default:true"
           "$ws_4, monitor:DP-2, default:true"
 
+          # Smart workspace layouts
+          "$ws_1, layoutopt:orientation:left"
+          "$ws_2, layoutopt:orientation:top"
+          "$ws_3, layoutopt:orientation:right"
+          "$ws_4, layoutopt:orientation:center"
+
           "special:calculator s[true]"
           "special:passman s[true]"
-          "special:resourceman s[true]"
           "special:obsidian s[true]"
         ];
 
@@ -551,15 +567,81 @@ in
           "suppressevent maximize, class:.*"
           "nofocus,class:^$,title:^$,xwayland:1,floating:1,fullscreen:0,pinned:0"
 
+          ######## SMART TILING RULES ########
+          # Browsers - optimized for reading and productivity
+          "size 70% 100%, class:^(brave-browser)$"
+          "tile, class:^(brave-browser)$"
+          "group set always, class:^(brave-browser)$"
+          "size 70% 100%, class:^(firefox)$"
+          "tile, class:^(firefox)$"
+          "group set always, class:^(firefox)$"
+
+          # Chrome-based browsers
+          "size 70% 100%, class:^(google-chrome)$"
+          "tile, class:^(google-chrome)$"
+          "group set always, class:^(google-chrome)$"
+
+          # IDEs and editors - generous space for productivity
+          "size 80% 90%, class:^(code)$"
+          "tile, class:^(code)$"
+          "center, class:^(code)$"
+          "group set always, class:^(code)$"
+
+          "size 80% 90%, class:^(neovim)$"
+          "tile, class:^(neovim)$"
+          "group set always, class:^(neovim)$"
+
+          "size 85% 95%, class:^(jetbrains-.*)$"
+          "tile, class:^(jetbrains-.*)$"
+          "center, class:^(jetbrains-.*)$"
+
+          # Terminals - golden ratio proportions for elegance
+          "size 61.8% 70%, class:^(kitty)$"
+          "tile, class:^(kitty)$"
+          "size 61.8% 70%, class:^(foot)$"
+          "tile, class:^(foot)$"
+          "size 61.8% 70%, class:^(com.mitchellh.ghostty)$"
+          "tile, class:^(com.mitchellh.ghostty)$"
+          "size 61.8% 70%, class:^(alacritty)$"
+          "tile, class:^(alacritty)$"
+
+          # Media applications - center stage
+          "size 80% 80%, class:^(mpv)$"
+          "center, class:^(mpv)$"
+          "size 85% 85%, class:^(vlc)$"
+          "center, class:^(vlc)$"
+
+          # Communication apps - sidebar friendly
+          "size 30% 80%, class:^(discord)$"
+          "tile, class:^(discord)$"
+          "size 30% 80%, class:^(slack)$"
+          "tile, class:^(slack)$"
+          "size 35% 85%, class:^(teams)$"
+          "tile, class:^(teams)$"
+
+          # File managers - explorer layout
+          "size 65% 75%, class:^(thunar)$"
+          "tile, class:^(thunar)$"
+          "size 65% 75%, class:^(nautilus)$"
+          "tile, class:^(nautilus)$"
+          "size 65% 75%, class:^(dolphin)$"
+          "tile, class:^(dolphin)$"
+
+          # System utilities - compact and efficient
+          "size 50% 60%, class:^(htop)$"
+          "center, class:^(htop)$"
+          "size 55% 65%, class:^(btop)$"
+          "center, class:^(btop)$"
+
           ######## TAGS ########
-          "tag:+browser class:^(brave-browser)$"
-          "tag:+browser class:^(firefox)$"
+          # "tag:+browser class:^(brave-browser)$"
+          # "tag:+browser class:^(firefox)$"
 
-          "tag:+ide class:^(code)$"
+          # "tag:+ide class:^(code)$"
 
-          "tag:+term class:^(kitty)$"
-          "tag:+term class:^(foot)$"
-          "tag:+term class:^(com.mitchellh.ghostty)$"
+          # "tag:+term class:^(kitty)$"
+          # "tag:+term class:^(foot)$"
+          # "tag:+term class:^(com.mitchellh.ghostty)$"
 
           "float, class:(clipse)"
           "size 622 652, class:(clipse)"
@@ -584,7 +666,7 @@ in
           "workspace special:special:obsidian,class:($obsidian)"
           "size 622 652, class:($obsidian)"
 
-          "workspace name:ide tag:^ide$"
+          # "workspace name:ide tag:^ide$"
         ];
 
         exec-once = [
@@ -606,7 +688,7 @@ in
 
     home = {
       packages = with pkgs; [
-        rofi-wayland
+        rofi
         networkmanagerapplet
         brightnessctl
         playerctl

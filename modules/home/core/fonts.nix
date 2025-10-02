@@ -1,24 +1,21 @@
 {
-  pkgs,
   ...
 }:
 {
-  home.packages = with pkgs; [
-    fontconfig
-    nerd-fonts.intone-mono
-    nerd-fonts.ubuntu
-    nerd-fonts.ubuntu-mono
-    nerd-fonts.ubuntu-sans
-    nerd-fonts.liberation
-  ];
+  fonts = {
+    fontconfig = {
+      enable = true;
 
-  # fonts = {
-  #   fontconfig = {
-  #     enable = true;
-  #     defaultFonts = {
-  #       sansSerif = [ pkgs.nerd-fonts.ubuntu.name ];
-  #       monospace = [ pkgs.nerd-fonts.ubuntu-mono.name ];
-  #     };
-  #   };
-  # };
+      defaultFonts = {
+        emoji = [ "Noto Color Emoji" ];
+        serif = [ "Ubuntu Nerd Font" ];
+        sansSerif = [ "UbuntuSans Nerd Font" ];
+        monospace = [ "IntoneMono Nerd Font Mono" ];
+      };
+
+      hinting = "full";
+
+      subpixelRendering = "rgb";
+    };
+  };
 }

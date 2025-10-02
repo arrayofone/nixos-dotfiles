@@ -1,16 +1,36 @@
-{ pkgs, ... }:
+{ config, pkgs, ... }:
 {
   imports = [
     ./hardware-configuration.nix
-    # pkgs.fetchTarball awsVpnClient
   ];
+
+  nix = {
+    settings = {
+      auto-optimise-store = true;
+      experimental-features = "nix-command flakes";
+    };
+
+    gc = {
+      automatic = true;
+      dates = [ "05:00" ];
+    };
+  };
 
   networking.hostName = "baradur";
 
   boot = {
+    kernelPackages = pkgs.linuxPackages_latest;
+
     loader = {
-      systemd-boot.enable = true;
-      efi.canTouchEfiVariables = true;
+      efi = {
+        canTouchEfiVariables = true;
+        efiSysMountPoint = "/boot";
+      };
+
+      grub = {
+        efiSupport = true;
+        device = "nodev";
+      };
     };
   };
 
@@ -61,13 +81,27 @@
     programs.ethereum.geth.sepolia = {
       enable = false;
     };
-    networking = {
-      # headscale.enable = false;
-      # tailscale.enable = false;
-      wireguard.server = {
-        enable = false;
-        externalInterface = "enp42s0";
-      };
+
+    networking.wireguard.server = {
+      enable = true;
+      interface = "wg0";
+      externalInterface = "enp42s0";
+      port = "$(cat ${config.sops.secrets."vpn/wg/port".path})";
+      ips = [ "10.20.255.253/16" ];
+      privateKeyFile = config.sops.secrets."vpn/wg/privateKey".path;
+      routes = [
+        {
+          destination = "$(cat ${config.sops.secrets."vpn/wg/endpoint-ip".path})";
+          via = "10.10.10.1";
+          dev = "enp42s0";
+        }
+      ];
+      peers = [
+        {
+          publicKey = "4N2292pRHaViKm4TCSuDHa8x48ARn8tNZv1dSHWRuhA=";
+          endpoint = "wg.arrayof.one:443";
+        }
+      ];
     };
   };
 
@@ -98,14 +132,6 @@
   };
 
   hardware = { };
-
-  nix = {
-    settings.experimental-features = "nix-command flakes";
-    gc = {
-      automatic = true;
-      dates = "03:15";
-    };
-  };
 
   services = {
     pulseaudio = {
@@ -141,13 +167,14 @@
     };
 
     ollama = {
-      enable = true;
+      enable = false;
       acceleration = "cuda";
       loadModels = [
         "deepseek-r1"
         "incept5/llama3.1-claude"
       ];
     };
+
     open-webui.enable = false;
     vsftpd = {
       # allowWriteableChroot

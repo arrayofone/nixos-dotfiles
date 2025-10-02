@@ -34,16 +34,16 @@ in
           # dynamic width from 0 to 300
           # width = (0, 300)
           # constant width of 300
-          width = 300;
+          width = 380;
 
           # The maximum height of a single notification, excluding the frame.
-          height = 300;
+          height = 120;
 
           # Position the notification in the top right corner
           origin = "top-right";
 
           # Offset from the origin
-          offset = "20x20";
+          offset = "15x15";
 
           # Scale factor. It is auto-detected if value is 0.
           scale = 0;
@@ -59,22 +59,22 @@ in
 
           # Set the progress bar height. This includes the frame, so make sure
           # it's at least twice as big as the frame width.
-          progress_bar_height = 10;
+          progress_bar_height = 8;
 
           # Set the frame width of the progress bar
           progress_bar_frame_width = 0;
 
           # Set the minimum width for the progress bar
-          progress_bar_min_width = 125;
+          progress_bar_min_width = 150;
 
           # Set the maximum width for the progress bar
-          progress_bar_max_width = 250;
+          progress_bar_max_width = 300;
 
           # Corner radius for the progress bar. 0 disables rounded corners.
-          progress_bar_corner_radius = 4;
+          progress_bar_corner_radius = 6;
 
           # Corner radius for the icon image.
-          icon_corner_radius = 5;
+          icon_corner_radius = 8;
 
           # Show how many messages are currently hidden (because of
           # notification_limit).
@@ -83,35 +83,35 @@ in
           # The transparency of the window.  Range: [0; 100].
           # This option will only work if a compositing window manager is
           # present (e.g. xcompmgr, compiz, etc.). (X11 only)
-          transparency = 10;
+          transparency = 5;
 
           # Draw a line of "separator_height" pixel height between two
           # notifications.
           # Set to 0 to disable.
           # If gap_size is greater than 0, this setting will be ignored.
-          separator_height = 2;
+          separator_height = 0;
 
           # Padding between text and separator.
-          padding = 8;
+          padding = 12;
 
           # Horizontal padding.
-          horizontal_padding = 8;
+          horizontal_padding = 16;
 
           # Padding between text and icon.
-          text_icon_padding = 10;
+          text_icon_padding = 12;
 
           # Defines width in pixels of frame around the notification window.
           # Set to 0 to disable.
-          frame_width = 3;
+          frame_width = 2;
 
           # Defines color of the frame around the notification window.
-          frame_color = "#eba0ac";
+          frame_color = "#ca9ee6";
 
           # Size of gap to display between notifications - requires a compositor.
           # If value is greater than 0, separator_height will be ignored and a border
           # of size frame_width will be drawn around each notification instead.
           # Click events on gaps do not currently propagate to applications below.
-          gap_size = 5;
+          gap_size = 8;
 
           # Define a color for the separator.
           # possible values are:
@@ -173,7 +173,7 @@ in
           #   %n  progress value if set without any extra characters
           #   %%  Literal %
           # Markup is allowed
-          format = "☁️ %a\n<b>♥︎ %s</b>\n%b";
+          format = "<span size='x-small' alpha='70%' weight='normal'>%a</span>\n<span size='medium' weight='bold'>%s</span>\n<span size='small' alpha='90%'>%b</span>";
 
           # Alignment of message text.
           # Possible values are "left", "center" and "right".
@@ -211,9 +211,9 @@ in
           #enable_recursive_icon_lookup = true
 
           # Set icon theme (only used for recursive icon lookup)
-          #icon_theme = Adwaita
+          # icon_theme = Adwaita
           # You can also set multiple icon themes, with the leftmost one being used first.
-          icon_theme = "Tela-circle-dracula";
+          icon_theme = "Papirus-Dark";
 
           # Align icons left/right/top/off
           icon_position = "left";
@@ -227,7 +227,7 @@ in
           max_icon_size = 64;
 
           # Paths to default icons (only neccesary when not using recursive icon lookup)
-          icon_path = "/usr/share/icons/Tela-circle-dracula/16/actions:/usr/share/icons/Tela-circle-dracula/16/apps:/usr/share/icons/Tela-circle-dracula/16/devices:/usr/share/icons/Tela-circle-dracula/16/mimetypes:/usr/share/icons/Tela-circle-dracula/16/panel:/usr/share/icons/Tela-circle-dracula/16/places:/usr/share/icons/Tela-circle-dracula/16/status";
+          icon_path = "/usr/share/icons/Papirus-Dark/16x16/actions:/usr/share/icons/Papirus-Dark/16x16/apps:/usr/share/icons/Papirus-Dark/16x16/devices:/usr/share/icons/Papirus-Dark/16x16/mimetypes:/usr/share/icons/Papirus-Dark/16x16/panel:/usr/share/icons/Papirus-Dark/16x16/places:/usr/share/icons/Papirus-Dark/16x16/status";
 
           ### History ###
 
@@ -260,7 +260,7 @@ in
           # corners.
           # The radius will be automatically lowered if it exceeds half of the
           # notification height to avoid clipping text and/or icons.
-          corner_radius = 10;
+          corner_radius = 12;
 
           # Ignore the dbus closeNotification message.
           # Useful to enforce the timeout set by dunst configuration. Without this
@@ -312,40 +312,58 @@ in
         experimental = {
           per_monitor_dpi = false;
         };
-        urgency_low = {
-          # background = "#32302f";
-          # foreground = "#ebdbb2";
-          # frame_color = "#689d6a";
-          icon = config.home.homeDirectory + "/.config/dunst/icons/low.svg";
-          timeout = 5;
-        };
-        urgency_normal = {
-          # background = "#32302f";
-          # foreground = "#ebdbb2";
-          # frame_color = "#458588";
-          icon = config.home.homeDirectory + "/.config/dunst/icons/normal.svg";
-          timeout = 5;
-        };
-        urgency_critical = {
-          # background = "#32302f";
-          # foreground = "#ebdbb2";
-          # frame_color = "#cc241d";
-          icon = config.home.homeDirectory + "/.config/dunst/icons/critical.svg";
-          timeout = 0;
-        };
+        # urgency_low = {
+        #   background = "#313244";
+        #   foreground = "#c6d0f5";
+        #   frame_color = "#a6e3a1";
+        #   icon = config.home.homeDirectory + "/.config/dunst/icons/low.svg";
+        #   timeout = 8;
+        # };
+        # urgency_normal = {
+        #   background = "#1e1e2e";
+        #   foreground = "#c6d0f5";
+        #   frame_color = "#89b4fa";
+        #   icon = config.home.homeDirectory + "/.config/dunst/icons/normal.svg";
+        #   timeout = 10;
+        # };
+        # urgency_critical = {
+        #   background = "#1e1e2e";
+        #   foreground = "#f38ba8";
+        #   frame_color = "#e78284";
+        #   icon = config.home.homeDirectory + "/.config/dunst/icons/critical.svg";
+        #   timeout = 0;
+        # };
         volume-control = {
           summary = "volctl";
-          format = "\"<span size=\"250%\">%a</span>\n%b\"";
+          format = "\"<span size='large' weight='bold' foreground='#fab387'>󰕾</span> <b>%s</b>\n<span size='small'>%b</span>\"";
+          frame_color = "#fab387";
+          timeout = 3;
         };
 
         brightness-control = {
           summary = "brightctl";
-          format = "\"<span size=\"250%\">%a</span>\n%b\"";
+          format = "\"<span size='large' weight='bold' foreground='#f9e2af'>󰃟</span> <b>%s</b>\n<span size='small'>%b</span>\"";
+          frame_color = "#f9e2af";
+          timeout = 3;
         };
 
         theme-switch = {
           summary = "theme";
-          format = "<b>%a</b>";
+          format = "\"<span size='large' weight='bold' foreground='#cba6f7'>󰐱</span> <b>%s</b>\n<span size='small'>%b</span>\"";
+          frame_color = "#cba6f7";
+          timeout = 5;
+        };
+
+        network = {
+          summary = "*Network*";
+          format = "\"<span size='large' weight='bold' foreground='#89b4fa'>󰖩</span> <b>%s</b>\n<span size='small'>%b</span>\"";
+          frame_color = "#89b4fa";
+        };
+
+        battery = {
+          summary = "*Battery*";
+          format = "\"<span size='large' weight='bold' foreground='#a6e3a1'>󰁹</span> <b>%s</b>\n<span size='small'>%b</span>\"";
+          frame_color = "#a6e3a1";
         };
       };
     };
