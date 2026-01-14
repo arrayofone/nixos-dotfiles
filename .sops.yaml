@@ -3,6 +3,8 @@ keys:
   - &baradur age1fe2alznmwldqrnlx09n4e7hfc3kflm2h9lmgem54kcadze5kp53qjuyrqy
   - &db age19r87m08mt03zg8ustzlx733s4m4wph6vvkd0qxlequfje5k0mawsy68vp2
   - &dbook age126t4jjumls89dfl83cx3lvukhwad5nte38zeq5uue4m39ex9kfeqtw4r2v
+  - &mingabook age14ejy4tppggtacyzxfhtnagqhtr60zyf6l6euh5vxlf8uh9vcef3s2clada
+  - &darrenbangsund age1fyndjw4ucc39hh2kyuxth2pyevl2h5zh9lmfq7v9h8neq9csnc9qrcm4zq
 creation_rules:
   - path_regex: secrets/arrayofone.yaml$
     key_groups:
@@ -20,3 +22,11 @@ creation_rules:
     key_groups:
       - age:
           - *dbook
+  - path_regex: secrets/mingabook.yaml$
+    key_groups:
+      - age:
+          - *mingabook
+  - path_regex: secrets/darrenbangsund.yaml$
+    key_groups:
+      - age:
+          - *darrenbangsund

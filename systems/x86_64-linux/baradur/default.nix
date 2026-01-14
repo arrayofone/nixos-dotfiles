@@ -115,25 +115,20 @@
   };
 
   environment = {
-    systemPackages =
-      with pkgs;
-      [
-        dconf
-        libqalculate
-        mdadm
-        pciutils
-        proton-pass
-        qalculate-gtk
-        shotman
-        usbutils
-        libsecret
-        gimp
-        cherry-studio
-        nvitop
-      ]
-      ++ [
-        pkgs.${namespace}.sys
-      ];
+    systemPackages = with pkgs; [
+      dconf
+      libqalculate
+      mdadm
+      pciutils
+      proton-pass
+      qalculate-gtk
+      shotman
+      usbutils
+      libsecret
+      gimp
+      cherry-studio
+      nvitop
+    ];
 
     sessionVariables = {
       DEFAULT_BROWSER = "${pkgs.firefox}/bin/firefox"; # Set default browser

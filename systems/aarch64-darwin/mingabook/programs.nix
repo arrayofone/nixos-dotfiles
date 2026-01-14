@@ -2,12 +2,12 @@
 {
   programs = {
     _1password = {
-      enable = true;
+      enable = false;
       package = pkgs._1password-cli;
     };
 
     _1password-gui = {
-      enable = true;
+      enable = false;
       package = pkgs._1password-gui;
     };
 
@@ -87,30 +87,12 @@
     };
 
     vim = {
-      enable = false;
+      enable = true;
       enableSensible = true;
       extraKnownPlugins = { };
       plugins = [ ];
       vimConfig = "";
       vimOptions = { };
     };
-
-    # zsh = {
-    #   enable = true;
-    #   enableAutosuggestions = false;
-    #   enableBashCompletion = false;
-    #   enableCompletion = false;
-    #   enableFastSyntaxHighlighting = false;
-    #   enableFzfCompletion = false;
-    #   enableFzfGit = false;
-    #   enableFzfHistory = false;
-    #   enableGlobalCompInit = false;
-    #   enableSyntaxHighlighting = false;
-    #   interactiveShellInit = "";
-    #   loginShellInit = "";
-    #   promptInit = "";
-    #   shellInit = "";
-    #   variables = { };
-    # };
   };
 }

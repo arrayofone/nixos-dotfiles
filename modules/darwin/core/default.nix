@@ -9,9 +9,8 @@
   imports = [
     # ./dock.nix
     # ./fonts.nix
-    ./homebrew.nix
-    ./programs.nix
-    ./secrets.nix
+    # ./homebrew.nix
+    # ./secrets.nix
   ];
 
   options.${namespace}.system.name = lib.mkOption {

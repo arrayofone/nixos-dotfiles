@@ -28,4 +28,8 @@ stdenv.mkDerivation {
     ln -s $out/lib/kotlin-lsp.sh $out/bin/kotlin-lsp
     wrapProgram $out/bin/kotlin-lsp
   '';
+
+  meta = {
+    mainProgram = "kotlin-lsp";
+  };
 }

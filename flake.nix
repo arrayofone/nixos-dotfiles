@@ -153,5 +153,46 @@
           };
         }
       ];
+
+      systems.hosts.mingabook.modules = with inputs; [
+        #   # An existing Linux builder is needed to initially bootstrap `nix-rosetta-builder`.
+        #   # If one isn't already available: comment out the `nix-rosetta-builder` module below,
+        #   # uncomment this `linux-builder` module, and run `darwin-rebuild switch`:
+        # { nix.linux-builder.enable = true; }
+        #   # Then: uncomment `nix-rosetta-builder`, remove `linux-builder`, and `darwin-rebuild switch`
+        #   # a second time. Subsequently, `nix-rosetta-builder` can rebuild itself.
+        nix-rosetta-builder.darwinModules.default
+        {
+          nix-rosetta-builder.enable = true;
+          # see available options in module.nix's `options.nix-rosetta-builder`
+          nix-rosetta-builder.onDemand = true;
+        }
+        nix-homebrew.darwinModules.nix-homebrew
+        {
+          nix-homebrew = {
+            # Install Homebrew under the default prefix
+            enable = true;
+
+            # Apple Silicon Only: Also install Homebrew under the default Intel prefix for Rosetta 2
+            enableRosetta = true;
+
+            # User owning the Homebrew prefix
+            user = "darrenbangsund";
+
+            # Optional: Declarative tap management
+            taps = {
+              # "oven-sh/bun" = homebrew-bun;
+              "oven-sh/homebrew-bun" = homebrew-bun;
+              "homebrew/homebrew-core" = homebrew-core;
+              "homebrew/homebrew-cask" = homebrew-cask;
+            };
+
+            # Optional: Enable fully-declarative tap management
+            #
+            # With mutableTaps disabled, taps can no longer be added imperatively with `brew tap`.
+            mutableTaps = false;
+          };
+        }
+      ];
     };
 }

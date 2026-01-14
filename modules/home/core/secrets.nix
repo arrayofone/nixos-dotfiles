@@ -34,9 +34,8 @@ in
     };
   };
 
-  programs.zsh.initContent = ''
-    export GEMINI_API_KEY="$(cat ${config.sops.secrets."ai/gemini/api-key".path})"
-  '';
+  # export GEMINI_API_KEY="$(cat ${config.sops.secrets."ai/gemini/api-key".path})"
+  programs.zsh.initContent = "";
 
   systemd.user.services.mbsync.unitConfig.After = [ "sops-nix.service" ];
 }

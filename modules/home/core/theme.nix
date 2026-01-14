@@ -44,18 +44,18 @@
       };
 
       sansSerif = {
-        name = "UbuntuSans Nerd Font";
-        package = lib.mkDefault pkgs.nerd-fonts.ubuntu-sans;
+        name = "Ubuntu";
+        package = pkgs.ubuntu-classic;
       };
 
       serif = {
-        name = "Ubuntu Nerd Font";
-        package = lib.mkDefault pkgs.nerd-fonts.ubuntu;
+        name = "Ubuntu";
+        package = pkgs.ubuntu-classic;
       };
 
       emoji = {
         name = "Noto Color Emoji";
-        package = lib.mkDefault pkgs.noto-fonts-color-emoji;
+        package = pkgs.noto-fonts-color-emoji;
       };
 
       sizes = {

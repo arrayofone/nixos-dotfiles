@@ -154,48 +154,40 @@ tasks:
   # SECRETS MANAGEMENT
   # =============================================================================
 
-  secrets:edit:
-    desc: "Edit secrets file with SOPS"
+  secrets:init:
+    desc: "Initialize secrets keys and files for the current host and user"
     cmds:
-      - sops {{.FLAKE_DIR}}/secrets/fellowship.yaml
+      - scripts/init-secrets.sh
 
-  secrets:decrypt:
-    desc: "Decrypt and show secrets"
+  secrets:edit:system:
+    desc: "Edit system secrets (secrets/$(hostname).yaml)"
     cmds:
-      - sops -d {{.FLAKE_DIR}}/secrets/fellowship.yaml
+      - scripts/manage-secrets.sh edit system
 
-  secrets:encrypt:
-    desc: "Re-encrypt secrets with current keys"
+  secrets:edit:user:
+    desc: "Edit user secrets (secrets/$(whoami).yaml)"
     cmds:
-      - sops updatekeys {{.FLAKE_DIR}}/secrets/fellowship.yaml
+      - scripts/manage-secrets.sh edit user
 
-  sops:user:ssh-gen-private:
+  secrets:encrypt:system:
+    desc: "Re-encrypt system secrets"
     cmds:
-      - nix run nixpkgs#ssh-to-age -- -private-key -i ~/.ssh/sops-nix > ~/.config/sops/age/keys.txt
+      - scripts/manage-secrets.sh encrypt system
 
-  sops:user:gen-public:
+  secrets:encrypt:user:
+    desc: "Re-encrypt user secrets"
     cmds:
-      - nix run nixpkgs#age-keygen -y ~/.config/sops/age/keys.txt
+      - scripts/manage-secrets.sh encrypt user
 
-  sops:system:ssh-gen-private:
+  secrets:decrypt:system:
+    desc: "Decrypt and show system secrets"
     cmds:
-      - ssh-keygen -A
-      - mkdir -p /var/lib/sops-nix
-      # - rm -rf /var/lib/sops-nix/key.txt
-      # - touch /var/lib/sops-nix/key.txt
-      - nix run nixpkgs#ssh-to-age -- -private-key -i /etc/ssh/ssh_host_ed25519_key > /var/lib/sops-nix/key.txt
+      - scripts/manage-secrets.sh decrypt system
 
-  sops:system:gen-public:
+  secrets:decrypt:user:
+    desc: "Decrypt and show user secrets"
     cmds:
-      - nix shell nixpkgs#age -c age-keygen -y /var/lib/sops-nix/key.txt
-
-  age:keygen:
-    desc: "Generate new age key"
-    cmds:
-      - mkdir -p ~/.config/age
-      - age-keygen -o ~/.config/age/keys.txt
-      - echo "Public key:"
-      - age-keygen -y ~/.config/age/keys.txt
+      - scripts/manage-secrets.sh decrypt user
 
   # =============================================================================
   # MAINTENANCE & CLEANUP

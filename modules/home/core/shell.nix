@@ -26,7 +26,7 @@
         golang = {
           symbol = "";
           style = "bg:#212736";
-          format = ''[[ $symbol ($version) ](fg:#769ff0 bg:#212736)]($style)'';
+          format = "[[ $symbol ($version) ](fg:#769ff0 bg:#212736)]($style)";
         };
       };
     };
@@ -53,7 +53,7 @@
       # defaultKeymap
       # dirHashes
       dotDir = config.home.homeDirectory + "/.config/zsh";
-      envExtra = '''';
+      envExtra = "";
       history = {
         append = true;
         expireDuplicatesFirst = true;
@@ -71,8 +71,8 @@
       };
       historySubstringSearch = {
         enable = true;
-        searchDownKey = "$key[Down]";
-        searchUpKey = "$key[Up]";
+        # searchDownKey = "$key[Down]";
+        # searchUpKey = "$key[Up]";
       };
       # initcontent
       # export LANG=C.UTF-8

@@ -1,9 +1,7 @@
 {
-  inputs,
   lib,
   namespace,
   pkgs,
-  system,
   ...
 }:
 {

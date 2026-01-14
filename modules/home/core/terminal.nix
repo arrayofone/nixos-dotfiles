@@ -5,8 +5,8 @@
 {
   programs = {
     alacritty.enable = true;
-    foot.enable = true;
-    ghostty.enable = true;
+    foot.enable = false;
+    ghostty.enable = false;
     kitty.enable = true;
   };
 
