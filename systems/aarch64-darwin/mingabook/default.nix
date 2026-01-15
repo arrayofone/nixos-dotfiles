@@ -16,6 +16,11 @@
     stateVersion = 6;
   };
 
+  fellowship.home.programs.zeditor = {
+    nodePath = lib.getExe pkgs.nodejs_21;
+    npmPath = lib.getExe' pkgs.nodejs_21 "npm";
+  };
+
   environment.systemPackages = with pkgs; [
     mkcert
     nodejs_21
