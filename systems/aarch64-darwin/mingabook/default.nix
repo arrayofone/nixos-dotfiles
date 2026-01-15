@@ -1,4 +1,4 @@
-{ ... }:
+{ lib, pkgs, ... }:
 {
   imports = [
     ./homebrew.nix
@@ -16,32 +16,26 @@
     stateVersion = 6;
   };
 
+  environment.systemPackages = with pkgs; [
+    mkcert
+    nodejs_21
+    pnpm
+    python310
+  ];
+
   homebrew = {
     taps = [ ];
     brews = [
-      "bun@1.2.7"
-      "gettext"
-      "ghostscript"
       "git-lfs"
-      "protoc-gen-grpc-web"
       "tmux"
     ];
     casks = [
       "arc"
-      "brave-browser"
       "chromium"
-      "cursor"
-      "datagrip"
-      "dbeaver-community"
       "discord"
       "firefox"
       "ghostty"
-      "gimp"
-      "goland"
       "google-chrome"
-      "hiddenbar"
-      "insomnia"
-      "intellij-idea"
       "istat-menus"
       "linear-linear"
       "messenger"
@@ -52,8 +46,6 @@
       "proton-pass"
       "slack"
       "spotify"
-      "telegram"
-      "visual-studio-code"
       "whatsapp"
       "zen"
     ];

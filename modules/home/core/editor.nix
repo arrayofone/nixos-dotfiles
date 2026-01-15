@@ -368,8 +368,8 @@
         };
 
         node = {
-          path = lib.getExe pkgs.nodejs;
-          npm_path = lib.getExe' pkgs.nodejs "npm";
+          path = "/run/current-system/sw/bin/node";
+          npm_path = "/run/current-system/sw/bin/npm";
         };
 
         hour_format = "hour24";

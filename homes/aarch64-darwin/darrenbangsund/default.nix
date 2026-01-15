@@ -1,6 +1,6 @@
 { ... }:
 {
-  fellowship.home.dev.enable = true;
+  fellowship.home.dev.enable = false;
 
   programs.zsh.envExtra = ''
     neofetch

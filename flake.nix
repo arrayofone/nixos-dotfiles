@@ -140,7 +140,6 @@
 
             # Optional: Declarative tap management
             taps = {
-              # "oven-sh/bun" = homebrew-bun;
               "oven-sh/homebrew-bun" = homebrew-bun;
               "homebrew/homebrew-core" = homebrew-core;
               "homebrew/homebrew-cask" = homebrew-cask;
@@ -181,7 +180,6 @@
 
             # Optional: Declarative tap management
             taps = {
-              # "oven-sh/bun" = homebrew-bun;
               "oven-sh/homebrew-bun" = homebrew-bun;
               "homebrew/homebrew-core" = homebrew-core;
               "homebrew/homebrew-cask" = homebrew-cask;

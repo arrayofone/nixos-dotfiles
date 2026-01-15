@@ -18,6 +18,7 @@ fi
 HOST_NAME=$(hostname)
 USER_NAME=$(whoami)
 SECRETS_DIR="secrets"
+USER_AGE_KEY="/Users/$USER_NAME/.config/sops/age/keys.txt"
 SYSTEM_AGE_KEY="/var/lib/sops-nix/key.txt"
 
 if [ "$SCOPE" == "system" ]; then
@@ -41,14 +42,14 @@ execute_sops() {
     sops_bin=$(command -v sops)
 
     # Try as user first
-    if "$sops_bin" "$@"; then
+    if SOPS_AGE_KEY_FILE="$USER_AGE_KEY" "$sops_bin" "$@"; then
         return 0
     fi
 
     # If failed and scope is system, try with system key via sudo
     if [ "$SCOPE" == "system" ]; then
         echo "User access failed. Attempting with system key (requires sudo)..." >&2
-        
+
         if [ ! -f "$SYSTEM_AGE_KEY" ]; then
             echo "System age key not found at $SYSTEM_AGE_KEY. Cannot fallback." >&2
             return 1
@@ -58,7 +59,7 @@ execute_sops() {
         sudo SOPS_AGE_KEY_FILE="$SYSTEM_AGE_KEY" "$sops_bin" "$@"
         return $?
     fi
-    
+
     return 1
 }
 
@@ -76,8 +77,8 @@ case $ACTION in
         execute_sops -e -i "$TARGET_FILE"
         ;;
     decrypt)
-        echo "Decrypting $TARGET_FILE..."
-        execute_sops -d "$TARGET_FILE"
+        echo "Decrypting (in-place) $TARGET_FILE..."
+        execute_sops -d -i "$TARGET_FILE"
         ;;
     *)
         echo "Error: Action must be 'edit', 'encrypt', or 'decrypt'"

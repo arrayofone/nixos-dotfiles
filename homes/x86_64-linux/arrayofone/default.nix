@@ -50,7 +50,6 @@ in
     packages = with pkgs; [
       clipse
       fontconfig
-      nixd
       pinentry-curses
     ];
 

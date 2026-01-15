@@ -45,6 +45,7 @@
       neofetch
       neovim
       netcat
+      nixd
       openssl
       protols
       ripgrep
