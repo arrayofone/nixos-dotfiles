@@ -1,11 +1,28 @@
 {
+  config,
   lib,
   namespace,
   pkgs,
   ...
 }:
+let
+  cfg = config.${namespace}.home.programs.zeditor;
+in
 {
-  programs.zed-editor = {
+  options.${namespace}.home.programs.zeditor = {
+    nodePath = lib.mkOption {
+      type = lib.types.str;
+      default = "/run/current-system/sw/bin/node";
+      description = "Path to node executable for Zed";
+    };
+    npmPath = lib.mkOption {
+      type = lib.types.str;
+      default = "/run/current-system/sw/bin/npm";
+      description = "Path to npm executable for Zed";
+    };
+  };
+
+  config.programs.zed-editor = {
     enable = true;
     package = pkgs.zed-editor;
     installRemoteServer = true;
@@ -585,8 +602,8 @@
 
       # Node.js Configuration
       node = {
-        path = lib.getExe pkgs.nodejs;
-        npm_path = lib.getExe' pkgs.nodejs "npm";
+        path = cfg.nodePath;
+        npm_path = cfg.npmPath;
       };
 
       # Language-specific Settings
