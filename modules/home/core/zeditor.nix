@@ -1,28 +1,11 @@
 {
-  config,
   lib,
   namespace,
   pkgs,
   ...
 }:
-let
-  cfg = config.${namespace}.home.programs.zeditor;
-in
 {
-  options.${namespace}.home.programs.zeditor = {
-    nodePath = lib.mkOption {
-      type = lib.types.str;
-      default = "/run/current-system/sw/bin/node";
-      description = "Path to node executable for Zed";
-    };
-    npmPath = lib.mkOption {
-      type = lib.types.str;
-      default = "/run/current-system/sw/bin/npm";
-      description = "Path to npm executable for Zed";
-    };
-  };
-
-  config.programs.zed-editor = {
+  programs.zed-editor = {
     enable = true;
     package = pkgs.zed-editor;
     installRemoteServer = true;
@@ -446,14 +429,14 @@ in
         inactive_opacity = 1;
       };
       bottom_dock_layout = "contained";
-      agent_font_size = null;
+      # agent_font_size = null;
       allow_rewrap = "in_comments";
       auto_indent = true;
       auto_indent_on_paste = true;
       auto_install_extensions = {
         html = true;
       };
-      auto_update_extensions = null;
+      auto_update_extensions = { };
       autosave = "off";
       autoscroll_on_clicks = false;
       auto_signature_help = false;
@@ -517,10 +500,10 @@ in
         };
       };
       minimap = {
-        show = "never";
+        show = "always";
         thumb = "always";
         thumb_border = "left_open";
-        current_line_highlight = null;
+        current_line_highlight = "line";
       };
       tab_bar = {
         show = true;
@@ -557,15 +540,20 @@ in
       expand_excerpt_lines = 5;
       excerpt_context_lines = 2;
       extend_comment_on_newline = true;
-      extend_list_on_newline = true;
-      indent_list_on_tab = true;
+      # extend_list_on_newline = true;
+      # indent_list_on_tab = true;
       status_bar = {
         active_language_button = true;
         cursor_position_button = true;
         line_endings_button = false;
-        active_encoding_button = "non_utf8";
+        # active_encoding_button = "non_utf8";
       };
       lsp = {
+        biome = {
+          settings = {
+            require_config_file = true;
+          };
+        };
         jdtls = {
           binary = {
             path = lib.getExe pkgs.jdt-language-server;
@@ -741,9 +729,9 @@ in
           min_column = 0;
           max_severity = null;
         };
-        update_with_cursor = false;
-        primary_only = false;
-        use_rendered = false;
+        # update_with_cursor = false;
+        # primary_only = false;
+        # use_rendered = false;
       };
       git = {
         git_gutter = "tracked_files";
@@ -799,15 +787,29 @@ in
           tab_size = 2;
           enable_language_server = true;
           hard_tabs = false;
+          formatter = {
+            language_server = {
+              name = "biome";
+            };
+          };
           language_servers = [
             "!eslint"
             "biome"
           ];
+          code_actions_on_format = {
+            "source.fixAll.biome" = true;
+            "source.organizeImports.biome" = true;
+          };
         };
         TypeScript = {
           tab_size = 2;
           hard_tabs = false;
           enable_language_server = true;
+          formatter = {
+            language_server = {
+              name = "biome";
+            };
+          };
           language_servers = [
             "!eslint"
             "!graphql"
@@ -816,10 +818,54 @@ in
             "biome"
             "..."
           ];
+          code_actions_on_format = {
+            "source.fixAll.biome" = true;
+            "source.organizeImports.biome" = true;
+          };
+        };
+        TSX = {
+          formatter = {
+            language_server = {
+              name = "biome";
+            };
+          };
+          code_actions_on_format = {
+            "source.fixAll.biome" = true;
+            "source.organizeImports.biome" = true;
+          };
         };
         JSON = {
           tab_size = 2;
           hard_tabs = false;
+          formatter = {
+            language_server = {
+              name = "biome";
+            };
+          };
+          code_actions_on_format = {
+            "source.fixAll.biome" = true;
+          };
+        };
+        JSONC = {
+          formatter = {
+            language_server = {
+              name = "biome";
+            };
+          };
+        };
+        CSS = {
+          formatter = {
+            language_server = {
+              name = "biome";
+            };
+          };
+        };
+        GraphQL = {
+          formatter = {
+            language_server = {
+              name = "biome";
+            };
+          };
         };
         Nix = {
           tab_size = 4;
@@ -859,14 +905,14 @@ in
       };
       line_indicator_format = "short";
       linked_edits = true;
-      lsp_document_colors = true;
+      lsp_document_colors = "border";
       max_tabs = null;
       middle_click_paste = true;
       multi_cursor_modifier = "alt";
       node = {
         ignore_system_version = true;
-        path = cfg.nodePath;
-        npm_path = cfg.npmPath;
+        path = lib.getExe pkgs.nodejs_22;
+        npm_path = lib.getExe' pkgs.nodejs_22 "npm";
       };
       proxy = null;
       on_last_window_closed = "platform_default";
@@ -896,7 +942,7 @@ in
         "**/*.crt"
         "**/secrets.yml"
       ];
-      projects_online_by_default = true;
+      # projects_online_by_default = true;
       read_ssh_config = true;
       redact_private_values = false;
       relative_line_numbers = "disabled";
@@ -993,7 +1039,26 @@ in
         };
         path_hyperlink_regexes = [
           "File \"(?<path>[^\"]+)\", line (?<line>[0-9]+)"
-          "(?x) # optionally starts with 0-2 opening prefix symbols [({\\[<]{0,2} # which may be followed by an opening quote (?<quote>["`])? # `path` is the shortest sequence of any non-space character (?<link>(?<path>[^ ]+? # which may end with a line and optionally a column, (?<line_column>:+[0-9]+(:[0-9]+)?|:?\([0-9]+([,:][0-9]+)?\))? )) # which must be followed by a matching quote (?(<quote>)\\k<quote>) # and optionally a single closing symbol [)}\\]>]? # if line/column matched, may be followed by a description (?(<line_column>):[^ 0-9][^ ]*)? # which may be followed by trailing punctuation [.,:)}\\]>]* # and always includes trailing whitespace or end of line ([ ]+|$)"
+          "(?x)"
+          "# optionally starts with 0-2 opening prefix symbols"
+          "[({\\[<]{0,2}"
+          "# which may be followed by an opening quote"
+          "(?<quote>[\"'`])?"
+          "# `path` is the shortest sequence of any non-space character"
+          "(?<link>(?<path>[^ ]+?"
+          "    # which may end with a line and optionally a column,"
+          "    (?<line_column>:+[0-9]+(:[0-9]+)?|:?\\([0-9]+([,:][0-9]+)?\\))?"
+          "))"
+          "# which must be followed by a matching quote"
+          "(?(<quote>)\\k<quote>)"
+          "# and optionally a single closing symbol"
+          "[)}\\]>]?"
+          "# if line/column matched, may be followed by a description"
+          "(?(<line_column>):[^ 0-9][^ ]*)?"
+          "# which may be followed by trailing punctuation"
+          "[.,:)}\\]>]*"
+          "# and always includes trailing whitespace or end of line"
+          "([ ]+|$)"
         ];
         path_hyperlink_timeout_ms = 1;
       };
@@ -1001,7 +1066,7 @@ in
         max_columns = 128;
         max_lines = 32;
       };
-      text_rendering_mode = "platform_default";
+      # text_rendering_mode = "platform_default";
       theme = {
         mode = "system";
         dark = "Palenight Theme";
@@ -1103,7 +1168,12 @@ in
       ui_font_fallbacks = null;
       ui_font_size = 12;
       ui_font_weight = 400;
-      agent = { };
+      agent = {
+        default_model = {
+          provider = "anthropic";
+          model = "claude-4-sonnet";
+        };
+      };
       notification_panel = {
         button = true;
         dock = "bottom";

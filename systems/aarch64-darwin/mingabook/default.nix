@@ -16,27 +16,30 @@
     stateVersion = 6;
   };
 
-  fellowship.home.programs.zeditor = {
-    nodePath = lib.getExe pkgs.nodejs_21;
-    npmPath = lib.getExe' pkgs.nodejs_21 "npm";
-  };
-
   environment.systemPackages = with pkgs; [
     mkcert
-    nodejs_21
+    nodejs_20
     pnpm
     python310
+    raycast
   ];
+
+  # TODO: THIS
+  services.aerospace = {
+    enable = false;
+  };
 
   homebrew = {
     taps = [ ];
     brews = [
       "git-lfs"
+      "nvm"
       "tmux"
     ];
     casks = [
       "arc"
       "chromium"
+      "dbeaver-community"
       "discord"
       "firefox"
       "ghostty"
