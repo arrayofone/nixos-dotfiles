@@ -7,7 +7,6 @@
 }:
 let
   cfg = config.${namespace}.home.programs.zeditor;
-  settings = builtins.fromJSON (builtins.readFile ./zed-settings.json);
 in
 {
   options.${namespace}.home.programs.zeditor = {
@@ -33,27 +32,1082 @@ in
     userKeymaps = [ ];
     userTasks = [ ];
 
-    extensions = settings.extensions;
+    # Extensions organized by category
+    extensions = [
+      # Icons
+      "bearded-icon-theme"
+      "catppuccin-icons"
+      "charmed-icons"
+      "chawyehsu-vscode-icons"
+      "clean-vscode-icons"
+      "colored-zed-icons-theme"
+      "icons-modern-material"
+      "jetbrains-icons"
+      "jetbrains-new-ui-icons"
+      "material-icon-theme"
+      "modern-icons"
+      "monospace-icon-theme"
+      "openmoji-icons"
+      "phosphor-icons-theme"
+      "seti-icons"
+      "symbols"
+      "vscode-icons"
+      "vscode-great-icons"
 
-    userSettings =
-      let
-        # Remove extensions from settings so they don't end up in settings.json
-        # although Zed might ignore them, it's cleaner.
-        cleanSettings = builtins.removeAttrs settings [ "extensions" ];
-      in
-      lib.recursiveUpdate cleanSettings {
-        # Nix-specific binary overrides that use lib.getExe or config values
-        node = {
-          path = cfg.nodePath;
-          npm_path = cfg.npmPath;
-        };
+      # Language Support
+      "assembly"
+      "biome"
+      "csv"
+      "dart"
+      "deno"
+      "flatbuffers"
+      "graphql"
+      "html"
+      "ini"
+      "java"
+      "kotlin"
+      "nix"
+      "proto"
+      "sql"
+      "toml"
+      "xml"
+      "zig"
 
-        lsp = {
-          jdtls.binary.path = lib.getExe pkgs.jdt-language-server;
-          kotlin-lsp.binary.path = lib.getExe pkgs.${namespace}.kotlin-lsp;
-          nix.binary.path = lib.getExe pkgs.nixd;
-          protobuf-language-server.binary.path = lib.getExe pkgs.protols;
+      # Development Tools
+      "docker-compose"
+      "dockerfile"
+      "git-firefly"
+      "golangci-lint"
+      "helm"
+      "http"
+      "make"
+      "nginx"
+      "terraform"
+      "tmux"
+
+      # Utilities
+      "brainfuck"
+      "log"
+      "mermaid"
+      "perplexity"
+
+      # Themes
+      "0x96f"
+      "0xtz"
+      "1984-theme"
+      "adaltas-theme"
+      "adech"
+      "adwaita"
+      "adwaita-pastel"
+      "aesthetic-theme"
+      "alabaster"
+      "alabaster-dark"
+      "amber-monochrome-monitor-crt-phosphor"
+      "andromeda"
+      "anthracite-theme"
+      "anya"
+      "anysphere-theme"
+      "apisartisan"
+      "aquarium-theme"
+      "arctic-depth"
+      "ariake"
+      "asteroid"
+      "atomize"
+      "axolosin"
+      "aylin-theme"
+      "aystra"
+      "ayu-darker"
+      "azutiku-theme"
+      "bamboo-theme"
+      "barbenheimer"
+      "base16"
+      "batman"
+      "beanseeds-pro"
+      "bearded"
+      "becker-theme"
+      "blackfox"
+      "blackrain-theme"
+      "blackula"
+      "blade-runner-2049"
+      "blanche"
+      "blankeos-zen"
+      "blinds-theme"
+      "bluloco-theme"
+      "brook-code-theme"
+      "bubblegum"
+      "call-trans-opt-received"
+      "catbox"
+      "catppuccin"
+      "catppuccin-blur"
+      "catppuccin-blur-plus"
+      "chai-theme"
+      "chanterelle"
+      "chaos-theory-theme"
+      "chatgpt"
+      "chocolate"
+      "cisco-theme"
+      "city-lights"
+      "claude-code-inspired-dark"
+      "cobalt2"
+      "codely-theme"
+      "codesandbox-theme"
+      "codestackr"
+      "colorizer"
+      "cosmos"
+      "crimson-theme"
+      "crystal-theme"
+      "cursor"
+      "cyan-light-theme"
+      "darcula-dark"
+      "darcula-dark-okkano"
+      "dark-discord"
+      "dark-material-dracula"
+      "dark-pop-ui"
+      "darker-horizon"
+      "darkmatter-theme"
+      "day-shift"
+      "decorative-stitch"
+      "denix"
+      "dogi"
+      "dracula"
+      "dram"
+      "dream"
+      "dune-theme"
+      "eiffel-theme"
+      "elderberry"
+      "ember-theme"
+      "emerald-night"
+      "everforest"
+      "everforest-theme"
+      "evil-rabbit-theme"
+      "exquisite"
+      "eyecandy"
+      "ezio-theme"
+      "flat-theme"
+      "fleet-themes"
+      "fleeting-theme"
+      "fleury"
+      "flexoki-themes"
+      "focus-theme"
+      "forest-night"
+      "frosted-theme"
+      "gafelson"
+      "gentle-dark"
+      "github-classic"
+      "github-copilot-theme"
+      "github-dark-default"
+      "github-monochrome-theme"
+      "github-plus-theme"
+      "github-theme"
+      "glazier"
+      "gleam-theme"
+      "graphene"
+      "green-monochrome-monitor-crt-phosphor"
+      "grey-theme"
+      "gruber-darker"
+      "gruber-flavors"
+      "gruvbox-baby"
+      "gruvbox-crisp-themes"
+      "gruvbox-ish"
+      "gruvbox-material"
+      "gruvchad"
+      "hacker-night-vision"
+      "hacker-theme"
+      "haku-dark-theme"
+      "halcyon"
+      "hami-melon-theme"
+      "hex-light-theme"
+      "hivacruz-theme"
+      "horizon"
+      "horizon-extended"
+      "hot-dog-stand"
+      "ibm-5151"
+      "iceberg"
+      "iceicebergy"
+      "indigo"
+      "intellij-newui-theme"
+      "ir-black"
+      "jellybeans-vim"
+      "jetbrains-darcula-theme-by-bronya0"
+      "jetbrains-rider"
+      "jetbrains-themes"
+      "kanagawa-themes"
+      "kanso"
+      "kiro"
+      "kiselevka"
+      "ktrz-monokai"
+      "kubesong"
+      "leblackque"
+      "lights-out"
+      "lonely-planet"
+      "lotus-theme"
+      "lusch-theme"
+      "lydia"
+      "macos-classic"
+      "malibu"
+      "maple-theme"
+      "marble"
+      "mariana-theme"
+      "marine-dark"
+      "martianized"
+      "material-dark"
+      "material-theme"
+      "matte-black"
+      "mau"
+      "maya"
+      "melange"
+      "mellow"
+      "min-theme"
+      "min-theme-plus"
+      "mint-theme"
+      "mnemonic"
+      "modest-dark"
+      "modus-themes"
+      "molten-theme"
+      "monokai-nebula"
+      "monokai-night"
+      "monokai-og"
+      "monokai-reversed"
+      "monokai-vibrant-amped"
+      "monolith"
+      "monosami"
+      "monospace-theme"
+      "moonlight"
+      "mosel"
+      "msun-dark"
+      "muted"
+      "nanowise"
+      "napalm"
+      "nebula-pulse"
+      "neo-brutalism"
+      "neon-cyberpunk"
+      "neon-pulse-theme"
+      "neosolarized"
+      "neovim-default"
+      "neutral-theme"
+      "new-darcula"
+      "night-owlz"
+      "night-shift"
+      "nightfox"
+      "nightfox-m"
+      "nixdorf-8870"
+      "nobin-theme"
+      "noctis-port"
+      "noir-and-blanc-theme"
+      "nord"
+      "nordic-nvim-theme"
+      "nordic-theme"
+      "norrsken"
+      "not-material-theme"
+      "nstlgy-dark"
+      "nuisance"
+      "nvim-nightfox"
+      "nyxvamp-theme"
+      "oasis"
+      "obsidian-sunset"
+      "ocean-dark-motifs"
+      "oceanic-next"
+      "oh-lucy"
+      "oldbook-theme"
+      "one-black-theme"
+      "one-dark-darkened"
+      "one-dark-extended"
+      "one-dark-flat"
+      "one-dark-pro"
+      "one-dark-pro-max"
+      "one-dark-pro-monokai-darker"
+      "one-hunter"
+      "one-thing-theme"
+      "onurb"
+      "oolong"
+      "oscura"
+      "outrun"
+      "oxocarbon"
+      "palenight"
+      "panda-theme"
+      "papercolor"
+      "paraiso"
+      "penumbra"
+      "penumbra-plus"
+      "perfect-dusk"
+      "phine-theme"
+      "pinata-theme"
+      "plato-themes"
+      "poimandres"
+      "polar-theme"
+      "popping-and-locking"
+      "purr"
+      "quiet-light-theme"
+      "quill"
+      "railscast"
+      "rainbow"
+      "replicant"
+      "retrofit-theme"
+      "rich-vesper"
+      "rose-pine-theme"
+      "rosevin"
+      "rust-rover-dark-theme"
+      "s-dark-theme"
+      "sequoia"
+      "serendipity"
+      "severance-theme"
+      "shades-of-purple-theme"
+      "short-giraffe-theme"
+      "simple-darker"
+      "siri"
+      "sitruuna"
+      "sl4y-theme"
+      "slate"
+      "smooth"
+      "snazzy"
+      "snow-fox-theme"
+      "snowfall"
+      "snowflake"
+      "solarized"
+      "solarized-fp"
+      "sonokai"
+      "spai-zero-theme"
+      "spiceflow-theme"
+      "srcery"
+      "struct-theme"
+      "sublime-mariana-theme"
+      "subliminal-nightfall"
+      "sumi-light"
+      "sunset-drive"
+      "supaglass"
+      "supergreatmonokai"
+      "syntax"
+      "synthwave"
+      "synthwave-alpha-theme"
+      "t3-theme"
+      "tailwind-theme"
+      "tanuki"
+      "terrible-theme"
+      "the-best-theme"
+      "the-dark-side"
+      "theme-lince"
+      "tm-twilight"
+      "tokyo-night"
+      "tomorrow-min-theme"
+      "tomorrow-night-burns-theme"
+      "tomorrow-theme"
+      "tron-legacy"
+      "tsar"
+      "tsarcasm"
+      "twilight"
+      "ultimate-dark-neo"
+      "umbralkai"
+      "underground-theme"
+      "unoflat"
+      "v0-theme"
+      "vague"
+      "vapor-theme"
+      "vercel-theme"
+      "vesper"
+      "vim-theme"
+      "vintergata"
+      "visual-assist-dark"
+      "vitesse"
+      "vitesse-theme-refined"
+      "vscode-classic-theme"
+      "vscode-dark-high-contrast"
+      "vscode-dark-modern"
+      "vscode-dark-plus"
+      "vscode-dark-polished"
+      "vscode-light-plus"
+      "vscode-monokai-charcoal"
+      "vue-theme"
+      "vynora"
+      "wakfu-theme"
+      "warp-one-dark"
+      "xcode-themes"
+      "xy-zed"
+      "yaka"
+      "yamura"
+      "yellowed"
+      "yue-theme"
+      "yugen"
+      "zed-legacy-themes"
+      "zedburn"
+      "zedokai"
+      "zedokai-darkest-machine"
+      "zedrack-theme"
+      "zedspace"
+      "zedwaita"
+      "zen"
+      "zen-abyssal"
+      "zero-trust-theme"
+      "zoegi-theme"
+    ];
+
+    userSettings = {
+      active_pane_modifiers = {
+        border_size = 0;
+        inactive_opacity = 1;
+      };
+      bottom_dock_layout = "contained";
+      agent_font_size = null;
+      allow_rewrap = "in_comments";
+      auto_indent = true;
+      auto_indent_on_paste = true;
+      auto_install_extensions = {
+        html = true;
+      };
+      auto_update_extensions = null;
+      autosave = "off";
+      autoscroll_on_clicks = false;
+      auto_signature_help = false;
+      show_signature_help_after_edits = false;
+      auto_update = false;
+      base_keymap = "VSCode";
+      buffer_font_family = "IntoneMono Nerd Font Mono";
+      buffer_font_features = null;
+      buffer_font_fallbacks = null;
+      buffer_font_size = 12;
+      buffer_font_weight = 400;
+      buffer_line_height = "comfortable";
+      centered_layout = {
+        left_padding = 0.2;
+        right_padding = 0.2;
+      };
+      close_on_file_delete = false;
+      confirm_quit = false;
+      diagnostics_max_severity = null;
+      disable_ai = false;
+      load_direnv = "shell_hook";
+      double_click_in_multibuffer = "select";
+      drop_target_size = 0.2;
+      edit_predictions = {
+        disabled_globs = [
+          "**/.env*"
+          "**/*.pem"
+          "**/*.key"
+          "**/*.cert"
+          "**/*.crt"
+          "**/.dev.vars"
+          "**/secrets.yml"
+        ];
+      };
+      edit_predictions_disabled_in = [ ];
+      current_line_highlight = "all";
+      selection_highlight = true;
+      rounded_selection = true;
+      cursor_blink = true;
+      cursor_shape = "bar";
+      gutter = {
+        line_numbers = true;
+        runnables = true;
+        breakpoints = true;
+        folds = true;
+        min_line_number_digits = 4;
+      };
+      hide_mouse = "on_typing_and_movement";
+      snippet_sort_order = "inline";
+      scrollbar = {
+        show = "auto";
+        cursors = true;
+        git_diff = true;
+        search_results = true;
+        selected_text = true;
+        selected_symbol = true;
+        diagnostics = "all";
+        axes = {
+          horizontal = true;
+          vertical = true;
         };
       };
+      minimap = {
+        show = "never";
+        thumb = "always";
+        thumb_border = "left_open";
+        current_line_highlight = null;
+      };
+      tab_bar = {
+        show = true;
+        show_nav_history_buttons = true;
+        show_tab_bar_buttons = true;
+      };
+      tabs = {
+        close_position = "right";
+        file_icons = false;
+        git_status = false;
+        activate_on_close = "history";
+        show_close_button = "hover";
+        show_diagnostics = "off";
+      };
+      inline_code_actions = true;
+      session = {
+        restore_unsaved_buffers = true;
+        trust_all_worktrees = false;
+      };
+      drag_and_drop_selection = {
+        enabled = true;
+        delay = 300;
+      };
+      toolbar = {
+        breadcrumbs = true;
+        quick_actions = true;
+        selections_menu = true;
+        agent_review = true;
+        code_actions = false;
+      };
+      use_system_window_tabs = false;
+      enable_language_server = true;
+      ensure_final_newline_on_save = true;
+      expand_excerpt_lines = 5;
+      excerpt_context_lines = 2;
+      extend_comment_on_newline = true;
+      extend_list_on_newline = true;
+      indent_list_on_tab = true;
+      status_bar = {
+        active_language_button = true;
+        cursor_position_button = true;
+        line_endings_button = false;
+        active_encoding_button = "non_utf8";
+      };
+      lsp = {
+        jdtls = {
+          binary = {
+            path = lib.getExe pkgs.jdt-language-server;
+            ignore_system_version = true;
+          };
+        };
+        kotlin-lsp = {
+          binary = {
+            path = lib.getExe pkgs.${namespace}.kotlin-lsp;
+            arguments = [ "--stdio" ];
+          };
+        };
+        nix = {
+          binary = {
+            path = lib.getExe pkgs.nixd;
+          };
+        };
+        protobuf-language-server = {
+          binary = {
+            path = lib.getExe pkgs.protols;
+          };
+        };
+      };
+      global_lsp_settings = {
+        button = true;
+      };
+      lsp_highlight_debounce = 75;
+      features = {
+        edit_prediction_provider = "none";
+      };
+      format_on_save = "on";
+      formatter = "auto";
+      use_autoclose = true;
+      always_treat_brackets_as_autoclosed = false;
+      file_scan_exclusions = [
+        "**/.git"
+        "**/.svn"
+        "**/.hg"
+        "**/.jj"
+        "**/.sl"
+        "**/.repo"
+        "**/CVS"
+        "**/.DS_Store"
+        "**/Thumbs.db"
+        "**/.classpath"
+        "**/.settings"
+      ];
+      file_scan_inclusions = [ ".env*" ];
+      file_types = {
+        "JSONC" = [
+          "**/.zed/**/*.json"
+          "**/zed/**/*.json"
+          "**/Zed/**/*.json"
+          "**/.vscode/**/*.json"
+          "tsconfig.json"
+          "jsconfig.json"
+        ];
+        "Dockerfile" = [
+          "Dockerfile*"
+          "*.dockerfile"
+        ];
+        "YAML" = [
+          "*.yml"
+          "*.yaml"
+        ];
+        "Shell Script" = [
+          ".env.*"
+          "*.zsh"
+          "*.bash"
+          "*.sh"
+          "APKBUILD"
+          "PKGBUILD"
+          "*.ebuild"
+          "*.eclass"
+          ".bashrc"
+          ".bash_profile"
+          ".zshrc"
+          ".zprofile"
+        ];
+        "Python" = [
+          "*.py"
+          "*.pyi"
+          "SConstruct"
+          "SConscript"
+        ];
+        "JavaScript" = [
+          "*.js"
+          "*.cjs"
+          "*.mjs"
+          "*.jsx"
+        ];
+        "TypeScript" = [
+          "*.ts"
+          "*.cts"
+          "*.mts"
+          "*.tsx"
+        ];
+        "HTML" = [
+          "*.html"
+          "*.htm"
+          "*.shtml"
+          "*.xhtml"
+        ];
+        "CSS" = [ "*.css" ];
+        "SCSS" = [ "*.scss" ];
+        "Java" = [
+          "*.java"
+          "*.jav"
+        ];
+        "Kotlin" = [
+          "*.kt"
+          "*.kts"
+        ];
+        "Go" = [ "*.go" ];
+        "Rust" = [ "*.rs" ];
+        "C" = [
+          "*.c"
+          "*.h"
+        ];
+        "C++" = [
+          "*.cpp"
+          "*.cc"
+          "*.cxx"
+          "*.hpp"
+          "*.hh"
+          "*.hxx"
+        ];
+        "Markdown" = [
+          "*.md"
+          "*.markdown"
+        ];
+        "TOML" = [ "*.toml" ];
+        "XML" = [
+          "*.xml"
+          "*.xsd"
+          "*.xsl"
+          "*.xslt"
+        ];
+        "SQL" = [
+          "*.sql"
+          "*.ddl"
+          "*.dml"
+        ];
+        "Terraform" = [
+          "*.tf"
+          "*.tfvars"
+        ];
+        "HCL" = [ "*.hcl" ];
+        "Nix" = [ "*.nix" ];
+        "Lua" = [ "*.lua" ];
+        "Ruby" = [
+          "*.rb"
+          "Rakefile"
+          "Gemfile"
+        ];
+        "PHP" = [ "*.php" ];
+        "C#" = [ "*.cs" ];
+        "Swift" = [ "*.swift" ];
+        "Zig" = [ "*.zig" ];
+        "Dart" = [ "*.dart" ];
+        "Proto" = [ "*.proto" ];
+        "GraphQL" = [
+          "*.graphql"
+          "*.gql"
+        ];
+      };
+      diagnostics = {
+        include_warnings = true;
+        inline = {
+          enabled = false;
+          update_debounce_ms = 150;
+          padding = 4;
+          min_column = 0;
+          max_severity = null;
+        };
+        update_with_cursor = false;
+        primary_only = false;
+        use_rendered = false;
+      };
+      git = {
+        git_gutter = "tracked_files";
+        gutter_debounce = null;
+        inline_blame = {
+          enabled = true;
+          delay_ms = 600;
+        };
+        branch_picker = {
+          show_author_name = true;
+        };
+        hunk_style = "staged_hollow";
+      };
+      go_to_definition_fallback = "find_all_references";
+      hard_tabs = false;
+      helix_mode = false;
+      indent_guides = {
+        enabled = true;
+        line_width = 1;
+        active_line_width = 1;
+        coloring = "fixed";
+        background_coloring = "disabled";
+      };
+      hover_popover_enabled = true;
+      hover_popover_delay = 300;
+      icon_theme = {
+        mode = "system";
+        dark = "Zed (Default)";
+        light = "Zed (Default)";
+      };
+      image_viewer = {
+        unit = "binary";
+      };
+      inlay_hints = {
+        enabled = false;
+        show_type_hints = true;
+        show_parameter_hints = true;
+        show_other_hints = true;
+        show_background = false;
+        edit_debounce_ms = 700;
+        scroll_debounce_ms = 50;
+        toggle_on_modifiers_press = null;
+      };
+      journal = {
+        path = "~";
+        hour_format = "hour12";
+      };
+      jsx_tag_auto_close = {
+        enabled = true;
+      };
+      languages = {
+        JavaScript = {
+          tab_size = 2;
+          enable_language_server = true;
+          hard_tabs = false;
+          language_servers = [
+            "!eslint"
+            "biome"
+          ];
+        };
+        TypeScript = {
+          tab_size = 2;
+          hard_tabs = false;
+          enable_language_server = true;
+          language_servers = [
+            "!eslint"
+            "!graphql"
+            "!deno"
+            "!typescript-language-server"
+            "biome"
+            "..."
+          ];
+        };
+        JSON = {
+          tab_size = 2;
+          hard_tabs = false;
+        };
+        Nix = {
+          tab_size = 4;
+          hard_tabs = true;
+          language_servers = [
+            "nixd"
+            "!nil"
+          ];
+        };
+        Go = {
+          tab_size = 4;
+          hard_tabs = true;
+        };
+        Kotlin = {
+          language_servers = [
+            "kotlin-lsp"
+            "!kotlin-language-server"
+          ];
+        };
+        Java = {
+          language_servers = [ "jdtls" ];
+        };
+      };
+      language_models = {
+        anthropic = {
+          api_url = "https://api.anthropic.com";
+        };
+        google = {
+          api_url = "https://generativelanguage.googleapis.com";
+        };
+        ollama = {
+          api_url = "http://localhost:11434";
+        };
+        openai = {
+          api_url = "https://api.openai.com/v1";
+        };
+      };
+      line_indicator_format = "short";
+      linked_edits = true;
+      lsp_document_colors = true;
+      max_tabs = null;
+      middle_click_paste = true;
+      multi_cursor_modifier = "alt";
+      node = {
+        ignore_system_version = true;
+        path = cfg.nodePath;
+        npm_path = cfg.npmPath;
+      };
+      proxy = null;
+      on_last_window_closed = "platform_default";
+      profiles = { };
+      preview_tabs = {
+        enabled = true;
+        enable_preview_from_project_panel = true;
+        enable_preview_from_file_finder = true;
+        enable_preview_from_multibuffer = true;
+        enable_preview_multibuffer_from_code_navigation = false;
+        enable_preview_file_from_code_navigation = true;
+        enable_keep_preview_on_code_navigation = false;
+      };
+      file_finder = {
+        file_icons = true;
+        modal_max_width = "small";
+        skip_focus_for_active_in_search = true;
+      };
+      pane_split_direction_horizontal = "up";
+      pane_split_direction_vertical = "left";
+      preferred_line_length = 80;
+      private_files = [
+        "**/.env*"
+        "**/*.pem"
+        "**/*.key"
+        "**/*.cert"
+        "**/*.crt"
+        "**/secrets.yml"
+      ];
+      projects_online_by_default = true;
+      read_ssh_config = true;
+      redact_private_values = false;
+      relative_line_numbers = "disabled";
+      remove_trailing_whitespace_on_save = true;
+      resize_all_panels_in_dock = [ "left" ];
+      restore_on_file_reopen = true;
+      restore_on_startup = "last_session";
+      scroll_beyond_last_line = "one_page";
+      scroll_sensitivity = 1;
+      fast_scroll_sensitivity = 4;
+      horizontal_scroll_margin = 5;
+      vertical_scroll_margin = 3;
+      search = {
+        button = true;
+        whole_word = false;
+        case_sensitive = false;
+        include_ignored = false;
+        regex = false;
+        center_on_match = false;
+      };
+      search_wrap = true;
+      seed_search_query_from_cursor = "always";
+      use_smartcase_search = false;
+      show_call_status_icon = true;
+      completions = {
+        words = "fallback";
+        words_min_length = 3;
+        lsp = true;
+        lsp_fetch_timeout_ms = 0;
+        lsp_insert_mode = "replace_suffix";
+      };
+      show_completions_on_input = true;
+      show_completion_documentation = true;
+      show_edit_predictions = true;
+      show_whitespaces = "boundary";
+      whitespace_map = {
+        space = "•";
+        tab = "→";
+      };
+      soft_wrap = "none";
+      show_wrap_guides = true;
+      use_on_type_format = true;
+      use_auto_surround = true;
+      use_system_path_prompts = true;
+      use_system_prompts = true;
+      wrap_guides = [ ];
+      tab_size = 2;
+      tasks = {
+        variables = { };
+        enabled = true;
+        prefer_lsp = false;
+      };
+      telemetry = {
+        diagnostics = true;
+        metrics = true;
+      };
+      terminal = {
+        alternate_scroll = "off";
+        blinking = "off";
+        copy_on_select = false;
+        keep_selection_on_copy = true;
+        dock = "bottom";
+        default_width = 640;
+        default_height = 320;
+        detect_venv = {
+          on = {
+            directories = [
+              ".env"
+              "env"
+              ".venv"
+              "venv"
+            ];
+            activate_script = "default";
+          };
+        };
+        env = {
+          TERM = "ghostty";
+        };
+        font_family = "IntoneMono Nerd Font Mono";
+        font_features = null;
+        font_size = null;
+        line_height = "comfortable";
+        minimum_contrast = 45;
+        option_as_meta = false;
+        button = false;
+        shell = "system";
+        scroll_multiplier = 3;
+        toolbar = {
+          breadcrumbs = false;
+        };
+        working_directory = "current_project_directory";
+        scrollbar = {
+          show = null;
+        };
+        path_hyperlink_regexes = [
+          "File \"(?<path>[^\"]+)\", line (?<line>[0-9]+)"
+          "(?x) # optionally starts with 0-2 opening prefix symbols [({\\[<]{0,2} # which may be followed by an opening quote (?<quote>["`])? # `path` is the shortest sequence of any non-space character (?<link>(?<path>[^ ]+? # which may end with a line and optionally a column, (?<line_column>:+[0-9]+(:[0-9]+)?|:?\([0-9]+([,:][0-9]+)?\))? )) # which must be followed by a matching quote (?(<quote>)\\k<quote>) # and optionally a single closing symbol [)}\\]>]? # if line/column matched, may be followed by a description (?(<line_column>):[^ 0-9][^ ]*)? # which may be followed by trailing punctuation [.,:)}\\]>]* # and always includes trailing whitespace or end of line ([ ]+|$)"
+        ];
+        path_hyperlink_timeout_ms = 1;
+      };
+      repl = {
+        max_columns = 128;
+        max_lines = 32;
+      };
+      text_rendering_mode = "platform_default";
+      theme = {
+        mode = "system";
+        dark = "Palenight Theme";
+        light = "Tokyo Night Storm";
+      };
+      title_bar = {
+        show_branch_icon = false;
+        show_branch_name = true;
+        show_project_items = true;
+        show_onboarding_banner = true;
+        show_user_picture = true;
+        show_user_menu = true;
+        show_sign_in = true;
+        show_menus = false;
+      };
+      vim_mode = false;
+      when_closing_with_no_tabs = "platform_default";
+      project_panel = {
+        button = true;
+        default_width = 240;
+        dock = "left";
+        entry_spacing = "comfortable";
+        file_icons = true;
+        folder_icons = true;
+        git_status = true;
+        indent_size = 20;
+        auto_reveal_entries = true;
+        auto_fold_dirs = true;
+        drag_and_drop = true;
+        scrollbar = {
+          show = null;
+        };
+        sticky_scroll = true;
+        show_diagnostics = "all";
+        indent_guides = {
+          show = "always";
+        };
+        sort_mode = "directories_first";
+        hide_root = false;
+        hide_hidden = false;
+        starts_open = true;
+        auto_open = {
+          on_create = true;
+          on_paste = true;
+          on_drop = true;
+        };
+      };
+      collaboration_panel = {
+        button = false;
+        dock = "left";
+        default_width = 240;
+      };
+      debugger = {
+        stepping_granularity = "line";
+        save_breakpoints = true;
+        dock = "bottom";
+        button = true;
+      };
+      git_panel = {
+        button = true;
+        dock = "left";
+        default_width = 360;
+        status_style = "icon";
+        fallback_branch_name = "main";
+        sort_by_path = false;
+        collapse_untracked_diff = false;
+        scrollbar = {
+          show = null;
+        };
+      };
+      git_hosting_providers = [ ];
+      outline_panel = {
+        button = true;
+        default_width = 300;
+        dock = "right";
+        file_icons = true;
+        folder_icons = true;
+        git_status = true;
+        indent_size = 20;
+        auto_reveal_entries = true;
+        auto_fold_dirs = true;
+        indent_guides = {
+          show = "always";
+        };
+        scrollbar = {
+          show = null;
+        };
+      };
+      calls = {
+        mute_on_join = false;
+        share_on_join = false;
+      };
+      colorize_brackets = false;
+      unnecessary_code_fade = 0.3;
+      ui_font_family = "IntoneMono Nerd Font Mono";
+      ui_font_features = {
+        calt = false;
+      };
+      ui_font_fallbacks = null;
+      ui_font_size = 12;
+      ui_font_weight = 400;
+      agent = { };
+      notification_panel = {
+        button = true;
+        dock = "bottom";
+      };
+    };
   };
 }
