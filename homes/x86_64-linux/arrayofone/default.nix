@@ -48,10 +48,28 @@ in
 
   home = {
     packages = with pkgs; [
+      bibata-cursors
       clipse
       fontconfig
+      neofetch
+      papirus-icon-theme
       pinentry-curses
     ];
+
+    stylix = {
+      cursor = {
+        package = pkgs.bibata-cursors;
+        name = "Bibata-Modern-Ice";
+        size = 32;
+      };
+
+      icons = {
+        enable = true;
+        package = pkgs.papirus-icon-theme;
+        light = "Papirus-Light";
+        dark = "Papirus-Dark";
+      };
+    };
 
     stateVersion = "24.05";
   };

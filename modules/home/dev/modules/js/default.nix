@@ -18,7 +18,7 @@ in
       packages = with pkgs; [
         deno
         nodejs
-        pnpm
+        # pnpm
         typescript
         yarn
       ];

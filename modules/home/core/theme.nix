@@ -2,7 +2,6 @@
   inputs,
   lib,
   pkgs,
-  system,
   ...
 }:
 {
@@ -10,12 +9,7 @@
 
   home.packages = [
     pkgs.font-awesome
-  ]
-  ++ lib.optionals (builtins.elem system pkgs.bibata-cursors.meta.platforms) [ pkgs.bibata-cursors ]
-  ++ lib.optionals (builtins.elem system pkgs.papirus-icon-theme.meta.platforms) [
-    pkgs.papirus-icon-theme
   ];
-  # ++ lib.mkIf (builtins.elem system pkgs.papirus-icon-theme.meta.platforms) [ ];
 
   stylix = {
     enable = true;
@@ -30,12 +24,6 @@
     };
 
     base16Scheme = ./theme/base16/catppuccin/macciato.yaml;
-
-    cursor = lib.mkIf (builtins.elem system pkgs.bibata-cursors.meta.platforms) {
-      package = pkgs.bibata-cursors;
-      name = "Bibata-Modern-Ice";
-      size = 32;
-    };
 
     fonts = {
       monospace = {
@@ -64,13 +52,6 @@
         popups = 12;
         terminal = 12;
       };
-    };
-
-    iconTheme = lib.mkIf (builtins.elem system pkgs.papirus-icon-theme.meta.platforms) {
-      enable = true;
-      package = pkgs.papirus-icon-theme;
-      light = "Papirus-Light";
-      dark = "Papirus-Dark";
     };
 
     # override = {

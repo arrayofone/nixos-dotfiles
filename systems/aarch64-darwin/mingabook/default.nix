@@ -16,6 +16,8 @@
     stateVersion = 6;
   };
 
+  home-manager.backupFileExtension = "hm-backup";
+
   environment.systemPackages = with pkgs; [
     mkcert
     nodejs_20
@@ -33,7 +35,7 @@
     taps = [ ];
     brews = [
       "git-lfs"
-      "nvm"
+      # "nvm"
       "tmux"
     ];
     casks = [

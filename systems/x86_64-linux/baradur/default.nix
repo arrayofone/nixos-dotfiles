@@ -22,6 +22,8 @@
     };
   };
 
+  home-manager.backupFileExtension = "hm-backup";
+
   networking.hostName = "baradur";
 
   boot = {

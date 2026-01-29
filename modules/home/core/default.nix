@@ -8,9 +8,10 @@
     # ./editor.nix
     ./env.nix
     ./fonts.nix
+    ./git.nix
     ./secrets.nix
     ./shell.nix
-    ./terminal.nix
+    ./ssh.nix
     ./theme.nix
     ./zeditor.nix
   ];
@@ -29,6 +30,9 @@
       bat
       btop
       claude-code
+      claude-monitor
+      docker
+      docker-compose
       gcc
       gemini-cli
       gh
@@ -39,14 +43,32 @@
       google-cloud-sdk
       htop
       jq
+      k9s
       kitty
+      kubectl
+      kubectx
+      kubernetes-helm
       lf
       lsof
-      neofetch
+      fastfetch
+      lazycli
+      lazydocker
+      lazygit
+      lazyjournal
+      lazynpm
+      lazysql
+      lazyssh
+      lazyworktree
+      minikube
       neovim
       netcat
       nixd
+      nixfmt
       openssl
+      podman
+      podman-compose
+      podman-tui
+      protobuf
       protols
       ripgrep
       sops
@@ -57,38 +79,6 @@
       wireguard-tools
       zellij
       zip
-
-      # TODO: are these needed for all systems? - probably not
-      # awscli2
-      docker
-      docker-compose
-      emacs
-      k9s
-      # kotlin-language-server
-      kubectl
-      kubectx
-      kubernetes-helm
-      lazydocker
-      lazysql
-      minikube
-      nil
-      nixfmt
-      oxker
-      podman
-      podman-compose
-      podman-tui
-      protobuf
-
-      alacritty
-      # foot
-      # ghostty
-      kitty
-      nixfmt
-      zip
-      unzip
-
-      claude-code
-      claude-monitor
     ]
     ++ [
       pkgs.${namespace}.sys
