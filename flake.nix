@@ -33,6 +33,11 @@
 
     nixos-wsl.url = "github:nix-community/NixOS-WSL";
 
+    microvm = {
+      url = "github:microvm-nix/microvm.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     ethereum-nix = {
       url = "github:nix-community/ethereum.nix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -111,6 +116,10 @@
             );
           }
         )
+      ];
+
+      systems.hosts.helms-deep.modules = with inputs; [
+        microvm.nixosModules.host
       ];
 
       systems.hosts.dbook.modules = with inputs; [

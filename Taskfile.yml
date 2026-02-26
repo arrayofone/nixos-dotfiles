@@ -6,6 +6,7 @@ vars:
   DARWIN_HOST: "digibook"
   NIXOS_USER: "arrayofone"
   DARWIN_USER: "db"
+  MICROVM_HOST: "helms-deep"
 
 tasks:
   # =============================================================================
@@ -357,6 +358,72 @@ tasks:
     cmds:
       - rm -f {{.FLAKE_DIR}}/result*
       - echo "🧹 Build results cleaned!"
+
+  # =============================================================================
+  # MICROVM HOST OPERATIONS
+  # =============================================================================
+
+  build:microvm-host:
+    desc: "Build microvm host (helms-deep) configuration"
+    cmds:
+      - nixos-rebuild build --flake {{.FLAKE_DIR}}#{{.MICROVM_HOST}} --target-host root@{{.MICROVM_HOST}}
+
+  switch:microvm-host:
+    desc: "Switch microvm host (helms-deep) to new configuration"
+    cmds:
+      - nixos-rebuild switch --flake {{.FLAKE_DIR}}#{{.MICROVM_HOST}} --target-host root@{{.MICROVM_HOST}}
+
+  deploy:microvm-host:
+    desc: "Full microvm host deployment workflow"
+    cmds:
+      - task: check
+      - task: build:microvm-host
+      - task: switch:microvm-host
+
+  vm:list:
+    desc: "List all microVMs on helms-deep"
+    cmds:
+      - ssh root@{{.MICROVM_HOST}} "systemctl list-units 'microvm@*' --no-pager"
+
+  vm:status:
+    desc: "Show status of a microVM (usage: task vm:status -- <vm-name>)"
+    cmds:
+      - ssh root@{{.MICROVM_HOST}} "systemctl status microvm@{{.CLI_ARGS}} --no-pager"
+    requires:
+      vars: [CLI_ARGS]
+
+  vm:start:
+    desc: "Start a microVM (usage: task vm:start -- <vm-name>)"
+    cmds:
+      - ssh root@{{.MICROVM_HOST}} "systemctl start microvm@{{.CLI_ARGS}}"
+    requires:
+      vars: [CLI_ARGS]
+
+  vm:stop:
+    desc: "Stop a microVM (usage: task vm:stop -- <vm-name>)"
+    cmds:
+      - ssh root@{{.MICROVM_HOST}} "systemctl stop microvm@{{.CLI_ARGS}}"
+    requires:
+      vars: [CLI_ARGS]
+
+  vm:restart:
+    desc: "Restart a microVM (usage: task vm:restart -- <vm-name>)"
+    cmds:
+      - ssh root@{{.MICROVM_HOST}} "systemctl restart microvm@{{.CLI_ARGS}}"
+    requires:
+      vars: [CLI_ARGS]
+
+  vm:logs:
+    desc: "Show logs for a microVM (usage: task vm:logs -- <vm-name>)"
+    cmds:
+      - ssh root@{{.MICROVM_HOST}} "journalctl -u microvm@{{.CLI_ARGS}} --no-pager -n 100"
+    requires:
+      vars: [CLI_ARGS]
+
+  debug:microvm-host:
+    desc: "Debug microvm host build with verbose output"
+    cmds:
+      - nixos-rebuild switch --flake {{.FLAKE_DIR}}#{{.MICROVM_HOST}} --target-host root@{{.MICROVM_HOST}} --show-trace --verbose
 
   # =============================================================================
   # HELP & SHORTCUTS

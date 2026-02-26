@@ -5,6 +5,7 @@ keys:
   - &dbook age126t4jjumls89dfl83cx3lvukhwad5nte38zeq5uue4m39ex9kfeqtw4r2v
   - &mingabook age14ejy4tppggtacyzxfhtnagqhtr60zyf6l6euh5vxlf8uh9vcef3s2clada
   - &darrenbangsund age1fyndjw4ucc39hh2kyuxth2pyevl2h5zh9lmfq7v9h8neq9csnc9qrcm4zq
+  - &helms-deep PLACEHOLDER_AGE_PUBLIC_KEY
 creation_rules:
   - path_regex: secrets/arrayofone.yaml$
     key_groups:
@@ -30,3 +31,7 @@ creation_rules:
     key_groups:
       - age:
           - *darrenbangsund
+  - path_regex: secrets/helms-deep.yaml$
+    key_groups:
+      - age:
+          - *helms-deep

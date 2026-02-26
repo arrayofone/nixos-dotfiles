@@ -24,6 +24,7 @@
     pnpm
     python310
     raycast
+    fellowship.scroll-reverser
   ];
 
   # TODO: THIS
@@ -35,12 +36,13 @@
     taps = [ ];
     brews = [
       "git-lfs"
-      # "nvm"
+      "nvm"
       "tmux"
     ];
     casks = [
       "arc"
       "chromium"
+      "claude"
       "dbeaver-community"
       "discord"
       "firefox"

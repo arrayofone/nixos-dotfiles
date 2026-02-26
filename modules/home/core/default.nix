@@ -31,6 +31,7 @@
       btop
       claude-code
       claude-monitor
+      deno
       docker
       docker-compose
       gcc
@@ -65,6 +66,7 @@
       nixd
       nixfmt
       openssl
+      parallel
       podman
       podman-compose
       podman-tui

@@ -554,6 +554,13 @@
             require_config_file = true;
           };
         };
+        deno = {
+          settings = {
+            deno = {
+              enable = true;
+            };
+          };
+        };
         jdtls = {
           binary = {
             path = lib.getExe pkgs.jdt-language-server;
@@ -1071,6 +1078,29 @@
         mode = "system";
         dark = "Palenight Theme";
         light = "Tokyo Night Storm";
+      };
+      theme_overrides = {
+        "Palenight Theme" = {
+          # Error diagnostics - bright red tones for visibility
+          "error" = "#ff5370";
+          "error.background" = "#ff537020";
+          "error.border" = "#ff5370";
+
+          # Warning diagnostics - amber/orange tones
+          "warning" = "#ffcb6b";
+          "warning.background" = "#ffcb6b20";
+          "warning.border" = "#ffcb6b";
+
+          # Info diagnostics - blue tones
+          "info" = "#82aaff";
+          "info.background" = "#82aaff20";
+          "info.border" = "#82aaff";
+
+          # Hint diagnostics - subtle cyan
+          "hint" = "#89ddff";
+          "hint.background" = "#89ddff15";
+          "hint.border" = "#89ddff";
+        };
       };
       title_bar = {
         show_branch_icon = false;

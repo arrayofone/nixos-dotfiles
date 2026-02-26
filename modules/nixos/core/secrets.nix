@@ -2,8 +2,12 @@
   config,
   inputs,
   lib,
+  namespace,
   ...
 }:
+let
+  wgEnabled = config.${namespace}.networking.wireguard.server.enable;
+in
 {
   imports = [ inputs.sops-nix.nixosModules.sops ];
 
@@ -16,13 +20,16 @@
       generateKey = true;
     };
 
-    secrets = {
-      "vpn/wg/endpoint" = { };
-      "vpn/wg/port" = { };
-      "vpn/wg/privateKey" = { };
-      "system/users/arrayofone/password" = {
-        neededForUsers = true;
+    secrets =
+      {
+        "system/users/arrayofone/password" = {
+          neededForUsers = true;
+        };
+      }
+      // lib.optionalAttrs wgEnabled {
+        "vpn/wg/endpoint" = { };
+        "vpn/wg/port" = { };
+        "vpn/wg/privateKey" = { };
       };
-    };
   };
 }
