@@ -1,3 +1,6 @@
+# @gitian:host mingabook system config — primary development machine (aarch64-darwin).
+# Installs Rosetta 2, configures Homebrew casks, enables Touch ID sudo,
+# and sets up weekly Nix garbage collection.
 { lib, pkgs, ... }:
 {
   imports = [
@@ -27,7 +30,7 @@
     fellowship.scroll-reverser
   ];
 
-  # TODO: THIS
+  # @gitian:todo Enable AeroSpace tiling window manager for macOS
   services.aerospace = {
     enable = false;
   };

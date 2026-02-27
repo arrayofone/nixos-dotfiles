@@ -1,3 +1,5 @@
+# @gitian:option Go development module — provides Go 1.25, gopls, delve debugger,
+# gotools, and go-ethereum. Gated behind `fellowship.home.dev_modules.go.enable`.
 {
   lib,
   config,

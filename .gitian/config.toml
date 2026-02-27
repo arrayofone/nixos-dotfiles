@@ -1,0 +1,35 @@
+# Gitian configuration for Fellowship NixOS/nix-darwin dotfiles
+# https://www.gitian.dev/docs#configuration
+
+[annotations]
+render_style = "nested"
+
+[files]
+hide_source_only = "true"
+
+# Custom tags for NixOS-specific concepts
+
+[tags.host]
+kind = "inline"
+color = "#60a5fa"
+label = "Host"
+
+[tags.module]
+kind = "inline"
+color = "#a78bfa"
+label = "Module"
+
+[tags.option]
+kind = "inline"
+color = "#34d399"
+label = "Option"
+
+[tags.input]
+kind = "inline"
+color = "#fbbf24"
+label = "Input"
+
+[tags.secret]
+kind = "block"
+color = "#f87171"
+label = "Secret"

@@ -1,3 +1,7 @@
+# @gitian Zed editor configuration — declarative settings, extensions, keymaps, and LSP wiring.
+# LSP binaries are resolved from nixpkgs (nixd, jdtls, protols, kotlin-lsp).
+# Biome is configured as the primary formatter for JS/TS/JSON/CSS/GraphQL.
+# See [[architecture]] for how this fits into the home-manager module tree.
 {
   lib,
   namespace,

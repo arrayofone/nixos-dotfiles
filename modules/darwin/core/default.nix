@@ -1,3 +1,6 @@
+# @gitian:module Darwin core module — defines the `fellowship.system.name` option
+# used by secrets and other modules to resolve host-specific config.
+# Submodules for dock, fonts, and secrets are available but currently disabled.
 {
   config,
   lib,

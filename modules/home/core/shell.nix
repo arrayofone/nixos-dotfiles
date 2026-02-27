@@ -1,3 +1,6 @@
+# @gitian Shell environment — Zsh with starship prompt, fzf, syntax highlighting,
+# autopair, history substring search, and enhancd. Includes a comprehensive
+# git alias system and shell aliases (bat, ripgrep, kubectl shortcuts).
 {
   config,
   pkgs,

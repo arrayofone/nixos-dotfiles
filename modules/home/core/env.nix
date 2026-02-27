@@ -1,3 +1,6 @@
+# @gitian:security Runtime secret injection — reads SOPS-decrypted files into
+# environment variables at shell init, avoiding Nix store embedding.
+# `sessionVariables` would bake secrets into the store; `initContent` reads them at runtime.
 { config, lib, ... }:
 {
   home = {

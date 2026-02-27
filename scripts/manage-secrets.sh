@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# @gitian:secret Secrets management — edit, encrypt, or decrypt SOPS files.
+# Falls back to system key via sudo when user key lacks access.
+# Run via `task secrets:edit:system`, `task secrets:encrypt:user`, etc.
 set -e
 
 # Usage: ./manage-secrets.sh <action> <scope>

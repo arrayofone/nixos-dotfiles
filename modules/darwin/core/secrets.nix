@@ -1,3 +1,7 @@
+# @gitian:secret Darwin system-level secrets via sops-nix.
+# Decrypts `secrets/<hostname>.yaml` using the system's SSH host key
+# and a generated age key at `/var/lib/sops-nix/key.txt`.
+# Currently provides WireGuard VPN credentials.
 {
   config,
   inputs,

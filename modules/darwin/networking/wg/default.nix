@@ -1,3 +1,6 @@
+# @gitian:module WireGuard VPN module — cross-platform (darwin + nixos) VPN client
+# using wg-quick. Peers, keys, and endpoints are configured via module options;
+# the private key file path comes from SOPS-decrypted secrets.
 {
   lib,
   config,

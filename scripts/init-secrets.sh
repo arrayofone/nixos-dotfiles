@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# @gitian:secret Secrets bootstrapper — generates SSH and age keys for both
+# the system and the current user, then creates initial encrypted YAML files.
+# Run via `task secrets:init`. See [[secrets]] for the full flow.
 set -e
 
 # Colors

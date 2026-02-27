@@ -1,3 +1,6 @@
+# @gitian Task runner (go-task) — orchestrates all system operations from a single CLI.
+# Run `task --list` to see available commands. Covers: build, switch, deploy,
+# home-manager, secrets management, flake ops, maintenance, and microVM control.
 version: "3"
 
 vars:
@@ -155,6 +158,8 @@ tasks:
   # SECRETS MANAGEMENT
   # =============================================================================
 
+  # @gitian:secret Secrets management tasks — init, edit, encrypt, decrypt.
+  # Uses SOPS + age encryption. See [[secrets]] for the full key hierarchy.
   secrets:init:
     desc: "Initialize secrets keys and files for the current host and user"
     cmds:

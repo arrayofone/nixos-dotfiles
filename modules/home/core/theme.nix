@@ -1,3 +1,6 @@
+# @gitian Global theming via Stylix — applies Catppuccin Macchiato (base16) across
+# all home-manager targets. Opacity, fonts, wallpaper, and polarity are set here.
+# Stylix auto-enables on most targets; Zed is explicitly disabled (uses its own theme).
 {
   inputs,
   lib,

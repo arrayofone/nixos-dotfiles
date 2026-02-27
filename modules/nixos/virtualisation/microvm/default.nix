@@ -1,3 +1,6 @@
+# @gitian:module MicroVM host module — defines Firecracker-based virtual machines with
+# typed option declarations (vcpus, memory, MAC, volumes). Each VM gets a TAP interface
+# bridged to the host network. Used on helms-deep (aarch64-linux).
 {
   config,
   lib,

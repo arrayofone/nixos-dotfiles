@@ -1,3 +1,6 @@
+# @gitian `sys` CLI — cross-platform rebuild helper that detects
+# darwin vs NixOS and dispatches to the correct rebuild command.
+# Provides: `sys rebuild`, `sys test`, `sys update`, `sys clean`.
 { writeShellScriptBin, ... }:
 writeShellScriptBin "sys" ''
 

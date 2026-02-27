@@ -1,3 +1,6 @@
+# @gitian:module Core home-manager module — imported by every user on every host.
+# Aggregates shell, git, SSH, secrets, theming, editor config, and the base package set.
+# See [[secrets]] for how SOPS secrets are wired into the home environment.
 {
   namespace,
   pkgs,

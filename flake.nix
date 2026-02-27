@@ -1,5 +1,9 @@
+# @gitian "Fellowship" — NixOS & nix-darwin dotfiles managed via Snowfall Library.
+# Defines all flake inputs, system configurations, and per-host module injection.
+# See [[architecture]] for the full system map.
 {
   inputs = {
+    # @gitian:input Core inputs shared by all platforms
     nixpkgs = {
       url = "github:nixos/nixpkgs/nixos-unstable";
     };
@@ -21,17 +25,8 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # @gitian:input NixOS-only inputs — Hyprland desktop, microVMs, and Ethereum nodes
     hyprland.url = "github:hyprwm/Hyprland";
-    hypridle.url = "github:hyprwm/hypridle";
-    hyprlock.url = "github:hyprwm/hyprlock";
-    hyprland-plugins = {
-      url = "github:hyprwm/hyprland-plugins";
-      inputs.hyprland.follows = "hyprland";
-    };
-
-    catppuccin.url = "github:catppuccin/nix";
-
-    nixos-wsl.url = "github:nix-community/NixOS-WSL";
 
     microvm = {
       url = "github:microvm-nix/microvm.nix";
@@ -43,6 +38,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # @gitian:input Darwin-only inputs — nix-darwin, Rosetta builder, and Homebrew
     # ###### #
     # DARWIN #
     # ###### #
@@ -102,6 +98,8 @@
         permittedInsecurePackages = [ ];
       };
 
+      # @gitian:host baradur — x86_64-linux desktop (Hyprland, Nvidia, Ollama, Steam).
+      # Imports ethereum-nix for potential validator/node operation.
       systems.hosts.baradur.modules = with inputs; [
         ethereum-nix.nixosModules.default
         (
@@ -118,10 +116,13 @@
         )
       ];
 
+      # @gitian:host helms-deep — aarch64-linux microVM host (RPi5 / arm server).
       systems.hosts.helms-deep.modules = with inputs; [
         microvm.nixosModules.host
       ];
 
+      # @gitian:host dbook — aarch64-darwin minimal macOS config.
+      # Bootstraps nix-rosetta-builder for x86_64 cross-compilation on Apple Silicon.
       systems.hosts.dbook.modules = with inputs; [
         #   # An existing Linux builder is needed to initially bootstrap `nix-rosetta-builder`.
         #   # If one isn't already available: comment out the `nix-rosetta-builder` module below,
@@ -162,6 +163,8 @@
         }
       ];
 
+      # @gitian:host mingabook — aarch64-darwin primary dev laptop.
+      # Current active machine. See [[mingabook]] for host-specific config.
       systems.hosts.mingabook.modules = with inputs; [
         #   # An existing Linux builder is needed to initially bootstrap `nix-rosetta-builder`.
         #   # If one isn't already available: comment out the `nix-rosetta-builder` module below,

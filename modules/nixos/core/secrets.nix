@@ -1,3 +1,7 @@
+# @gitian:secret NixOS system-level secrets via sops-nix.
+# Decrypts `secrets/<hostname>.yaml` using the host SSH key.
+# Always provides `system/users/arrayofone/password` for user creation.
+# Conditionally provides WireGuard keys when the VPN server is enabled.
 {
   config,
   inputs,

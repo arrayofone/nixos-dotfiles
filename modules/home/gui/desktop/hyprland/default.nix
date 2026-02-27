@@ -1,3 +1,6 @@
+# @gitian:module Home-manager Hyprland config — comprehensive window manager settings
+# including dwindle/master layouts (golden-ratio splits), animations, keybindings,
+# workspace rules, and special workspaces for calculator/password-manager/notes.
 {
   config,
   lib,

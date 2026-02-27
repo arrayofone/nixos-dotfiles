@@ -1,3 +1,7 @@
+# @gitian:security SSH config with split GitHub identities.
+# `gh-personal` key maps to `github.com` directly.
+# `gh-work` key maps to `gitwork` host alias (resolves to `github.com`).
+# Work repos use `gitwork:org/repo` as remote URL to trigger the correct key.
 { ... }:
 {
   programs.ssh = {

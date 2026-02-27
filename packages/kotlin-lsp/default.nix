@@ -1,3 +1,5 @@
+# @gitian JetBrains Kotlin LSP — packages the official Kotlin language server
+# from JetBrains CDN. Used by the Zed editor via `lsp.kotlin-lsp.binary.path`.
 {
   pkgs,
   stdenv,

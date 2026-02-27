@@ -1,3 +1,6 @@
+# @gitian:module NixOS Hyprland system module — enables Hyprland compositor at the system level,
+# configures the Cachix binary cache, UWSM session launcher, SDDM Wayland session, and XDG portals.
+# The home-manager Hyprland module handles window manager settings and keybindings.
 {
   config,
   lib,

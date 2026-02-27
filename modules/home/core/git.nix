@@ -1,3 +1,7 @@
+# @gitian:security Git identity splitting — uses `gitdir:` conditional includes
+# to switch between personal and work identities based on the repository path.
+# Commits under `~/projects/personal/` use `arrayofone`; `~/projects/work/` uses `darrenminga`.
+# GPG signing is enforced globally for both commits and tags.
 { ... }:
 {
   programs.git = {

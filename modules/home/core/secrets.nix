@@ -1,3 +1,7 @@
+# @gitian:secret Home-manager secrets via sops-nix.
+# Decrypts `secrets/<username>.yaml` at activation time using the user's age key.
+# Secrets are exposed as files under `config.sops.secrets.<name>.path`.
+# See [[secrets]] for the full encryption flow.
 {
   config,
   inputs,
