@@ -51,7 +51,7 @@
   };
 
   fellowship = {
-    networking.bridge = {
+    bridge = {
       enable = true;
       subnet = "10.10.0.0/24";
       hostAddress = "10.10.0.1";
@@ -62,7 +62,7 @@
       uplinkInterface = "eth0";
     };
 
-    virtualisation.microvm = {
+    microvm = {
       enable = true;
       bridgeInterface = "br0";
 

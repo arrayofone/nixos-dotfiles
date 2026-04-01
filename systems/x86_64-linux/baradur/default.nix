@@ -79,22 +79,20 @@
   };
 
   fellowship = {
-    gui.desktop = {
-      dunst.enable = true;
-      hyprland.enable = true;
-      sddm = {
-        enable = true;
-      };
+    dunst.enable = true;
+    hyprland.enable = true;
+    sddm = {
+      enable = true;
     };
-    hardware.nvidia.enable = true;
-    programs.ethereum.erigon.sepolia = {
+    nvidia.enable = true;
+    erigon.sepolia = {
       enable = false;
     };
-    programs.ethereum.geth.sepolia = {
+    geth.sepolia = {
       enable = false;
     };
 
-    networking.wireguard.server = {
+    wireguard = {
       dns = [ "1.1.1.1" ];
       enable = true;
       interface = "wg0";

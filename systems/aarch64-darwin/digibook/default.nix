@@ -18,7 +18,7 @@
 
   ${namespace} = {
     system.name = "digibook";
-    networking.wireguard.server = {
+    wireguard = {
       enable = true;
       interface = "wg0";
       ips = [ "10.20.255.252/32" ];

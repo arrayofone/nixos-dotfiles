@@ -1,6 +1,6 @@
 { pkgs, ... }:
 {
-  fellowship.home.dev.enable = false;
+  fellowship.dev.enable = false;
 
   programs.zsh.envExtra = "";
 

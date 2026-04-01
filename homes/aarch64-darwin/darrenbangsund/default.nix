@@ -1,6 +1,6 @@
 { ... }:
 {
-  # fellowship.home = {
+  # fellowship = {
   #   dev.enable = false;
   #   programs.zeditor = {
   #     nodePath = lib.getExe pkgs.nodejs_20;

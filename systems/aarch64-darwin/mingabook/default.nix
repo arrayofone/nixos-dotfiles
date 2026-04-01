@@ -1,7 +1,12 @@
 # @gitian:host mingabook system config — primary development machine (aarch64-darwin).
 # Installs Rosetta 2, configures Homebrew casks, enables Touch ID sudo,
 # and sets up weekly Nix garbage collection.
-{ config, lib, namespace, pkgs, ... }:
+{
+  config,
+  namespace,
+  pkgs,
+  ...
+}:
 {
   imports = [
     ./homebrew.nix
@@ -12,17 +17,23 @@
 
   ${namespace} = {
     system.name = "mingabook";
-    networking.wireguard.server = {
+    wireguard = {
       enable = true;
       interface = "wg0";
-      ips = [ "10.200.255.251/32" "fd3c:fd4c:b4e7:74d1:ffff:ffff:ffff:fffb/128" ];
+      ips = [
+        "10.200.255.251/32"
+        "fd3c:fd4c:b4e7:74d1:ffff:ffff:ffff:fffb/128"
+      ];
       dns = [ "1.1.1.1" ];
       mtu = 1420;
       privateKeyFile = config.sops.secrets."vpn/wg/privateKey".path;
       peers = [
         {
           publicKey = "raWuekoXvFFlrAQA0kFM9MG0dvRK3DXSXhHRDkQrJ10=";
-          allowedIPs = [ "0.0.0.0/0" "::/0" ];
+          allowedIPs = [
+            "0.0.0.0/0"
+            "::/0"
+          ];
           endpoint = "15.222.132.212:443";
           persistentKeepalive = 20;
         }

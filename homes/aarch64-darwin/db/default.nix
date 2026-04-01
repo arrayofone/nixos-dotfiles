@@ -5,10 +5,10 @@
   ...
 }:
 {
-  fellowship.home = {
+  fellowship = {
     dev.enable = true;
-    dev_modules.go.enable = lib.mkForce false;
-    dev_modules.flutter.enable = lib.mkForce false;
+    dev-go.enable = lib.mkForce false;
+    dev-flutter.enable = lib.mkForce false;
   };
 
   programs.zsh.envExtra = '''';
