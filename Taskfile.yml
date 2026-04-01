@@ -1,11 +1,15 @@
+# @gitian Task runner (go-task) — orchestrates all system operations from a single CLI.
+# Run `task --list` to see available commands. Covers: build, switch, deploy,
+# home-manager, secrets management, flake ops, maintenance, and microVM control.
 version: "3"
 
 vars:
   FLAKE_DIR: "{{.USER_WORKING_DIR}}"
   NIXOS_HOST: "baradur"
-  DARWIN_HOST: "digibook"
+  DARWIN_HOST: "mingabook"
   NIXOS_USER: "arrayofone"
-  DARWIN_USER: "db"
+  DARWIN_USER: "darrenbangsund"
+  MICROVM_HOST: "helms-deep"
 
 tasks:
   # =============================================================================
@@ -47,11 +51,11 @@ tasks:
     cmds:
       - sudo nixos-rebuild dry-run --flake {{.FLAKE_DIR}}#{{.NIXOS_HOST}}
 
-  vm:nixos:
-    desc: "Build and run NixOS configuration in VM"
-    cmds:
-      - sudo nixos-rebuild build-vm --flake {{.FLAKE_DIR}}#{{.NIXOS_HOST}}
-      - echo "VM built! Run: ./result/bin/run-{{.NIXOS_HOST}}-vm"
+  # vm:nixos:
+  #   desc: "Build and run NixOS configuration in VM"
+  #   cmds:
+  #     - sudo nixos-rebuild build-vm --flake {{.FLAKE_DIR}}#{{.NIXOS_HOST}}
+  #     - echo "VM built! Run: ./result/bin/run-{{.NIXOS_HOST}}-vm"
 
   # =============================================================================
   # HOME MANAGER OPERATIONS
@@ -154,28 +158,42 @@ tasks:
   # SECRETS MANAGEMENT
   # =============================================================================
 
-  secrets:edit:
-    desc: "Edit secrets file with SOPS"
+  # @gitian:secret Secrets management tasks — init, edit, encrypt, decrypt.
+  # Uses SOPS + age encryption. See [[secrets]] for the full key hierarchy.
+  secrets:init:
+    desc: "Initialize secrets keys and files for the current host and user"
     cmds:
-      - sops {{.FLAKE_DIR}}/secrets/fellowship.yaml
+      - scripts/init-secrets.sh
 
-  secrets:decrypt:
-    desc: "Decrypt and show secrets"
+  secrets:edit:system:
+    desc: "Edit system secrets (secrets/$(hostname).yaml)"
     cmds:
-      - sops -d {{.FLAKE_DIR}}/secrets/fellowship.yaml
+      - scripts/manage-secrets.sh edit system
 
-  secrets:encrypt:
-    desc: "Re-encrypt secrets with current keys"
+  secrets:edit:user:
+    desc: "Edit user secrets (secrets/$(whoami).yaml)"
     cmds:
-      - sops updatekeys {{.FLAKE_DIR}}/secrets/fellowship.yaml
+      - scripts/manage-secrets.sh edit user
 
-  age:keygen:
-    desc: "Generate new age key"
+  secrets:encrypt:system:
+    desc: "Re-encrypt system secrets"
     cmds:
-      - mkdir -p ~/.config/age
-      - age-keygen -o ~/.config/age/keys.txt
-      - echo "Public key:"
-      - age-keygen -y ~/.config/age/keys.txt
+      - scripts/manage-secrets.sh encrypt system
+
+  secrets:encrypt:user:
+    desc: "Re-encrypt user secrets"
+    cmds:
+      - scripts/manage-secrets.sh encrypt user
+
+  secrets:decrypt:system:
+    desc: "Decrypt and show system secrets"
+    cmds:
+      - scripts/manage-secrets.sh decrypt system
+
+  secrets:decrypt:user:
+    desc: "Decrypt and show user secrets"
+    cmds:
+      - scripts/manage-secrets.sh decrypt user
 
   # =============================================================================
   # MAINTENANCE & CLEANUP
@@ -345,6 +363,72 @@ tasks:
     cmds:
       - rm -f {{.FLAKE_DIR}}/result*
       - echo "🧹 Build results cleaned!"
+
+  # =============================================================================
+  # MICROVM HOST OPERATIONS
+  # =============================================================================
+
+  build:microvm-host:
+    desc: "Build microvm host (helms-deep) configuration"
+    cmds:
+      - nixos-rebuild build --flake {{.FLAKE_DIR}}#{{.MICROVM_HOST}} --target-host root@{{.MICROVM_HOST}}
+
+  switch:microvm-host:
+    desc: "Switch microvm host (helms-deep) to new configuration"
+    cmds:
+      - nixos-rebuild switch --flake {{.FLAKE_DIR}}#{{.MICROVM_HOST}} --target-host root@{{.MICROVM_HOST}}
+
+  deploy:microvm-host:
+    desc: "Full microvm host deployment workflow"
+    cmds:
+      - task: check
+      - task: build:microvm-host
+      - task: switch:microvm-host
+
+  vm:list:
+    desc: "List all microVMs on helms-deep"
+    cmds:
+      - ssh root@{{.MICROVM_HOST}} "systemctl list-units 'microvm@*' --no-pager"
+
+  vm:status:
+    desc: "Show status of a microVM (usage: task vm:status -- <vm-name>)"
+    cmds:
+      - ssh root@{{.MICROVM_HOST}} "systemctl status microvm@{{.CLI_ARGS}} --no-pager"
+    requires:
+      vars: [CLI_ARGS]
+
+  vm:start:
+    desc: "Start a microVM (usage: task vm:start -- <vm-name>)"
+    cmds:
+      - ssh root@{{.MICROVM_HOST}} "systemctl start microvm@{{.CLI_ARGS}}"
+    requires:
+      vars: [CLI_ARGS]
+
+  vm:stop:
+    desc: "Stop a microVM (usage: task vm:stop -- <vm-name>)"
+    cmds:
+      - ssh root@{{.MICROVM_HOST}} "systemctl stop microvm@{{.CLI_ARGS}}"
+    requires:
+      vars: [CLI_ARGS]
+
+  vm:restart:
+    desc: "Restart a microVM (usage: task vm:restart -- <vm-name>)"
+    cmds:
+      - ssh root@{{.MICROVM_HOST}} "systemctl restart microvm@{{.CLI_ARGS}}"
+    requires:
+      vars: [CLI_ARGS]
+
+  vm:logs:
+    desc: "Show logs for a microVM (usage: task vm:logs -- <vm-name>)"
+    cmds:
+      - ssh root@{{.MICROVM_HOST}} "journalctl -u microvm@{{.CLI_ARGS}} --no-pager -n 100"
+    requires:
+      vars: [CLI_ARGS]
+
+  debug:microvm-host:
+    desc: "Debug microvm host build with verbose output"
+    cmds:
+      - nixos-rebuild switch --flake {{.FLAKE_DIR}}#{{.MICROVM_HOST}} --target-host root@{{.MICROVM_HOST}} --show-trace --verbose
 
   # =============================================================================
   # HELP & SHORTCUTS

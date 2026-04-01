@@ -6,7 +6,7 @@
 , dpkg
 , curl
 , lttng-ust
-, wrapGAppsHook
+, wrapGAppsHook3
 , libredirect
 }:
 
@@ -21,7 +21,7 @@ stdenv.mkDerivation rec {
 
   nativeBuildInputs = [
     autoPatchelfHook
-    wrapGAppsHook
+    wrapGAppsHook3
   ];
 
   buildInputs = [

@@ -1,8 +1,0 @@
-{
-  ...
-}:
-{
-  imports = [
-    ./secrets.nix
-  ];
-}

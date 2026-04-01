@@ -1,16 +1,48 @@
-{ pkgs, ... }:
+{
+  config,
+  namespace,
+  pkgs,
+  ...
+}:
 {
   imports = [
     ./hardware-configuration.nix
-    # pkgs.fetchTarball awsVpnClient
   ];
+
+  nix = {
+    settings = {
+      auto-optimise-store = true;
+      experimental-features = "nix-command flakes";
+      trusted-users = [ "@wheel" ];
+    };
+
+    gc = {
+      automatic = true;
+      dates = [ "05:00" ];
+    };
+  };
+
+  home-manager.backupFileExtension = "hm-backup";
 
   networking.hostName = "baradur";
 
   boot = {
+    kernelPackages = pkgs.linuxPackages_6_6;
+
     loader = {
-      systemd-boot.enable = true;
-      efi.canTouchEfiVariables = true;
+      systemd-boot.enable = false;
+
+      efi = {
+        canTouchEfiVariables = true;
+        efiSysMountPoint = "/boot";
+      };
+
+      grub = {
+        enable = true;
+        device = "nodev";
+        useOSProber = true;
+        efiSupport = true;
+      };
     };
   };
 
@@ -30,7 +62,7 @@
     users.arrayofone = {
       isNormalUser = true;
       group = "arrayofone";
-      initialPassword = "letmein";
+      hashedPasswordFile = config.sops.secrets."system/users/arrayofone/password".path;
       description = "primordial devboi";
       shell = pkgs.zsh;
       extraGroups = [
@@ -47,37 +79,39 @@
   };
 
   fellowship = {
-    gui.desktop = {
-      dunst.enable = true;
-      hyprland.enable = true;
-      sddm = {
-        enable = true;
-      };
-    };
-    hardware.nvidia.enable = true;
-    programs.ethereum.erigon.sepolia = {
-      enable = false;
-    };
-    programs.ethereum.geth.sepolia = {
-      enable = false;
-    };
-    networking = {
-      # headscale.enable = false;
-      # tailscale.enable = false;
-      wireguard.server = {
-        enable = false;
-        externalInterface = "enp42s0";
-      };
+    dunst.enable = true;
+    hyprland.enable = true;
+    sddm.enable = true;
+    nvidia.enable = true;
+    erigon.sepolia.enable = false;
+    geth.sepolia.enable = false;
+
+    wireguard = {
+      dns = [ "9.9.9.9" ];
+      enable = true;
+      interface = "wg0";
+      ips = [
+        "10.200.255.254/32"
+        "fd3c:fd4c:b4e7:74d1:ffff:ffff:ffff:fffe/128"
+      ];
+      peers = [
+        {
+          publicKey = "raWuekoXvFFlrAQA0kFM9MG0dvRK3DXSXhHRDkQrJ10=";
+          endpoint = "15.222.132.212:443";
+          allowedIPs = [
+            "0.0.0.0/0"
+            "::/0"
+          ];
+        }
+      ];
+      privateKeyFile = config.sops.secrets."vpn/wg/privateKey".path;
     };
   };
 
   environment = {
     systemPackages = with pkgs; [
-      alacritty
       dconf
-      foot
       ghostty
-      kitty
       libqalculate
       mdadm
       pciutils
@@ -85,11 +119,11 @@
       qalculate-gtk
       shotman
       usbutils
-      nixfmt
       libsecret
       gimp
-      zip
-      unzip
+      cherry-studio
+      nvitop
+      zoom-us
     ];
 
     sessionVariables = {
@@ -97,22 +131,7 @@
     };
   };
 
-  hardware = { };
-
-  nix = {
-    settings.experimental-features = "nix-command flakes";
-    gc = {
-      automatic = true;
-      dates = "03:15";
-    };
-  };
-
   services = {
-    pulseaudio = {
-      enable = false;
-      extraConfig = "unload-module module-suspend-on-idle";
-    };
-
     openssh.enable = true;
     printing.enable = true;
     pipewire = {
@@ -132,56 +151,54 @@
           ];
         };
       };
-      # If you want to use JACK applications, uncomment this
-      #jack.enable = true;
-
-      # use the example session manager (no others are packaged yet so this is enabled by default,
-      # no need to redefine it in your config for now)
-      #media-session.enable = true;
     };
 
     ollama = {
       enable = true;
-      acceleration = "cuda";
+      package = pkgs.ollama-cuda;
       loadModels = [
-        "deepseek-r1"
-        "incept5/llama3.1-claude"
+        "deepseek-r1:14b"
+        "gemma3:12b"
+        "gpt-oss:20b"
+        "phi3:14b"
       ];
     };
-    open-webui.enable = false;
-    vsftpd = {
-      # allowWriteableChroot
-      # anonymousMkdirEnable
-      # anonymousUmask
-      # anonymousUploadEnable
-      # anonymousUser
-      # anonymousUserHome
-      # anonymousUserNoPassword
-      chrootlocalUser = true;
+
+    open-webui = {
       enable = true;
-      # enableVirtualUsers
-      # extraConfig
-      # forceLocalDataSSL
-      # forceLocalLoginsSSL
-      # localRoot
+      host = "0.0.0.0";
+      port = 1111;
+      environment = {
+        "WEBUI_AUTH" = "False";
+      };
+    };
+
+    vsftpd = {
+      enable = true;
+      chrootlocalUser = true;
       localUsers = true;
-      # portPromiscuous
-      # rsaCertFile
-      # rsaKeyFile
-      # ssl_sslv2
-      # ssl_sslv3
-      # ssl_tlsv1
-      # userDbPath
-      # userlist
-      # userlistDeny
-      # userlistEnable
-      # userlistFile
-      # virtualUseLocalPrivs
       writeEnable = true;
     };
   };
 
   security.rtkit.enable = true;
+
+  # Allow passwordless VPN toggle from waybar
+  security.sudo.extraRules = [
+    {
+      users = [ "arrayofone" ];
+      commands = [
+        {
+          command = "/run/current-system/sw/bin/systemctl start wg-quick-wg0.service";
+          options = [ "NOPASSWD" ];
+        }
+        {
+          command = "/run/current-system/sw/bin/systemctl stop wg-quick-wg0.service";
+          options = [ "NOPASSWD" ];
+        }
+      ];
+    }
+  ];
 
   programs = {
     zsh.enable = true;
@@ -194,59 +211,35 @@
       dedicatedServer.openFirewall = true;
       localNetworkGameTransfers.openFirewall = true;
     };
-
-    # Some programs need SUID wrappers, can be configured further or are
-    # started in user sessions.
-    # programs.mtr.enable = true;
-    # programs.gnupg.agent = {
-    #   enable = true;
-    #   enableSSHSupport = true;
-    # };
   };
 
   virtualisation = {
     oci-containers.backend = "podman";
 
-    containers = {
-      enable = true;
-    };
-
-    docker = {
-      enable = true;
-    };
-
-    podman = {
-      enable = false;
-      dockerCompat = false;
-
-      # Required for containers under podman-compose to be able to talk to each other.
-      defaultNetwork.settings.dns_enabled = false;
-    };
+    containers.enable = true;
+    docker.enable = true;
   };
 
-  # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
 
   networking.firewall = {
     enable = true;
     allowedTCPPorts = [
+      11434
       8082
       5432
       5433
       5434
       3000
+      1111
+      443
       21
       20
     ];
     checkReversePath = false;
   };
 
-  # Open ports in the firewall.
-  # networking.firewall.allowedTCPPorts = [ ... ];
-  # networking.firewall.allowedUDPPorts = [ ... ];
-  # Or disable the firewall altogether.
-
-  system.stateVersion = "24.05"; # Did you read the comment?
+  system.stateVersion = "24.05";
 
   i18n.defaultLocale = "en_CA.UTF-8";
 

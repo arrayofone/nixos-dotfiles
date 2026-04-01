@@ -1,3 +1,5 @@
+# @gitian Snowfall module helpers — convenience wrappers used across all NixOS and home-manager modules.
+# Provides `mkOpt`, `mkBoolOpt`, `enabled`, and `disabled` to reduce boilerplate in option declarations.
 { lib, ... }:
 with lib;
 rec {

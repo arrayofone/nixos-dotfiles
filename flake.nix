@@ -1,5 +1,9 @@
+# @gitian "Fellowship" — NixOS & nix-darwin dotfiles managed via Snowfall Library.
+# Defines all flake inputs, system configurations, and per-host module injection.
+# See [[architecture]] for the full system map.
 {
   inputs = {
+    # @gitian:input Core inputs shared by all platforms
     nixpkgs = {
       url = "github:nixos/nixpkgs/nixos-unstable";
     };
@@ -16,30 +20,25 @@
 
     sops-nix.url = "github:Mic92/sops-nix";
 
-    # headscale.url = "github:juanfont/headscale";
-
     stylix = {
       url = "github:danth/stylix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # @gitian:input NixOS-only inputs — Hyprland desktop, microVMs, and Ethereum nodes
     hyprland.url = "github:hyprwm/Hyprland";
-    hypridle.url = "github:hyprwm/hypridle";
-    hyprlock.url = "github:hyprwm/hyprlock";
-    hyprland-plugins = {
-      url = "github:hyprwm/hyprland-plugins";
-      inputs.hyprland.follows = "hyprland";
+
+    microvm = {
+      url = "github:microvm-nix/microvm.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
-
-    catppuccin.url = "github:catppuccin/nix";
-
-    nixos-wsl.url = "github:nix-community/NixOS-WSL";
 
     ethereum-nix = {
       url = "github:nix-community/ethereum.nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # @gitian:input Darwin-only inputs — nix-darwin, Rosetta builder, and Homebrew
     # ###### #
     # DARWIN #
     # ###### #
@@ -94,17 +93,16 @@
     lib.mkFlake {
       src = ./.;
 
-      shells = {
-        default = "digits";
-      };
-
       channels-config = {
         allowUnfree = true;
-        permittedInsecurePackages = [ ];
+        permittedInsecurePackages = [ "electron-38.8.4" ];
       };
 
+      # @gitian:host baradur — x86_64-linux desktop (Hyprland, Nvidia, Ollama, Steam).
+      # Imports ethereum-nix for potential validator/node operation.
       systems.hosts.baradur.modules = with inputs; [
         ethereum-nix.nixosModules.default
+        microvm.nixosModules.host
         (
           { pkgs, system, ... }:
           {
@@ -119,7 +117,14 @@
         )
       ];
 
-      systems.hosts.digibook.modules = with inputs; [
+      # @gitian:host helms-deep — aarch64-linux microVM host (RPi5 / arm server).
+      systems.hosts.helms-deep.modules = with inputs; [
+        microvm.nixosModules.host
+      ];
+
+      # @gitian:host dbook — aarch64-darwin minimal macOS config.
+      # Bootstraps nix-rosetta-builder for x86_64 cross-compilation on Apple Silicon.
+      systems.hosts.dbook.modules = with inputs; [
         #   # An existing Linux builder is needed to initially bootstrap `nix-rosetta-builder`.
         #   # If one isn't already available: comment out the `nix-rosetta-builder` module below,
         #   # uncomment this `linux-builder` module, and run `darwin-rebuild switch`:
@@ -146,7 +151,48 @@
 
             # Optional: Declarative tap management
             taps = {
-              # "oven-sh/bun" = homebrew-bun;
+              "oven-sh/homebrew-bun" = homebrew-bun;
+              "homebrew/homebrew-core" = homebrew-core;
+              "homebrew/homebrew-cask" = homebrew-cask;
+            };
+
+            # Optional: Enable fully-declarative tap management
+            #
+            # With mutableTaps disabled, taps can no longer be added imperatively with `brew tap`.
+            mutableTaps = false;
+          };
+        }
+      ];
+
+      # @gitian:host mingabook — aarch64-darwin primary dev laptop.
+      # Current active machine. See [[mingabook]] for host-specific config.
+      systems.hosts.mingabook.modules = with inputs; [
+        #   # An existing Linux builder is needed to initially bootstrap `nix-rosetta-builder`.
+        #   # If one isn't already available: comment out the `nix-rosetta-builder` module below,
+        #   # uncomment this `linux-builder` module, and run `darwin-rebuild switch`:
+        # { nix.linux-builder.enable = true; }
+        #   # Then: uncomment `nix-rosetta-builder`, remove `linux-builder`, and `darwin-rebuild switch`
+        #   # a second time. Subsequently, `nix-rosetta-builder` can rebuild itself.
+        nix-rosetta-builder.darwinModules.default
+        {
+          nix-rosetta-builder.enable = true;
+          # see available options in module.nix's `options.nix-rosetta-builder`
+          nix-rosetta-builder.onDemand = true;
+        }
+        nix-homebrew.darwinModules.nix-homebrew
+        {
+          nix-homebrew = {
+            # Install Homebrew under the default prefix
+            enable = true;
+
+            # Apple Silicon Only: Also install Homebrew under the default Intel prefix for Rosetta 2
+            enableRosetta = true;
+
+            # User owning the Homebrew prefix
+            user = "darrenbangsund";
+
+            # Optional: Declarative tap management
+            taps = {
               "oven-sh/homebrew-bun" = homebrew-bun;
               "homebrew/homebrew-core" = homebrew-core;
               "homebrew/homebrew-cask" = homebrew-cask;
