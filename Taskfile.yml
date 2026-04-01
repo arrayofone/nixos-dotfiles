@@ -6,9 +6,9 @@ version: "3"
 vars:
   FLAKE_DIR: "{{.USER_WORKING_DIR}}"
   NIXOS_HOST: "baradur"
-  DARWIN_HOST: "digibook"
+  DARWIN_HOST: "mingabook"
   NIXOS_USER: "arrayofone"
-  DARWIN_USER: "db"
+  DARWIN_USER: "darrenbangsund"
   MICROVM_HOST: "helms-deep"
 
 tasks:

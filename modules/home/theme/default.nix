@@ -10,8 +10,14 @@
 {
   imports = [ inputs.stylix.homeModules.stylix ];
 
-  home.packages = [
-    pkgs.font-awesome
+  home.packages = with pkgs; [
+    # Icon fonts
+    font-awesome
+    material-design-icons
+
+    # Nerd fonts for terminal/editor icons
+    nerd-fonts.intone-mono
+    nerd-fonts.symbols-only
   ];
 
   stylix = {
@@ -20,10 +26,10 @@
     autoEnable = true;
 
     opacity = {
-      applications = 0.95;
+      applications = 0.96;
       desktop = 1.0;
-      popups = 0.95;
-      terminal = 0.95;
+      popups = 0.94;
+      terminal = 0.92;
     };
 
     base16Scheme = ./theme/base16/catppuccin/macciato.yaml;
@@ -31,12 +37,12 @@
     fonts = {
       monospace = {
         name = "IntoneMono Nerd Font Mono";
-        package = lib.mkDefault pkgs.nerd-fonts.intone-mono;
+        package = pkgs.nerd-fonts.intone-mono;
       };
 
       sansSerif = {
-        name = "Ubuntu";
-        package = pkgs.ubuntu-classic;
+        name = "Ubuntu Sans";
+        package = pkgs.ubuntu-sans;
       };
 
       serif = {
@@ -50,41 +56,36 @@
       };
 
       sizes = {
-        applications = 12;
-        desktop = 12;
-        popups = 12;
-        terminal = 12;
+        applications = 11;
+        desktop = 11;
+        popups = 11;
+        terminal = 13;
       };
     };
-
-    # override = {
-    #   base00 = "1e1e2e"; # base - Catppuccin Mocha
-    #   base01 = "181825"; # mantle
-    #   base02 = "313244"; # surface0
-    #   base03 = "45475a"; # surface1
-    #   base04 = "585b70"; # surface2
-    #   base05 = "cdd6f4"; # text
-    #   base06 = "f5e0dc"; # rosewater
-    #   base07 = "b4befe"; # lavender
-    #   base08 = "f38ba8"; # red
-    #   base09 = "fab387"; # peach
-    #   base0A = "f9e2af"; # yellow
-    #   base0B = "a6e3a1"; # green
-    #   base0C = "94e2d5"; # teal
-    #   base0D = "89b4fa"; # blue
-    #   base0E = "cba6f7"; # mauve
-    #   base0F = "f2cdcd"; # flamingo
-    # };
 
     image = ./theme/wallpapers/rx7.png;
 
     polarity = "dark";
 
     targets = {
-      #   vscode.profileNames = [ "default" ];
       firefox.profileNames = [ "default" ];
       librewolf.profileNames = [ "default" ];
       zed.enable = false;
+
+      # Better Rofi styling
+      rofi.enable = true;
+
+      # GTK theming
+      gtk.enable = true;
+
+      # Foot terminal
+      foot.enable = true;
+
+      # Bat (cat replacement)
+      bat.enable = true;
+
+      # fzf
+      fzf.enable = true;
     };
   };
 }

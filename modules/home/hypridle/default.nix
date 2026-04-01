@@ -18,26 +18,29 @@ in
         enable = true;
         settings = {
           general = {
-            # lock_cmd = "${pkgs.hyprlock}/bin/hyprlock";
             lock_cmd = "pidof hyprlock || hyprlock";
             before_sleep_cmd = "playerctl pause && loginctl lock-session";
             after_sleep_cmd = "hyprctl dispatch dpms on";
           };
 
           listener = [
+            # Warning notification before lock (10 minutes)
             {
               timeout = 600;
-              on-timeout = "notify-send \"Baradur\" \"Good night :-)\" -a timeout -u low -t 30000 -i ${./eye.png}";
-              on-resume = "notify-send \"Baradur\" \"Welcome back :-)\" -a timeout -u low -t 10000 -i ${./eye.png}";
+              on-timeout = "notify-send \"The Eye of Sauron\" \"The darkness approaches...\" -h string:x-canonical-private-synchronous:idle -h int:value:30 -a \"Barad-dûr\" -u normal -t 30000 -i ${./eye.png}";
+              on-resume = "notify-send \"The Eye of Sauron\" \"The light returns to Middle-earth\" -h string:x-canonical-private-synchronous:idle -a \"Barad-dûr\" -u low -t 8000 -i ${./eye.png}";
             }
+            # Pause media before lock
             {
               timeout = 630;
               on-timeout = "playerctl pause";
             }
+            # Lock session (10.5 minutes)
             {
               timeout = 630;
               on-timeout = "loginctl lock-session";
             }
+            # Turn off displays (30 minutes)
             {
               timeout = 1800;
               on-timeout = "hyprctl dispatch dpms off";

@@ -56,31 +56,49 @@ in
         ];
 
         env = [
+          # Cursor
           "XCURSOR_SIZE,24"
+          "XCURSOR_THEME,Bibata-Modern-Ice"
           "HYPRCURSOR_SIZE,24"
           "HYPRCURSOR_THEME,Bibata-Modern-Ice"
-          "ELECTRON_OZONE_PLATFORM_HINT,x11"
+
+          # Electron/Chromium Wayland
+          "ELECTRON_OZONE_PLATFORM_HINT,auto"
+          "NIXOS_OZONE_WL,1"
+
+          # XDG Desktop
           "XDG_CURRENT_DESKTOP,Hyprland"
           "XDG_SESSION_DESKTOP,Hyprland"
           "XDG_SESSION_TYPE,wayland"
+
+          # Qt theming
+          "QT_QPA_PLATFORM,wayland;xcb"
+          "QT_QPA_PLATFORMTHEME,kvantum"
+          "QT_WAYLAND_DISABLE_WINDOWDECORATION,1"
+          "QT_AUTO_SCREEN_SCALE_FACTOR,1"
+
+          # GTK
+          "GDK_BACKEND,wayland,x11,*"
+          "GTK_THEME,Catppuccin-Macchiato-Standard-Mauve-Dark"
         ];
 
         general = {
-          border_size = 2;
-          gaps_in = 5;
-          gaps_out = 15;
+          border_size = 3;
+          gaps_in = 6;
+          gaps_out = 16;
           float_gaps = 0;
-          gaps_workspaces = 0;
+          gaps_workspaces = 50;
 
-          "col.inactive_border" = lib.mkDefault "0x66333333";
-          "col.active_border" = lib.mkDefault "rgba(ca9ee6ff) rgba(f2d5cfff) 45deg";
-          "col.nogroup_border" = lib.mkDefault "0x66ae8b2d";
-          "col.nogroup_border_active" = lib.mkDefault "0xffe78284";
+          # Catppuccin Macchiato gradient border
+          "col.inactive_border" = lib.mkDefault "rgba(363a4f88)";
+          "col.active_border" = lib.mkDefault "rgba(c6a0f6ff) rgba(8bd5caff) rgba(8aadf4ff) 45deg";
+          "col.nogroup_border" = lib.mkDefault "rgba(494d6488)";
+          "col.nogroup_border_active" = lib.mkDefault "rgba(ed8796ff)";
 
           layout = "dwindle";
           no_focus_fallback = false;
-          resize_on_border = false;
-          extend_border_grab_area = 15;
+          resize_on_border = true;
+          extend_border_grab_area = 20;
           hover_icon_on_border = true;
           allow_tearing = false;
           resize_corner = 0;
@@ -95,47 +113,47 @@ in
         };
 
         decoration = {
-          rounding = 10;
-          rounding_power = 2.0;
+          rounding = 14;
+          rounding_power = 2.2;
           active_opacity = 1.0;
-          inactive_opacity = 0.95;
+          inactive_opacity = 0.92;
           fullscreen_opacity = 1.0;
           dim_inactive = true;
-          dim_strength = 0.15;
-          dim_special = 0.2;
-          dim_around = 0.4;
+          dim_strength = 0.12;
+          dim_special = 0.3;
+          dim_around = 0.5;
           screen_shader = "";
           border_part_of_window = true;
 
           blur = {
             enabled = true;
-            size = 8;
-            passes = 3;
-            ignore_opacity = false;
+            size = 12;
+            passes = 4;
+            ignore_opacity = true;
             new_optimizations = true;
             xray = false;
-            noise = 0.0117;
-            contrast = 1.1;
-            brightness = 1.0;
-            vibrancy = 0.2;
-            vibrancy_darkness = 0.2;
+            noise = 0.02;
+            contrast = 1.05;
+            brightness = 0.95;
+            vibrancy = 0.3;
+            vibrancy_darkness = 0.3;
             special = true;
             popups = true;
-            popups_ignorealpha = 0.6;
+            popups_ignorealpha = 0.5;
             input_methods = true;
-            input_methods_ignorealpha = 0.6;
+            input_methods_ignorealpha = 0.5;
           };
 
           shadow = {
             enabled = true;
-            range = 12;
-            render_power = 3;
+            range = 20;
+            render_power = 4;
             sharp = false;
             ignore_window = true;
-            color = lib.mkDefault "0xcc000000";
-            # color_inactive = ""; # unset
-            offset = "0 8";
-            scale = 0.97;
+            color = lib.mkDefault "rgba(1a1a2ecc)";
+            color_inactive = lib.mkDefault "rgba(1a1a2e99)";
+            offset = "0 12";
+            scale = 0.95;
           };
         };
 
@@ -144,33 +162,56 @@ in
           workspace_wraparound = false;
 
           bezier = [
-            "fluent_decel,0.1, 1, 0, 1"
-            "easeOutCirc,0, 0.55, 0.45, 1"
-            "easeOutCubic,0.33, 1, 0.68, 1"
-            "easeInOutQuart,0.76, 0, 0.24, 1"
-            "linear,0,0,1,1"
-            "almostLinear,0.5,0.5,0.75,1.0"
-            "quick,0.15,0,0.1,1"
+            # Smooth and snappy
+            "smoothOut, 0.36, 0, 0.66, -0.56"
+            "smoothIn, 0.25, 1, 0.5, 1"
+            "overshot, 0.05, 0.9, 0.1, 1.1"
+
+            # Fluent design inspired
+            "fluent_decel, 0.1, 1, 0, 1"
+            "easeOutCirc, 0, 0.55, 0.45, 1"
+            "easeOutCubic, 0.33, 1, 0.68, 1"
+            "easeInOutQuart, 0.76, 0, 0.24, 1"
+
+            # Elastic and bouncy
+            "elastic, 0.68, -0.6, 0.32, 1.6"
+            "bounce, 0.175, 0.885, 0.32, 1.275"
+
+            # Utility
+            "linear, 0, 0, 1, 1"
+            "quick, 0.15, 0, 0.1, 1"
           ];
 
           animation = [
-            "global, 1, 8, default"
-            "border, 1, 6, fluent_decel"
-            "borderangle, 1, 30, fluent_decel, once"
-            "windows, 1, 5, fluent_decel, popin 60%"
-            "windowsIn, 1, 5, fluent_decel, slide"
-            "windowsOut, 1, 4, easeInOutQuart, slide"
-            "windowsMove, 1, 4, fluent_decel, slide"
-            "fadeIn, 1, 3, easeOutCirc"
-            "fadeOut, 1, 3, easeOutCirc"
-            "fade, 1, 8, easeOutCirc"
-            "layers, 1, 4, easeOutCirc, fade"
-            "layersIn, 1, 4, easeOutCirc, slide"
-            "layersOut, 1, 4, easeOutCirc, slide"
-            "workspaces, 1, 4, easeOutCubic, slide"
-            "workspacesIn, 1, 4, easeOutCubic, slidefade 15%"
-            "workspacesOut, 1, 4, easeInOutQuart, slidefade 15%"
-            "specialWorkspace, 1, 3, easeOutCirc, slidevert"
+            "global, 1, 6, default"
+
+            # Border animations - rotating gradient
+            "border, 1, 8, fluent_decel"
+            "borderangle, 1, 100, linear, loop"
+
+            # Window animations
+            "windows, 1, 5, overshot, popin 80%"
+            "windowsIn, 1, 5, bounce, popin 80%"
+            "windowsOut, 1, 4, smoothOut, popin 80%"
+            "windowsMove, 1, 5, overshot, slide"
+
+            # Fade animations
+            "fadeIn, 1, 4, smoothIn"
+            "fadeOut, 1, 4, smoothOut"
+            "fade, 1, 6, smoothIn"
+            "fadeDim, 1, 6, smoothIn"
+            "fadeShadow, 1, 6, smoothIn"
+
+            # Layer animations (rofi, waybar, etc.)
+            "layers, 1, 4, smoothIn, fade"
+            "layersIn, 1, 4, bounce, slide"
+            "layersOut, 1, 3, smoothOut, slide"
+
+            # Workspace animations
+            "workspaces, 1, 5, overshot, slide"
+            "workspacesIn, 1, 5, bounce, slidefade 20%"
+            "workspacesOut, 1, 5, smoothOut, slidefade 20%"
+            "specialWorkspace, 1, 4, bounce, slidevert"
           ];
         };
 
@@ -265,40 +306,43 @@ in
           merge_floated_into_tiled_on_groupbar = false;
           group_on_movetoworkspace = false;
 
-          "col.border_active" = lib.mkDefault "rgba(ca9ee6ff)";
-          "col.border_inactive" = lib.mkDefault "0x66414559";
-          "col.border_locked_active" = lib.mkDefault "rgba(e78284ff)";
-          "col.border_locked_inactive" = lib.mkDefault "0x66626880";
+          # Catppuccin Macchiato group colors
+          "col.border_active" = lib.mkDefault "rgba(c6a0f6ff)";
+          "col.border_inactive" = lib.mkDefault "rgba(494d6488)";
+          "col.border_locked_active" = lib.mkDefault "rgba(ed8796ff)";
+          "col.border_locked_inactive" = lib.mkDefault "rgba(5b607888)";
 
           groupbar = {
             enabled = true;
-            font_family = "";
-            font_size = 10;
-            font_weight_active = "normal";
+            font_family = "Ubuntu Sans";
+            font_size = 11;
+            font_weight_active = "bold";
             font_weight_inactive = "normal";
-            gradients = false;
-            height = 16;
-            indicator_gap = 0;
-            indicator_height = 3;
+            gradients = true;
+            height = 22;
+            indicator_gap = 2;
+            indicator_height = 4;
             stacked = false;
             priority = 3;
             render_titles = true;
             text_offset = 0;
             scrolling = true;
-            rounding = 6;
-            gradient_rounding = 2;
+            rounding = 10;
+            gradient_rounding = 8;
             round_only_edges = true;
             gradient_round_only_edges = true;
-            text_color = lib.mkDefault "0xffc6d0f5";
-            # text_color_inactive = null; # unset
-            # text_color_locked_active = null; # unset
-            # text_color_locked_inactive = null; # unset
-            "col.active" = lib.mkDefault "0x80ca9ee6";
-            "col.inactive" = lib.mkDefault "0x80414559";
-            "col.locked_active" = lib.mkDefault "0x80e78284";
-            "col.locked_inactive" = lib.mkDefault "0x80626880";
-            gaps_in = 2;
-            gaps_out = 2;
+            # Catppuccin Macchiato text colors
+            text_color = lib.mkDefault "rgba(cad3f5ff)";
+            text_color_inactive = lib.mkDefault "rgba(a5adcbcc)";
+            text_color_locked_active = lib.mkDefault "rgba(ed8796ff)";
+            text_color_locked_inactive = lib.mkDefault "rgba(ee99a0cc)";
+            # Catppuccin Macchiato bar colors
+            "col.active" = lib.mkDefault "rgba(c6a0f6cc)";
+            "col.inactive" = lib.mkDefault "rgba(363a4fcc)";
+            "col.locked_active" = lib.mkDefault "rgba(ed8796cc)";
+            "col.locked_inactive" = lib.mkDefault "rgba(494d64cc)";
+            gaps_in = 3;
+            gaps_out = 3;
             keep_upper_gap = true;
           };
         };
@@ -306,9 +350,9 @@ in
         misc = {
           disable_hyprland_logo = true;
           disable_splash_rendering = true;
-          "col.splash" = "0xffffffff";
-          font_family = lib.mkDefault "Sans";
-          splash_font_family = "";
+          "col.splash" = "rgba(c6a0f6ff)";
+          font_family = lib.mkDefault "Ubuntu";
+          splash_font_family = "Ubuntu Sans";
           force_default_wallpaper = 0;
           vfr = true;
           vrr = 1;
@@ -326,7 +370,7 @@ in
           mouse_move_focuses_monitor = true;
           allow_session_lock_restore = false;
           # session_lock_xray = false; # does not exist. Bug in documentation?
-          background_color = lib.mkDefault "0x1e1e2e";
+          background_color = lib.mkDefault "0x24273a";
           close_special_on_empty = true;
           exit_window_retains_fullscreen = false;
           initial_workspace_tracking = 1;
@@ -406,7 +450,7 @@ in
         };
 
         experimental = {
-          xx_color_management_v4 = false;
+          # xx_color_management_v4 = false;
         };
 
         debug = {

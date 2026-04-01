@@ -41,6 +41,7 @@ in
           ];
           modules-right = [
             "tray"
+            "custom/vpn"
             "idle_inhibitor"
             "pulseaudio"
             "network"
@@ -117,11 +118,11 @@ in
               weeks-pos = "right";
               on-scroll = 1;
               format = {
-                months = "<span color='#cba6f7'><b>{}</b></span>";
-                days = "<span color='#cdd6f4'><b>{}</b></span>";
-                weeks = "<span color='#94e2d5'><b>W{}</b></span>";
-                weekdays = "<span color='#fab387'><b>{}</b></span>";
-                today = "<span color='#f38ba8'><b><u>{}</u></b></span>";
+                months = "<span color='#c6a0f6'><b>{}</b></span>";
+                days = "<span color='#cad3f5'><b>{}</b></span>";
+                weeks = "<span color='#8bd5ca'><b>W{}</b></span>";
+                weekdays = "<span color='#f5a97f'><b>{}</b></span>";
+                today = "<span color='#ed8796'><b><u>{}</u></b></span>";
               };
             };
           };
@@ -238,10 +239,352 @@ in
             tooltip-format-activated = "Idle inhibitor is active";
             tooltip-format-deactivated = "Idle inhibitor is inactive";
           };
+
+          # WireGuard VPN toggle
+          "custom/vpn" = {
+            format = "{}";
+            interval = 5;
+            exec = ''
+              if ip link show wg0 &>/dev/null; then
+                echo '{"text": "󰌾", "tooltip": "VPN Connected (wg0)", "class": "connected"}'
+              else
+                echo '{"text": "󰿆", "tooltip": "VPN Disconnected", "class": "disconnected"}'
+              fi
+            '';
+            return-type = "json";
+            on-click = ''
+              if ip link show wg0 &>/dev/null; then
+                sudo systemctl stop wg-quick-wg0.service
+              else
+                sudo systemctl start wg-quick-wg0.service
+              fi
+            '';
+          };
         };
       };
 
-      # style = builtins.readFile ./config/style.css;
+      style = ''
+        /* Catppuccin Macchiato Palette */
+        @define-color base #24273a;
+        @define-color mantle #1e2030;
+        @define-color crust #181926;
+        @define-color surface0 #363a4f;
+        @define-color surface1 #494d64;
+        @define-color surface2 #5b6078;
+        @define-color text #cad3f5;
+        @define-color subtext0 #a5adcb;
+        @define-color subtext1 #b8c0e0;
+        @define-color lavender #b7bdf8;
+        @define-color blue #8aadf4;
+        @define-color sapphire #7dc4e4;
+        @define-color sky #91d7e3;
+        @define-color teal #8bd5ca;
+        @define-color green #a6da95;
+        @define-color yellow #eed49f;
+        @define-color peach #f5a97f;
+        @define-color maroon #ee99a0;
+        @define-color red #ed8796;
+        @define-color mauve #c6a0f6;
+        @define-color pink #f5bde6;
+        @define-color flamingo #f0c6c6;
+        @define-color rosewater #f4dbd6;
+
+        * {
+          font-family: "Ubuntu Sans", "Ubuntu", "Font Awesome 6 Free", sans-serif;
+          font-size: 14px;
+          font-weight: 600;
+          min-height: 0;
+        }
+
+        window#waybar {
+          background: transparent;
+        }
+
+        window#waybar > box {
+          background: alpha(@base, 0.85);
+          border: 2px solid alpha(@surface1, 0.8);
+          border-radius: 16px;
+          margin: 0;
+          padding: 0 8px;
+        }
+
+        tooltip {
+          background: @mantle;
+          border: 2px solid @mauve;
+          border-radius: 12px;
+        }
+
+        tooltip label {
+          color: @text;
+          padding: 4px 8px;
+        }
+
+        /* Module styling */
+        #workspaces,
+        #window,
+        #tray,
+        #idle_inhibitor,
+        #pulseaudio,
+        #network,
+        #cpu,
+        #memory,
+        #temperature,
+        #battery,
+        #clock {
+          padding: 4px 12px;
+          margin: 4px 2px;
+          border-radius: 10px;
+          background: alpha(@surface0, 0.6);
+          color: @text;
+          transition: all 0.3s ease;
+        }
+
+        /* Workspaces */
+        #workspaces {
+          background: transparent;
+          padding: 0;
+          margin: 4px 4px;
+        }
+
+        #workspaces button {
+          padding: 4px 8px;
+          margin: 0 2px;
+          border-radius: 8px;
+          background: alpha(@surface0, 0.5);
+          color: @subtext0;
+          border: none;
+          transition: all 0.3s ease;
+        }
+
+        #workspaces button:hover {
+          background: alpha(@surface1, 0.8);
+          color: @text;
+        }
+
+        #workspaces button.active {
+          background: linear-gradient(135deg, alpha(@mauve, 0.8), alpha(@lavender, 0.6));
+          color: @base;
+          font-weight: 800;
+          text-shadow: 0 0 2px alpha(@base, 0.3);
+        }
+
+        #workspaces button.urgent {
+          background: linear-gradient(135deg, @red, @maroon);
+          color: @base;
+          animation: pulse 1s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+          0% { opacity: 1; }
+          50% { opacity: 0.7; }
+          100% { opacity: 1; }
+        }
+
+        /* Window title */
+        #window {
+          color: @lavender;
+          font-weight: 500;
+          background: alpha(@surface0, 0.4);
+        }
+
+        /* Submap */
+        #submap {
+          padding: 4px 14px;
+          margin: 4px 2px;
+          border-radius: 10px;
+          background: linear-gradient(135deg, @mauve, @pink);
+          color: @base;
+          font-weight: 800;
+          animation: breathe 2s ease-in-out infinite;
+        }
+
+        @keyframes breathe {
+          0% { opacity: 1; }
+          50% { opacity: 0.8; }
+          100% { opacity: 1; }
+        }
+
+        /* System tray */
+        #tray {
+          background: alpha(@surface0, 0.4);
+        }
+
+        #tray > .passive {
+          -gtk-icon-effect: dim;
+        }
+
+        #tray > .needs-attention {
+          -gtk-icon-effect: highlight;
+          background: alpha(@red, 0.3);
+        }
+
+        /* Idle inhibitor */
+        #idle_inhibitor {
+          color: @subtext0;
+          background: alpha(@surface0, 0.4);
+        }
+
+        #idle_inhibitor.activated {
+          color: @green;
+          background: alpha(@green, 0.2);
+        }
+
+        /* VPN */
+        #custom-vpn {
+          color: @subtext0;
+          background: alpha(@surface0, 0.4);
+          padding: 4px 12px;
+          margin: 4px 2px;
+          border-radius: 10px;
+          transition: all 0.3s ease;
+        }
+
+        #custom-vpn.connected {
+          color: @green;
+          background: alpha(@green, 0.2);
+        }
+
+        #custom-vpn.disconnected {
+          color: @surface2;
+          background: alpha(@surface0, 0.4);
+        }
+
+        #custom-vpn:hover {
+          background: alpha(@surface1, 0.8);
+        }
+
+        /* Clock */
+        #clock {
+          color: @rosewater;
+          background: linear-gradient(135deg, alpha(@mauve, 0.3), alpha(@surface0, 0.6));
+          font-weight: 700;
+          padding: 4px 16px;
+        }
+
+        /* CPU */
+        #cpu {
+          color: @blue;
+          background: alpha(@blue, 0.15);
+        }
+
+        #cpu.warning {
+          color: @yellow;
+          background: alpha(@yellow, 0.2);
+        }
+
+        #cpu.critical {
+          color: @red;
+          background: alpha(@red, 0.2);
+          animation: pulse 1s ease-in-out infinite;
+        }
+
+        /* Memory */
+        #memory {
+          color: @green;
+          background: alpha(@green, 0.15);
+        }
+
+        #memory.warning {
+          color: @yellow;
+          background: alpha(@yellow, 0.2);
+        }
+
+        #memory.critical {
+          color: @red;
+          background: alpha(@red, 0.2);
+          animation: pulse 1s ease-in-out infinite;
+        }
+
+        /* Temperature */
+        #temperature {
+          color: @yellow;
+          background: alpha(@yellow, 0.15);
+        }
+
+        #temperature.critical {
+          color: @red;
+          background: alpha(@red, 0.25);
+          animation: pulse 0.8s ease-in-out infinite;
+        }
+
+        /* Network */
+        #network {
+          color: @teal;
+          background: alpha(@teal, 0.15);
+        }
+
+        #network.disconnected {
+          color: @surface2;
+          background: alpha(@surface0, 0.4);
+        }
+
+        #network.linked {
+          color: @yellow;
+          background: alpha(@yellow, 0.15);
+        }
+
+        /* Audio */
+        #pulseaudio {
+          color: @peach;
+          background: alpha(@peach, 0.15);
+        }
+
+        #pulseaudio.muted {
+          color: @surface2;
+          background: alpha(@surface0, 0.4);
+        }
+
+        #pulseaudio.bluetooth {
+          color: @blue;
+          background: alpha(@blue, 0.15);
+        }
+
+        /* Battery */
+        #battery {
+          color: @green;
+          background: alpha(@green, 0.15);
+        }
+
+        #battery.good {
+          color: @green;
+          background: alpha(@green, 0.15);
+        }
+
+        #battery.warning:not(.charging) {
+          color: @yellow;
+          background: alpha(@yellow, 0.2);
+        }
+
+        #battery.critical:not(.charging) {
+          color: @red;
+          background: linear-gradient(135deg, alpha(@red, 0.3), alpha(@maroon, 0.2));
+          animation: pulse 1s ease-in-out infinite;
+        }
+
+        #battery.charging {
+          color: @green;
+          background: alpha(@green, 0.2);
+        }
+
+        #battery.plugged {
+          color: @teal;
+          background: alpha(@teal, 0.15);
+        }
+
+        /* Hover effects for all modules */
+        #tray:hover,
+        #idle_inhibitor:hover,
+        #pulseaudio:hover,
+        #network:hover,
+        #cpu:hover,
+        #memory:hover,
+        #temperature:hover,
+        #battery:hover,
+        #clock:hover {
+          background: alpha(@surface1, 0.8);
+          border-radius: 10px;
+        }
+      '';
     };
 
     home = {
