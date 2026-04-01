@@ -95,7 +95,7 @@
 
       channels-config = {
         allowUnfree = true;
-        permittedInsecurePackages = [ ];
+        permittedInsecurePackages = [ "electron-38.8.4" ];
       };
 
       # @gitian:host baradur — x86_64-linux desktop (Hyprland, Nvidia, Ollama, Steam).
