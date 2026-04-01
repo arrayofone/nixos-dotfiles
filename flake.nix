@@ -102,6 +102,7 @@
       # Imports ethereum-nix for potential validator/node operation.
       systems.hosts.baradur.modules = with inputs; [
         ethereum-nix.nixosModules.default
+        microvm.nixosModules.host
         (
           { pkgs, system, ... }:
           {
