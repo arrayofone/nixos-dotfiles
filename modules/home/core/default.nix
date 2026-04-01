@@ -8,7 +8,6 @@
 }:
 {
   imports = [
-    # ./editor.nix
     ./env.nix
     ./fonts.nix
     ./git.nix
@@ -16,6 +15,8 @@
     ./shell.nix
     ./ssh.nix
     ./theme.nix
+    ./tmux.nix
+    ./vscode.nix
     ./zeditor.nix
   ];
 
@@ -77,7 +78,7 @@
       protols
       ripgrep
       sops
-      tmux
+
       unzip
       vim-full
       wget

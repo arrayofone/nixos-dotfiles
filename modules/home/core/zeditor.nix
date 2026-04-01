@@ -571,12 +571,12 @@
             ignore_system_version = true;
           };
         };
-        kotlin-lsp = {
-          binary = {
-            path = lib.getExe pkgs.${namespace}.kotlin-lsp;
-            arguments = [ "--stdio" ];
-          };
-        };
+        # kotlin-lsp = {
+        #   binary = {
+        #     path = lib.getExe pkgs.${namespace}.kotlin-lsp;
+        #     arguments = [ "--stdio" ];
+        #   };
+        # };
         nix = {
           binary = {
             path = lib.getExe pkgs.nixd;

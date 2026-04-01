@@ -13,7 +13,7 @@
     # ./dock.nix
     # ./fonts.nix
     # ./homebrew.nix
-    # ./secrets.nix
+    ./secrets.nix
   ];
 
   options.${namespace}.system.name = lib.mkOption {

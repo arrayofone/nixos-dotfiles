@@ -284,6 +284,9 @@
         gst = "g stash";
         gstp = "gst pop";
         gstl = "gst list";
+        vpn-up = "sudo wg-quick up wg0";
+        vpn-down = "sudo wg-quick down wg0";
+
         c = "codium";
         cdot = "c .";
         csys = "c ~/.sys";

@@ -11,8 +11,5 @@
       "Thunderbolt Bridge"
       "Wi-Fi"
     ];
-    wg-quick = {
-      interfaces = { };
-    };
   };
 }

@@ -10,6 +10,16 @@
 {
   options.${namespace}.networking.wireguard.server = {
     enable = lib.mkEnableOption "enable wireguard server";
+    dns = lib.mkOption {
+      description = "DNS addresses for the wireguard interface";
+      type = lib.types.listOf lib.types.str;
+      default = [ "1.1.1.1" ];
+    };
+    mtu = lib.mkOption {
+      description = "MTU for the wireguard interface";
+      type = lib.types.nullOr lib.types.int;
+      default = null;
+    };
     interface = lib.mkOption {
       description = "WireGuard interface name";
       type = lib.types.str;
@@ -70,9 +80,13 @@
     networking.wg-quick.interfaces = {
       ${config.${namespace}.networking.wireguard.server.interface} = {
         address = config.${namespace}.networking.wireguard.server.ips;
-        dns = [ "9.9.9.9" ];
+        dns = config.${namespace}.networking.wireguard.server.dns;
         privateKeyFile = config.${namespace}.networking.wireguard.server.privateKeyFile;
-
+      }
+      // lib.optionalAttrs (config.${namespace}.networking.wireguard.server.mtu != null) {
+        mtu = config.${namespace}.networking.wireguard.server.mtu;
+      }
+      // {
         peers = map (
           peer:
           {
