@@ -1,14 +1,36 @@
+# Editor
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
 !.vscode/*.code-snippets
-
-# modules/nixos/networking/wg/keys
-
-# Local History for Visual Studio Code
 .history/
-
-# Built Visual Studio Code Extensions
 *.vsix
+.idea/
+*.swp
+*.swo
+*~
+
+# AI assistants
+.claude/
+.copilot/
+.cursor/
+.aider*
+
+# Nix
+result
+result-*
+.direnv/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets
+*.age
+*.enc
+!*.pub
+
+# Superpowers specs
+docs/superpowers/
