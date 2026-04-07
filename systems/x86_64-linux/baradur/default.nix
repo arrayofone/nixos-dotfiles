@@ -217,7 +217,10 @@
     oci-containers.backend = "podman";
 
     containers.enable = true;
-    docker.enable = true;
+    docker = {
+    	enable = true;
+	enableNvidia = true;
+	};
   };
 
   nixpkgs.config.allowUnfree = true;
