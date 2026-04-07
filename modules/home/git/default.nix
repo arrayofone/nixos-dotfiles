@@ -6,6 +6,7 @@
 {
   programs.git = {
     enable = true;
+    signing.format = "openpgp";
     includes = [
       {
         condition = "gitdir:~/projects/personal/";

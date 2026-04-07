@@ -17,9 +17,6 @@
       enableSensible = true;
     };
 
-    vim = {
-      enable = true;
-      enableSensible = true;
-    };
+    vim.enable = false;
   };
 }

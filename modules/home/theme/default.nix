@@ -3,7 +3,6 @@
 # Stylix auto-enables on most targets; Zed is explicitly disabled (uses its own theme).
 {
   inputs,
-  lib,
   pkgs,
   ...
 }:

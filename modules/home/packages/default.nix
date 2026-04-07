@@ -18,7 +18,6 @@
       bat
       btop
       claude-code
-      claude-monitor
       deno
       docker
       docker-compose
@@ -64,7 +63,7 @@
       sops
 
       unzip
-      vim-full
+
       wget
       wireguard-tools
       zellij
