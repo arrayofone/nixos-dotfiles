@@ -8,7 +8,10 @@
   #   };
   # };
 
-  fellowship.dev-go.enable = true;
+  fellowship = {
+    dev-go.enable = true;
+    element.enable = true;
+  };
 
   #  export NX_TUI=false
   # export NVM_DIR="$HOME/.nvm"
