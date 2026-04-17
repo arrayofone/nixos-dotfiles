@@ -20,7 +20,7 @@ in
         go_1_26
         go-ethereum
         gopls
-        gotools
+        (lib.meta.lowPrio gotools)
         go-tools
         # golangci-lint
       ];
