@@ -17,7 +17,7 @@ in
   sops = {
     # age.keyFile = "/home/${config.snowfallorg.user.name}/.age-key.txt"; # must have no password!
     # It's also possible to use a ssh key, but only when it has no password:
-    age.sshKeyPaths = [ "/home/${config.snowfallorg.user.name}/.ssh/sops-nix" ];
+    age.sshKeyPaths = [ "${config.home.homeDirectory}/.ssh/sops-nix" ];
     defaultSopsFile = "${secrets}/${config.snowfallorg.user.name}.yaml";
     # secrets.test = {
     #   # sopsFile = ./secrets.yml.enc; # optionally define per-secret files
@@ -35,6 +35,7 @@ in
       "git/gh/ssh-public" = { };
       "ai/anthropic/api-key" = { };
       "ai/gemini/api-key" = { };
+      "localstack/auth-token" = { };
     };
   };
 

@@ -432,37 +432,89 @@
         border_size = 0;
         inactive_opacity = 1;
       };
-      bottom_dock_layout = "contained";
+      agent = {
+        default_model = {
+          model = "claude-4-sonnet";
+          provider = "anthropic";
+        };
+      };
       # agent_font_size = null;
       allow_rewrap = "in_comments";
+      always_treat_brackets_as_autoclosed = false;
       auto_indent = true;
       auto_indent_on_paste = true;
       auto_install_extensions = {
         html = true;
       };
+      auto_signature_help = false;
+      auto_update = false;
       auto_update_extensions = { };
       autosave = "off";
       autoscroll_on_clicks = false;
-      auto_signature_help = false;
-      show_signature_help_after_edits = false;
-      auto_update = false;
       base_keymap = "VSCode";
+      bottom_dock_layout = "contained";
+      buffer_font_fallbacks = null;
       buffer_font_family = "IntoneMono Nerd Font Mono";
       buffer_font_features = null;
-      buffer_font_fallbacks = null;
       buffer_font_size = 12;
       buffer_font_weight = 400;
       buffer_line_height = "comfortable";
+      calls = {
+        mute_on_join = false;
+        share_on_join = false;
+      };
       centered_layout = {
         left_padding = 0.2;
         right_padding = 0.2;
       };
       close_on_file_delete = false;
+      # code_lens = "off";
+      collaboration_panel = {
+        button = false;
+        default_width = 240;
+        dock = "left";
+      };
+      colorize_brackets = false;
+      completions = {
+        lsp = true;
+        lsp_fetch_timeout_ms = 0;
+        lsp_insert_mode = "replace_suffix";
+        words = "fallback";
+        words_min_length = 3;
+      };
       confirm_quit = false;
+      current_line_highlight = "all";
+      cursor_blink = true;
+      cursor_shape = "bar";
+      debugger = {
+        button = true;
+        dock = "bottom";
+        save_breakpoints = true;
+        stepping_granularity = "line";
+      };
+      diagnostics = {
+        include_warnings = true;
+        inline = {
+          enabled = false;
+          max_severity = null;
+          min_column = 0;
+          padding = 4;
+          update_debounce_ms = 150;
+        };
+        # primary_only = false;
+        # update_with_cursor = false;
+        # use_rendered = false;
+      };
       diagnostics_max_severity = null;
+      # diff_view_style = "split";
       disable_ai = false;
-      load_direnv = "shell_hook";
+      # document_folding_ranges = "off";
+      # document_symbols = "off";
       double_click_in_multibuffer = "select";
+      drag_and_drop_selection = {
+        delay = 300;
+        enabled = true;
+      };
       drop_target_size = 0.2;
       edit_predictions = {
         disabled_globs = [
@@ -476,82 +528,374 @@
         ];
       };
       edit_predictions_disabled_in = [ ];
-      current_line_highlight = "all";
-      selection_highlight = true;
-      rounded_selection = true;
-      cursor_blink = true;
-      cursor_shape = "bar";
-      gutter = {
-        line_numbers = true;
-        runnables = true;
-        breakpoints = true;
-        folds = true;
-        min_line_number_digits = 4;
-      };
-      hide_mouse = "on_typing_and_movement";
-      snippet_sort_order = "inline";
-      scrollbar = {
-        show = "auto";
-        cursors = true;
-        git_diff = true;
-        search_results = true;
-        selected_text = true;
-        selected_symbol = true;
-        diagnostics = "all";
-        axes = {
-          horizontal = true;
-          vertical = true;
-        };
-      };
-      minimap = {
-        show = "always";
-        thumb = "always";
-        thumb_border = "left_open";
-        current_line_highlight = "line";
-      };
-      tab_bar = {
-        show = true;
-        show_nav_history_buttons = true;
-        show_tab_bar_buttons = true;
-      };
-      tabs = {
-        close_position = "right";
-        file_icons = false;
-        git_status = false;
-        activate_on_close = "history";
-        show_close_button = "hover";
-        show_diagnostics = "off";
-      };
-      inline_code_actions = true;
-      session = {
-        restore_unsaved_buffers = true;
-        trust_all_worktrees = false;
-      };
-      drag_and_drop_selection = {
-        enabled = true;
-        delay = 300;
-      };
-      toolbar = {
-        breadcrumbs = true;
-        quick_actions = true;
-        selections_menu = true;
-        agent_review = true;
-        code_actions = false;
-      };
-      use_system_window_tabs = false;
       enable_language_server = true;
       ensure_final_newline_on_save = true;
-      expand_excerpt_lines = 5;
       excerpt_context_lines = 2;
+      expand_excerpt_lines = 5;
       extend_comment_on_newline = true;
       # extend_list_on_newline = true;
-      # indent_list_on_tab = true;
-      status_bar = {
-        active_language_button = true;
-        cursor_position_button = true;
-        line_endings_button = false;
-        # active_encoding_button = "non_utf8";
+      fast_scroll_sensitivity = 4;
+      features = {
+        edit_predictions = {
+          provider = "none";
+        };
       };
+      file_finder = {
+        file_icons = true;
+        modal_max_width = "small";
+        skip_focus_for_active_in_search = true;
+      };
+      file_scan_exclusions = [
+        "**/.git"
+        "**/.svn"
+        "**/.hg"
+        "**/.jj"
+        "**/.sl"
+        "**/.repo"
+        "**/CVS"
+        "**/.DS_Store"
+        "**/Thumbs.db"
+        "**/.classpath"
+        "**/.settings"
+      ];
+      file_scan_inclusions = [ ".env*" ];
+      file_types = {
+        "C" = [
+          "*.c"
+          "*.h"
+        ];
+        "C#" = [ "*.cs" ];
+        "C++" = [
+          "*.cpp"
+          "*.cc"
+          "*.cxx"
+          "*.hpp"
+          "*.hh"
+          "*.hxx"
+        ];
+        "CSS" = [ "*.css" ];
+        "Dart" = [ "*.dart" ];
+        "Dockerfile" = [
+          "Dockerfile*"
+          "*.dockerfile"
+        ];
+        "Go" = [ "*.go" ];
+        "GraphQL" = [
+          "*.graphql"
+          "*.gql"
+        ];
+        "HCL" = [ "*.hcl" ];
+        "HTML" = [
+          "*.html"
+          "*.htm"
+          "*.shtml"
+          "*.xhtml"
+        ];
+        "Java" = [
+          "*.java"
+          "*.jav"
+        ];
+        "JavaScript" = [
+          "*.js"
+          "*.cjs"
+          "*.mjs"
+          "*.jsx"
+        ];
+        "JSONC" = [
+          "**/.zed/**/*.json"
+          "**/zed/**/*.json"
+          "**/Zed/**/*.json"
+          "**/.vscode/**/*.json"
+          "tsconfig.json"
+          "jsconfig.json"
+        ];
+        "Kotlin" = [
+          "*.kt"
+          "*.kts"
+        ];
+        "Lua" = [ "*.lua" ];
+        "Markdown" = [
+          "*.md"
+          "*.markdown"
+        ];
+        "Nix" = [ "*.nix" ];
+        "PHP" = [ "*.php" ];
+        "Proto" = [ "*.proto" ];
+        "Python" = [
+          "*.py"
+          "*.pyi"
+          "SConstruct"
+          "SConscript"
+        ];
+        "Ruby" = [
+          "*.rb"
+          "Rakefile"
+          "Gemfile"
+        ];
+        "Rust" = [ "*.rs" ];
+        "SCSS" = [ "*.scss" ];
+        "Shell Script" = [
+          ".env.*"
+          "*.zsh"
+          "*.bash"
+          "*.sh"
+          "APKBUILD"
+          "PKGBUILD"
+          "*.ebuild"
+          "*.eclass"
+          ".bashrc"
+          ".bash_profile"
+          ".zshrc"
+          ".zprofile"
+        ];
+        "SQL" = [
+          "*.sql"
+          "*.ddl"
+          "*.dml"
+        ];
+        "Swift" = [ "*.swift" ];
+        "Terraform" = [
+          "*.tf"
+          "*.tfvars"
+        ];
+        "TOML" = [ "*.toml" ];
+        "TypeScript" = [
+          "*.ts"
+          "*.cts"
+          "*.mts"
+          "*.tsx"
+        ];
+        "XML" = [
+          "*.xml"
+          "*.xsd"
+          "*.xsl"
+          "*.xslt"
+        ];
+        "YAML" = [
+          "*.yml"
+          "*.yaml"
+        ];
+        "Zig" = [ "*.zig" ];
+      };
+      format_on_save = "on";
+      formatter = "auto";
+      git = {
+        branch_picker = {
+          show_author_name = true;
+        };
+        git_gutter = "tracked_files";
+        gutter_debounce = null;
+        hunk_style = "staged_hollow";
+        inline_blame = {
+          delay_ms = 600;
+          enabled = true;
+          # min_column = 0;
+          # padding = 0;
+          # show_commit_summary = false;
+        };
+        # worktree_directory = "../worktrees";
+      };
+      git_hosting_providers = [ ];
+      git_panel = {
+        button = true;
+        collapse_untracked_diff = false;
+        default_width = 360;
+        dock = "left";
+        fallback_branch_name = "main";
+        scrollbar = {
+          show = null;
+        };
+        sort_by_path = false;
+        status_style = "icon";
+      };
+      global_lsp_settings = {
+        button = true;
+        # notifications = {
+        #   dismiss_timeout_ms = 5000;
+        # };
+        # request_timeout = 120;
+      };
+      go_to_definition_fallback = "find_all_references";
+      # go_to_definition_scroll_strategy = "center";
+      gutter = {
+        breakpoints = true;
+        folds = true;
+        line_numbers = true;
+        min_line_number_digits = 4;
+        runnables = true;
+      };
+      hard_tabs = false;
+      helix_mode = false;
+      hide_mouse = "on_typing_and_movement";
+      horizontal_scroll_margin = 5;
+      hover_popover_delay = 300;
+      hover_popover_enabled = true;
+      # hover_popover_hiding_delay = 300;
+      # hover_popover_sticky = true;
+      icon_theme = {
+        dark = "Zed (Default)";
+        light = "Zed (Default)";
+        mode = "system";
+      };
+      image_viewer = {
+        unit = "binary";
+      };
+      indent_guides = {
+        active_line_width = 1;
+        background_coloring = "disabled";
+        coloring = "fixed";
+        enabled = true;
+        line_width = 1;
+      };
+      # indent_list_on_tab = true;
+      inlay_hints = {
+        edit_debounce_ms = 700;
+        enabled = false;
+        scroll_debounce_ms = 50;
+        show_background = false;
+        show_other_hints = true;
+        show_parameter_hints = true;
+        show_type_hints = true;
+        toggle_on_modifiers_press = null;
+      };
+      inline_code_actions = true;
+      # instrumentation = {
+      #   performance_profiler = {
+      #     enabled = false;
+      #   };
+      # };
+      journal = {
+        hour_format = "hour12";
+        path = "~";
+      };
+      jsx_tag_auto_close = {
+        enabled = true;
+      };
+      language_models = {
+        anthropic = {
+          api_url = "https://api.anthropic.com";
+        };
+        google = {
+          api_url = "https://generativelanguage.googleapis.com";
+        };
+        ollama = {
+          api_url = "http://localhost:11434";
+        };
+        openai = {
+          api_url = "https://api.openai.com/v1";
+        };
+      };
+      languages = {
+        CSS = {
+          formatter = {
+            language_server = {
+              name = "biome";
+            };
+          };
+        };
+        Go = {
+          hard_tabs = true;
+          tab_size = 4;
+        };
+        GraphQL = {
+          formatter = {
+            language_server = {
+              name = "biome";
+            };
+          };
+        };
+        Java = {
+          language_servers = [ "jdtls" ];
+        };
+        JavaScript = {
+          code_actions_on_format = {
+            "source.fixAll.biome" = true;
+            "source.organizeImports.biome" = true;
+          };
+          enable_language_server = true;
+          formatter = {
+            language_server = {
+              name = "biome";
+            };
+          };
+          hard_tabs = false;
+          language_servers = [
+            "!eslint"
+            "biome"
+          ];
+          tab_size = 2;
+        };
+        JSON = {
+          code_actions_on_format = {
+            "source.fixAll.biome" = true;
+          };
+          formatter = {
+            language_server = {
+              name = "biome";
+            };
+          };
+          hard_tabs = false;
+          tab_size = 2;
+        };
+        JSONC = {
+          formatter = {
+            language_server = {
+              name = "biome";
+            };
+          };
+        };
+        Kotlin = {
+          language_servers = [
+            "kotlin-lsp"
+            "!kotlin-language-server"
+          ];
+        };
+        Nix = {
+          hard_tabs = true;
+          language_servers = [
+            "nixd"
+            "!nil"
+          ];
+          tab_size = 4;
+        };
+        TSX = {
+          code_actions_on_format = {
+            "source.fixAll.biome" = true;
+            "source.organizeImports.biome" = true;
+          };
+          formatter = {
+            language_server = {
+              name = "biome";
+            };
+          };
+        };
+        TypeScript = {
+          code_actions_on_format = {
+            "source.fixAll.biome" = true;
+            "source.organizeImports.biome" = true;
+          };
+          enable_language_server = true;
+          formatter = {
+            language_server = {
+              name = "biome";
+            };
+          };
+          hard_tabs = false;
+          language_servers = [
+            "!eslint"
+            "!graphql"
+            "!deno"
+            "!typescript-language-server"
+            "biome"
+            "..."
+          ];
+          tab_size = 2;
+        };
+      };
+      # line_ending = "detect";
+      line_indicator_format = "short";
+      linked_edits = true;
+      load_direnv = "shell_hook";
       lsp = {
         biome = {
           settings = {
@@ -567,8 +911,8 @@
         };
         jdtls = {
           binary = {
-            path = lib.getExe pkgs.jdt-language-server;
             ignore_system_version = true;
+            path = lib.getExe pkgs.jdt-language-server;
           };
         };
         # kotlin-lsp = {
@@ -588,363 +932,57 @@
           };
         };
       };
-      global_lsp_settings = {
-        button = true;
-      };
-      lsp_highlight_debounce = 75;
-      features = {
-        edit_prediction_provider = "none";
-      };
-      format_on_save = "on";
-      formatter = "auto";
-      use_autoclose = true;
-      always_treat_brackets_as_autoclosed = false;
-      file_scan_exclusions = [
-        "**/.git"
-        "**/.svn"
-        "**/.hg"
-        "**/.jj"
-        "**/.sl"
-        "**/.repo"
-        "**/CVS"
-        "**/.DS_Store"
-        "**/Thumbs.db"
-        "**/.classpath"
-        "**/.settings"
-      ];
-      file_scan_inclusions = [ ".env*" ];
-      file_types = {
-        "JSONC" = [
-          "**/.zed/**/*.json"
-          "**/zed/**/*.json"
-          "**/Zed/**/*.json"
-          "**/.vscode/**/*.json"
-          "tsconfig.json"
-          "jsconfig.json"
-        ];
-        "Dockerfile" = [
-          "Dockerfile*"
-          "*.dockerfile"
-        ];
-        "YAML" = [
-          "*.yml"
-          "*.yaml"
-        ];
-        "Shell Script" = [
-          ".env.*"
-          "*.zsh"
-          "*.bash"
-          "*.sh"
-          "APKBUILD"
-          "PKGBUILD"
-          "*.ebuild"
-          "*.eclass"
-          ".bashrc"
-          ".bash_profile"
-          ".zshrc"
-          ".zprofile"
-        ];
-        "Python" = [
-          "*.py"
-          "*.pyi"
-          "SConstruct"
-          "SConscript"
-        ];
-        "JavaScript" = [
-          "*.js"
-          "*.cjs"
-          "*.mjs"
-          "*.jsx"
-        ];
-        "TypeScript" = [
-          "*.ts"
-          "*.cts"
-          "*.mts"
-          "*.tsx"
-        ];
-        "HTML" = [
-          "*.html"
-          "*.htm"
-          "*.shtml"
-          "*.xhtml"
-        ];
-        "CSS" = [ "*.css" ];
-        "SCSS" = [ "*.scss" ];
-        "Java" = [
-          "*.java"
-          "*.jav"
-        ];
-        "Kotlin" = [
-          "*.kt"
-          "*.kts"
-        ];
-        "Go" = [ "*.go" ];
-        "Rust" = [ "*.rs" ];
-        "C" = [
-          "*.c"
-          "*.h"
-        ];
-        "C++" = [
-          "*.cpp"
-          "*.cc"
-          "*.cxx"
-          "*.hpp"
-          "*.hh"
-          "*.hxx"
-        ];
-        "Markdown" = [
-          "*.md"
-          "*.markdown"
-        ];
-        "TOML" = [ "*.toml" ];
-        "XML" = [
-          "*.xml"
-          "*.xsd"
-          "*.xsl"
-          "*.xslt"
-        ];
-        "SQL" = [
-          "*.sql"
-          "*.ddl"
-          "*.dml"
-        ];
-        "Terraform" = [
-          "*.tf"
-          "*.tfvars"
-        ];
-        "HCL" = [ "*.hcl" ];
-        "Nix" = [ "*.nix" ];
-        "Lua" = [ "*.lua" ];
-        "Ruby" = [
-          "*.rb"
-          "Rakefile"
-          "Gemfile"
-        ];
-        "PHP" = [ "*.php" ];
-        "C#" = [ "*.cs" ];
-        "Swift" = [ "*.swift" ];
-        "Zig" = [ "*.zig" ];
-        "Dart" = [ "*.dart" ];
-        "Proto" = [ "*.proto" ];
-        "GraphQL" = [
-          "*.graphql"
-          "*.gql"
-        ];
-      };
-      diagnostics = {
-        include_warnings = true;
-        inline = {
-          enabled = false;
-          update_debounce_ms = 150;
-          padding = 4;
-          min_column = 0;
-          max_severity = null;
-        };
-        # update_with_cursor = false;
-        # primary_only = false;
-        # use_rendered = false;
-      };
-      git = {
-        git_gutter = "tracked_files";
-        gutter_debounce = null;
-        inline_blame = {
-          enabled = true;
-          delay_ms = 600;
-        };
-        branch_picker = {
-          show_author_name = true;
-        };
-        hunk_style = "staged_hollow";
-      };
-      go_to_definition_fallback = "find_all_references";
-      hard_tabs = false;
-      helix_mode = false;
-      indent_guides = {
-        enabled = true;
-        line_width = 1;
-        active_line_width = 1;
-        coloring = "fixed";
-        background_coloring = "disabled";
-      };
-      hover_popover_enabled = true;
-      hover_popover_delay = 300;
-      icon_theme = {
-        mode = "system";
-        dark = "Zed (Default)";
-        light = "Zed (Default)";
-      };
-      image_viewer = {
-        unit = "binary";
-      };
-      inlay_hints = {
-        enabled = false;
-        show_type_hints = true;
-        show_parameter_hints = true;
-        show_other_hints = true;
-        show_background = false;
-        edit_debounce_ms = 700;
-        scroll_debounce_ms = 50;
-        toggle_on_modifiers_press = null;
-      };
-      journal = {
-        path = "~";
-        hour_format = "hour12";
-      };
-      jsx_tag_auto_close = {
-        enabled = true;
-      };
-      languages = {
-        JavaScript = {
-          tab_size = 2;
-          enable_language_server = true;
-          hard_tabs = false;
-          formatter = {
-            language_server = {
-              name = "biome";
-            };
-          };
-          language_servers = [
-            "!eslint"
-            "biome"
-          ];
-          code_actions_on_format = {
-            "source.fixAll.biome" = true;
-            "source.organizeImports.biome" = true;
-          };
-        };
-        TypeScript = {
-          tab_size = 2;
-          hard_tabs = false;
-          enable_language_server = true;
-          formatter = {
-            language_server = {
-              name = "biome";
-            };
-          };
-          language_servers = [
-            "!eslint"
-            "!graphql"
-            "!deno"
-            "!typescript-language-server"
-            "biome"
-            "..."
-          ];
-          code_actions_on_format = {
-            "source.fixAll.biome" = true;
-            "source.organizeImports.biome" = true;
-          };
-        };
-        TSX = {
-          formatter = {
-            language_server = {
-              name = "biome";
-            };
-          };
-          code_actions_on_format = {
-            "source.fixAll.biome" = true;
-            "source.organizeImports.biome" = true;
-          };
-        };
-        JSON = {
-          tab_size = 2;
-          hard_tabs = false;
-          formatter = {
-            language_server = {
-              name = "biome";
-            };
-          };
-          code_actions_on_format = {
-            "source.fixAll.biome" = true;
-          };
-        };
-        JSONC = {
-          formatter = {
-            language_server = {
-              name = "biome";
-            };
-          };
-        };
-        CSS = {
-          formatter = {
-            language_server = {
-              name = "biome";
-            };
-          };
-        };
-        GraphQL = {
-          formatter = {
-            language_server = {
-              name = "biome";
-            };
-          };
-        };
-        Nix = {
-          tab_size = 4;
-          hard_tabs = true;
-          language_servers = [
-            "nixd"
-            "!nil"
-          ];
-        };
-        Go = {
-          tab_size = 4;
-          hard_tabs = true;
-        };
-        Kotlin = {
-          language_servers = [
-            "kotlin-lsp"
-            "!kotlin-language-server"
-          ];
-        };
-        Java = {
-          language_servers = [ "jdtls" ];
-        };
-      };
-      language_models = {
-        anthropic = {
-          api_url = "https://api.anthropic.com";
-        };
-        google = {
-          api_url = "https://generativelanguage.googleapis.com";
-        };
-        ollama = {
-          api_url = "http://localhost:11434";
-        };
-        openai = {
-          api_url = "https://api.openai.com/v1";
-        };
-      };
-      line_indicator_format = "short";
-      linked_edits = true;
       lsp_document_colors = "border";
+      lsp_highlight_debounce = 75;
       max_tabs = null;
       middle_click_paste = true;
+      minimap = {
+        current_line_highlight = "line";
+        show = "always";
+        thumb = "always";
+        thumb_border = "left_open";
+      };
+      # mouse_wheel_zoom = false;
       multi_cursor_modifier = "alt";
       node = {
         ignore_system_version = true;
-        path = lib.getExe pkgs.nodejs_22;
         npm_path = lib.getExe' pkgs.nodejs_22 "npm";
+        path = lib.getExe pkgs.nodejs_22;
       };
-      proxy = null;
+      notification_panel = {
+        button = true;
+        dock = "bottom";
+      };
       on_last_window_closed = "platform_default";
-      profiles = { };
-      preview_tabs = {
-        enabled = true;
-        enable_preview_from_project_panel = true;
-        enable_preview_from_file_finder = true;
-        enable_preview_from_multibuffer = true;
-        enable_preview_multibuffer_from_code_navigation = false;
-        enable_preview_file_from_code_navigation = true;
-        enable_keep_preview_on_code_navigation = false;
-      };
-      file_finder = {
+      outline_panel = {
+        auto_fold_dirs = true;
+        auto_reveal_entries = true;
+        button = true;
+        default_width = 300;
+        dock = "right";
         file_icons = true;
-        modal_max_width = "small";
-        skip_focus_for_active_in_search = true;
+        folder_icons = true;
+        git_status = true;
+        indent_guides = {
+          show = "always";
+        };
+        indent_size = 20;
+        scrollbar = {
+          show = null;
+        };
       };
       pane_split_direction_horizontal = "up";
       pane_split_direction_vertical = "left";
       preferred_line_length = 80;
+      preview_tabs = {
+        enable_keep_preview_on_code_navigation = false;
+        enable_preview_file_from_code_navigation = true;
+        enable_preview_from_file_finder = true;
+        enable_preview_from_multibuffer = true;
+        enable_preview_from_project_panel = true;
+        enable_preview_multibuffer_from_code_navigation = false;
+        enabled = true;
+      };
       private_files = [
         "**/.env*"
         "**/*.pem"
@@ -953,58 +991,115 @@
         "**/*.crt"
         "**/secrets.yml"
       ];
+      profiles = { };
+      project_panel = {
+        auto_fold_dirs = true;
+        auto_open = {
+          on_create = true;
+          on_drop = true;
+          on_paste = true;
+        };
+        auto_reveal_entries = true;
+        button = true;
+        default_width = 240;
+        dock = "left";
+        drag_and_drop = true;
+        entry_spacing = "comfortable";
+        file_icons = true;
+        folder_icons = true;
+        git_status = true;
+        hide_hidden = false;
+        hide_root = false;
+        indent_guides = {
+          show = "always";
+        };
+        indent_size = 20;
+        scrollbar = {
+          show = null;
+        };
+        show_diagnostics = "all";
+        sort_mode = "directories_first";
+        starts_open = true;
+        sticky_scroll = true;
+      };
       # projects_online_by_default = true;
+      proxy = null;
       read_ssh_config = true;
       redact_private_values = false;
       relative_line_numbers = "disabled";
       remove_trailing_whitespace_on_save = true;
+      repl = {
+        max_columns = 128;
+        max_lines = 32;
+      };
       resize_all_panels_in_dock = [ "left" ];
       restore_on_file_reopen = true;
       restore_on_startup = "last_session";
+      rounded_selection = true;
       scroll_beyond_last_line = "one_page";
       scroll_sensitivity = 1;
-      fast_scroll_sensitivity = 4;
-      horizontal_scroll_margin = 5;
-      vertical_scroll_margin = 3;
+      scrollbar = {
+        axes = {
+          horizontal = true;
+          vertical = true;
+        };
+        cursors = true;
+        diagnostics = "all";
+        git_diff = true;
+        search_results = true;
+        selected_symbol = true;
+        selected_text = true;
+        show = "auto";
+      };
       search = {
         button = true;
-        whole_word = false;
         case_sensitive = false;
+        center_on_match = false;
         include_ignored = false;
         regex = false;
-        center_on_match = false;
+        whole_word = false;
       };
       search_wrap = true;
       seed_search_query_from_cursor = "always";
-      use_smartcase_search = false;
+      selection_highlight = true;
+      # semantic_tokens = "off";
+      session = {
+        restore_unsaved_buffers = true;
+        trust_all_worktrees = false;
+      };
       show_call_status_icon = true;
-      completions = {
-        words = "fallback";
-        words_min_length = 3;
-        lsp = true;
-        lsp_fetch_timeout_ms = 0;
-        lsp_insert_mode = "replace_suffix";
-      };
-      show_completions_on_input = true;
       show_completion_documentation = true;
+      show_completions_on_input = true;
       show_edit_predictions = true;
+      show_signature_help_after_edits = false;
       show_whitespaces = "boundary";
-      whitespace_map = {
-        space = "•";
-        tab = "→";
-      };
-      soft_wrap = "none";
       show_wrap_guides = true;
-      use_on_type_format = true;
-      use_auto_surround = true;
-      use_system_path_prompts = true;
-      use_system_prompts = true;
-      wrap_guides = [ ];
+      snippet_sort_order = "inline";
+      soft_wrap = "none";
+      status_bar = {
+        # active_encoding_button = "non_utf8";
+        active_language_button = true;
+        cursor_position_button = true;
+        line_endings_button = false;
+      };
+      tab_bar = {
+        show = true;
+        show_nav_history_buttons = true;
+        show_tab_bar_buttons = true;
+      };
       tab_size = 2;
+      tabs = {
+        activate_on_close = "history";
+        close_position = "right";
+        file_icons = false;
+        git_status = false;
+        show_close_button = "hover";
+        show_diagnostics = "off";
+      };
       tasks = {
-        variables = { };
         enabled = true;
         prefer_lsp = false;
+        variables = { };
       };
       telemetry = {
         diagnostics = true;
@@ -1013,41 +1108,32 @@
       terminal = {
         alternate_scroll = "off";
         blinking = "off";
+        button = false;
         copy_on_select = false;
-        keep_selection_on_copy = true;
-        dock = "bottom";
-        default_width = 640;
         default_height = 320;
+        default_width = 640;
         detect_venv = {
           on = {
+            activate_script = "default";
             directories = [
               ".env"
               "env"
               ".venv"
               "venv"
             ];
-            activate_script = "default";
           };
         };
+        dock = "bottom";
         env = {
           TERM = "ghostty";
         };
         font_family = "IntoneMono Nerd Font Mono";
         font_features = null;
         font_size = null;
+        keep_selection_on_copy = true;
         line_height = "comfortable";
         minimum_contrast = 45;
         option_as_meta = false;
-        button = false;
-        shell = "system";
-        scroll_multiplier = 3;
-        toolbar = {
-          breadcrumbs = false;
-        };
-        working_directory = "current_project_directory";
-        scrollbar = {
-          show = null;
-        };
         path_hyperlink_regexes = [
           "File \"(?<path>[^\"]+)\", line (?<line>[0-9]+)"
           "(?x)"
@@ -1072,16 +1158,21 @@
           "([ ]+|$)"
         ];
         path_hyperlink_timeout_ms = 1;
-      };
-      repl = {
-        max_columns = 128;
-        max_lines = 32;
+        scroll_multiplier = 3;
+        scrollbar = {
+          show = null;
+        };
+        shell = "system";
+        toolbar = {
+          breadcrumbs = false;
+        };
+        working_directory = "current_project_directory";
       };
       # text_rendering_mode = "platform_default";
       theme = {
-        mode = "system";
         dark = "Palenight Theme";
         light = "Tokyo Night Storm";
+        mode = "system";
       };
       theme_overrides = {
         "Palenight Theme" = {
@@ -1109,109 +1200,43 @@
       title_bar = {
         show_branch_icon = false;
         show_branch_name = true;
-        show_project_items = true;
-        show_onboarding_banner = true;
-        show_user_picture = true;
-        show_user_menu = true;
-        show_sign_in = true;
         show_menus = false;
+        show_onboarding_banner = true;
+        show_project_items = true;
+        show_sign_in = true;
+        show_user_menu = true;
+        show_user_picture = true;
       };
-      vim_mode = false;
-      when_closing_with_no_tabs = "platform_default";
-      project_panel = {
-        button = true;
-        default_width = 240;
-        dock = "left";
-        entry_spacing = "comfortable";
-        file_icons = true;
-        folder_icons = true;
-        git_status = true;
-        indent_size = 20;
-        auto_reveal_entries = true;
-        auto_fold_dirs = true;
-        drag_and_drop = true;
-        scrollbar = {
-          show = null;
-        };
-        sticky_scroll = true;
-        show_diagnostics = "all";
-        indent_guides = {
-          show = "always";
-        };
-        sort_mode = "directories_first";
-        hide_root = false;
-        hide_hidden = false;
-        starts_open = true;
-        auto_open = {
-          on_create = true;
-          on_paste = true;
-          on_drop = true;
-        };
+      toolbar = {
+        agent_review = true;
+        breadcrumbs = true;
+        code_actions = false;
+        quick_actions = true;
+        selections_menu = true;
       };
-      collaboration_panel = {
-        button = false;
-        dock = "left";
-        default_width = 240;
-      };
-      debugger = {
-        stepping_granularity = "line";
-        save_breakpoints = true;
-        dock = "bottom";
-        button = true;
-      };
-      git_panel = {
-        button = true;
-        dock = "left";
-        default_width = 360;
-        status_style = "icon";
-        fallback_branch_name = "main";
-        sort_by_path = false;
-        collapse_untracked_diff = false;
-        scrollbar = {
-          show = null;
-        };
-      };
-      git_hosting_providers = [ ];
-      outline_panel = {
-        button = true;
-        default_width = 300;
-        dock = "right";
-        file_icons = true;
-        folder_icons = true;
-        git_status = true;
-        indent_size = 20;
-        auto_reveal_entries = true;
-        auto_fold_dirs = true;
-        indent_guides = {
-          show = "always";
-        };
-        scrollbar = {
-          show = null;
-        };
-      };
-      calls = {
-        mute_on_join = false;
-        share_on_join = false;
-      };
-      colorize_brackets = false;
-      unnecessary_code_fade = 0.3;
+      ui_font_fallbacks = null;
       ui_font_family = "IntoneMono Nerd Font Mono";
       ui_font_features = {
         calt = false;
       };
-      ui_font_fallbacks = null;
       ui_font_size = 12;
       ui_font_weight = 400;
-      agent = {
-        default_model = {
-          provider = "anthropic";
-          model = "claude-4-sonnet";
-        };
+      unnecessary_code_fade = 0.3;
+      use_auto_surround = true;
+      use_autoclose = true;
+      use_on_type_format = true;
+      use_smartcase_search = false;
+      use_system_path_prompts = true;
+      use_system_prompts = true;
+      use_system_window_tabs = false;
+      vertical_scroll_margin = 3;
+      vim_mode = false;
+      when_closing_with_no_tabs = "platform_default";
+      whitespace_map = {
+        space = "•";
+        tab = "→";
       };
-      notification_panel = {
-        button = true;
-        dock = "bottom";
-      };
+      wrap_guides = [ ];
     };
   };
 }

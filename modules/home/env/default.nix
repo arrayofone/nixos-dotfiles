@@ -12,10 +12,17 @@
   # read secrets into env at runtime to prevent embedding
   # secrets into the build as sessionVariables does
   programs.zsh = {
-    initContent = lib.optionalString (builtins.hasAttr "ai/anthropic/api-key" config.sops.secrets) ''
-      if [ -f "${config.sops.secrets."ai/anthropic/api-key".path}" ]; then
-        export ANTHROPIC_API_KEY=$(cat "${config.sops.secrets."ai/anthropic/api-key".path}")
-      fi
-    '';
+    initContent = lib.concatStrings [
+      (lib.optionalString (builtins.hasAttr "ai/anthropic/api-key" config.sops.secrets) ''
+        if [ -f "${config.sops.secrets."ai/anthropic/api-key".path}" ]; then
+          export ANTHROPIC_API_KEY=$(cat "${config.sops.secrets."ai/anthropic/api-key".path}")
+        fi
+      '')
+      (lib.optionalString (builtins.hasAttr "localstack/auth-token" config.sops.secrets) ''
+        if [ -f "${config.sops.secrets."localstack/auth-token".path}" ]; then
+          export LOCALSTACK_AUTH_TOKEN=$(cat "${config.sops.secrets."localstack/auth-token".path}")
+        fi
+      '')
+    ];
   };
 }

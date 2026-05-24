@@ -18,7 +18,7 @@
   ${namespace} = {
     system.name = "mingabook";
     wireguard = {
-      enable = true;
+      enable = false;
       interface = "wg0";
       ips = [
         "10.200.255.251/32"
@@ -53,11 +53,14 @@
   home-manager.backupFileExtension = "hm-backup";
 
   environment.systemPackages = with pkgs; [
+    awscli2
     mkcert
     nodejs_20
     pnpm
     python3
     raycast
+    terraform
+    terraform-local
     fellowship.scroll-reverser
   ];
 
@@ -70,6 +73,7 @@
     taps = [ ];
     brews = [
       "git-lfs"
+      "localstack"
       "nvm"
       "tmux"
     ];
@@ -80,10 +84,11 @@
       "dbeaver-community"
       "discord"
       "firefox"
+      "gimp"
       "ghostty"
       "google-chrome"
       "istat-menus"
-      "linear-linear"
+      "linear"
       "messenger"
       "obsidian"
       "orbstack"
@@ -92,6 +97,7 @@
       "proton-pass"
       "slack"
       "spotify"
+      "stats"
       "whatsapp"
       "zen"
     ];
