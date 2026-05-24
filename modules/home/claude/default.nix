@@ -22,7 +22,7 @@ in
     };
 
     home.activation.claudeVaultLinks =
-      lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+      config.lib.dag.entryAfter [ "writeBoundary" ] ''
         VAULT=${lib.escapeShellArg cfg.vaultPath}
         CLAUDE_DIR=${lib.escapeShellArg "${config.home.homeDirectory}/.claude"}
 

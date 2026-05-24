@@ -6,9 +6,11 @@
 }:
 {
   fellowship = {
+    claude.enable = true;
     dev.enable = true;
     dev-go.enable = lib.mkForce false;
     dev-flutter.enable = lib.mkForce false;
+    obsidian.enable = true;
   };
 
   programs.zsh.envExtra = '''';
