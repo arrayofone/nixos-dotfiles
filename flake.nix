@@ -8,6 +8,12 @@
       url = "github:nixos/nixpkgs/nixos-unstable";
     };
 
+    # @gitian:input nixpkgs-master — bleeding-edge nixpkgs for opt-in packages ahead of unstable.
+    # Deliberately NOT following nixpkgs; pinned in flake.lock and advanced via `nix flake update nixpkgs-master`.
+    nixpkgs-master = {
+      url = "github:nixos/nixpkgs/master";
+    };
+
     snowfall-lib = {
       url = "github:snowfallorg/lib";
       inputs.nixpkgs.follows = "nixpkgs";

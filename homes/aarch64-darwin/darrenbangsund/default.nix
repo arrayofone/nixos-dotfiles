@@ -11,6 +11,7 @@
   fellowship = {
     dev-go.enable = true;
     element.enable = true;
+    packages.claudeCodeFromMaster = true;
   };
 
   #  export NX_TUI=false
@@ -19,8 +20,6 @@
   # [ -s "$(brew --prefix nvm)/etc/bash_completion.d/nvm" ] && \. "$(brew --prefix nvm)/etc/bash_completion.d/nvm"
   #  fastfetch
   programs.zsh.envExtra = "";
-
-  gtk.gtk4.theme = null;
 
   home = {
     # packages = with pkgs; [ ];
