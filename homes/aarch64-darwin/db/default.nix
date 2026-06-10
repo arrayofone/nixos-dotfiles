@@ -11,6 +11,7 @@
     dev-go.enable = lib.mkForce false;
     dev-flutter.enable = lib.mkForce false;
     obsidian.enable = true;
+    packages.claudeCodeFromMaster = true;
   };
 
   programs.zsh.envExtra = '''';
