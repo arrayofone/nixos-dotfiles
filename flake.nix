@@ -44,6 +44,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # @gitian:input nixos-raspberrypi — vendor firmware/kernel for the diskless Pi netboot workers.
+    # Deliberately NOT following nixpkgs: it pins a tested nixpkgs/firmware pair. Injected per-host
+    # (raspberry-pi-4.base / raspberry-pi-5.base) when the Pi worker/agent hosts are instantiated.
+    nixos-raspberrypi.url = "github:nvmd/nixos-raspberrypi";
+
     # @gitian:input Darwin-only inputs — nix-darwin, Rosetta builder, and Homebrew
     # ###### #
     # DARWIN #
