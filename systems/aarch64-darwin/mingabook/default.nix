@@ -55,7 +55,8 @@
   environment.systemPackages = with pkgs; [
     awscli2
     mkcert
-    nodejs_20
+    # nodejs_20 was removed from nixpkgs after its 2026-04-30 EOL
+    nodejs_22
     pnpm
     python3
     raycast

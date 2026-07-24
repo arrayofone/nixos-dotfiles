@@ -109,11 +109,19 @@
         permittedInsecurePackages = import ./data/permitted-insecure-packages.nix;
       };
 
+      # @gitian NixOS-wide module injection. Snowfall auto-imports every
+      # modules/nixos/* into every NixOS host, and the geth/microvm modules
+      # reference options declared by these upstream modules — so the option
+      # declarations must exist on every host, not just the ones that enable
+      # them. Importing is inert until a host flips the corresponding enables.
+      systems.modules.nixos = with inputs; [
+        ethereum-nix.nixosModules.default
+        microvm.nixosModules.host
+      ];
+
       # @gitian:host baradur — x86_64-linux desktop (Hyprland, Nvidia, Ollama, Steam).
       # Imports ethereum-nix for potential validator/node operation.
       systems.hosts.baradur.modules = with inputs; [
-        ethereum-nix.nixosModules.default
-        microvm.nixosModules.host
         (
           { pkgs, system, ... }:
           {
@@ -128,10 +136,13 @@
         )
       ];
 
-      # @gitian:host helms-deep — aarch64-linux microVM host (RPi5 / arm server).
-      systems.hosts.helms-deep.modules = with inputs; [
-        microvm.nixosModules.host
-      ];
+      # @gitian:host agent — aarch64-linux RPi5, currently on the mainline
+      # kernel (its unpinned third-party nix-rpi5 fetchTarball broke pure
+      # evaluation and was removed). The vendor kernel/firmware comes back via
+      # nixos-raspberrypi in the pi-netboot plan's Phase 5 — as of 2026-07-24
+      # that input (rev 2bbb6ee) cannot be mixed into a host on current
+      # nixos-unstable (vendor kernel lacks buildDTBs/target passthru; its
+      # legacyPackages cross-evaluates badly against the newer module set).
 
       # @gitian:host dbook — aarch64-darwin minimal macOS config.
       # Bootstraps nix-rosetta-builder for x86_64 cross-compilation on Apple Silicon.
