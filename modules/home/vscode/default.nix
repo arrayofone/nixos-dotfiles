@@ -6,7 +6,8 @@
 {
   programs = {
     vscode = {
-      enable = true;
+      # Disabled: config retained, package not installed. Flip to true to reinstate.
+      enable = false;
       package = pkgs.vscode;
 
       profiles.default = {

@@ -71,8 +71,17 @@
       librewolf.profileNames = [ "default" ];
       zed.enable = false;
 
-      # Better Rofi styling
-      rofi.enable = true;
+      # Stylix still injects hyprlang-style dotted keys ("col.active_border") into
+      # wayland.windowManager.hyprland.settings, which are invalid under the Lua
+      # config (configType = "lua"); the hyprland module carries the same
+      # Catppuccin Macchiato palette itself.
+      hyprland.enable = false;
+
+      # Rofi and dunst carry hand-crafted Macchiato-glass themes in their own
+      # modules; stylix's generic targets would fight them (theme option
+      # conflict for rofi, color overrides for dunst).
+      rofi.enable = false;
+      dunst.enable = false;
 
       # GTK theming
       gtk.enable = true;

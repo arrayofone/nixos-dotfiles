@@ -23,6 +23,7 @@ in
     hypridle.enable = true;
     hyprland.enable = true;
     hyprlock.enable = true;
+    rofi.enable = true;
     waybar.enable = true;
 
     brave.enable = true;
@@ -38,6 +39,7 @@ in
     webcord.enable = true;
 
     dev.enable = true;
+    packages.claudeCodeFromMaster = true;
   };
 
   home = {

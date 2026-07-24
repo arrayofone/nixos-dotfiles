@@ -8,6 +8,9 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    programs.firefox.enable = true;
+    programs.firefox = {
+      enable = true;
+      configPath = ".mozilla/firefox";
+    };
   };
 }

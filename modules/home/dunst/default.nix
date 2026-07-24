@@ -16,7 +16,6 @@ in
   config = lib.mkIf cfg.enable {
     home = {
       packages = with pkgs; [
-        dunst
         libnotify
       ];
     };
@@ -80,10 +79,15 @@ in
           # notification_limit).
           indicate_hidden = "yes";
 
-          # The transparency of the window.  Range: [0; 100].
-          # This option will only work if a compositing window manager is
-          # present (e.g. xcompmgr, compiz, etc.). (X11 only)
-          transparency = 5;
+          ### Colors (Catppuccin Macchiato glass) ###
+
+          # Glass card: mantle at ~90% alpha; the Hyprland dunst layer_rule
+          # blur frosts whatever is behind the notification.
+          background = "#1e2030E6";
+          foreground = "#cad3f5";
+
+          # Progress bar: mauve → blue accent gradient
+          highlight = "#c6a0f6, #8aadf4";
 
           # Draw a line of "separator_height" pixel height between two
           # notifications.
@@ -105,13 +109,13 @@ in
           frame_width = 2;
 
           # Defines color of the frame around the notification window.
-          frame_color = "#ca9ee6";
+          frame_color = "#c6a0f6";
 
           # Size of gap to display between notifications - requires a compositor.
           # If value is greater than 0, separator_height will be ignored and a border
           # of size frame_width will be drawn around each notification instead.
           # Click events on gaps do not currently propagate to applications below.
-          gap_size = 8;
+          gap_size = 10;
 
           # Define a color for the separator.
           # possible values are:
@@ -133,7 +137,7 @@ in
 
           ### Text ###
 
-          # font = "Intel One Mono";
+          font = "Ubuntu Sans 11";
 
           # The spacing between lines.  If the height is smaller than the
           # font height, it will get raised to the font height.
@@ -208,7 +212,7 @@ in
 
           # Recursive icon lookup. You can set a single theme, instead of having to
           # define all lookup paths.
-          #enable_recursive_icon_lookup = true
+          enable_recursive_icon_lookup = true;
 
           # Set icon theme (only used for recursive icon lookup)
           # icon_theme = Adwaita
@@ -226,8 +230,8 @@ in
           # Scale larger icons down to this size, set to 0 to disable
           max_icon_size = 64;
 
-          # Paths to default icons (only neccesary when not using recursive icon lookup)
-          icon_path = "/usr/share/icons/Papirus-Dark/16x16/actions:/usr/share/icons/Papirus-Dark/16x16/apps:/usr/share/icons/Papirus-Dark/16x16/devices:/usr/share/icons/Papirus-Dark/16x16/mimetypes:/usr/share/icons/Papirus-Dark/16x16/panel:/usr/share/icons/Papirus-Dark/16x16/places:/usr/share/icons/Papirus-Dark/16x16/status";
+          # Recursive lookup + icon_theme replaces hardcoded /usr/share paths
+          # (which don't exist on NixOS; papirus-icon-theme lands in the profile)
 
           ### History ###
 
@@ -241,10 +245,10 @@ in
           ### Misc/Advanced ###
 
           # dmenu path.
-          dmenu = config.home.homeDirectory + "/.config/rofi/Red-Rofi.rasi -dmenu -p dunst:";
+          dmenu = "${pkgs.rofi}/bin/rofi -dmenu -p dunst";
 
           # Browser for opening urls in context menu.
-          browser = "/usr/bin/xdg-open";
+          browser = "${pkgs.xdg-utils}/bin/xdg-open";
 
           # Always run rule-defined scripts, even if the notification is suppressed
           always_run_script = true;
@@ -260,7 +264,7 @@ in
           # corners.
           # The radius will be automatically lowered if it exceeds half of the
           # notification height to avoid clipping text and/or icons.
-          corner_radius = 12;
+          corner_radius = 14;
 
           # Ignore the dbus closeNotification message.
           # Useful to enforce the timeout set by dunst configuration. Without this
@@ -312,58 +316,60 @@ in
         experimental = {
           per_monitor_dpi = false;
         };
-        # urgency_low = {
-        #   background = "#313244";
-        #   foreground = "#c6d0f5";
-        #   frame_color = "#a6e3a1";
-        #   icon = config.home.homeDirectory + "/.config/dunst/icons/low.svg";
-        #   timeout = 8;
-        # };
-        # urgency_normal = {
-        #   background = "#1e1e2e";
-        #   foreground = "#c6d0f5";
-        #   frame_color = "#89b4fa";
-        #   icon = config.home.homeDirectory + "/.config/dunst/icons/normal.svg";
-        #   timeout = 10;
-        # };
-        # urgency_critical = {
-        #   background = "#1e1e2e";
-        #   foreground = "#f38ba8";
-        #   frame_color = "#e78284";
-        #   icon = config.home.homeDirectory + "/.config/dunst/icons/critical.svg";
-        #   timeout = 0;
-        # };
+        # Urgency tiers: same glass card, frame color carries the severity —
+        # muted surface for low, mauve accent for normal, red (and a touch
+        # more opacity) for critical.
+        urgency_low = {
+          background = "#1e2030E6";
+          foreground = "#a5adcb";
+          frame_color = "#5b6078";
+          timeout = 6;
+        };
+        urgency_normal = {
+          background = "#1e2030E6";
+          foreground = "#cad3f5";
+          frame_color = "#c6a0f6";
+          timeout = 10;
+        };
+        urgency_critical = {
+          background = "#1e2030F2";
+          foreground = "#cad3f5";
+          frame_color = "#ed8796";
+          highlight = "#ed8796";
+          timeout = 0;
+        };
+        # Per-app accents (Macchiato: peach/yellow/mauve/blue/green)
         volume-control = {
           summary = "volctl";
-          format = "\"<span size='large' weight='bold' foreground='#fab387'>󰕾</span> <b>%s</b>\n<span size='small'>%b</span>\"";
-          frame_color = "#fab387";
+          format = "\"<span size='large' weight='bold' foreground='#f5a97f'>󰕾</span> <b>%s</b>\n<span size='small'>%b</span>\"";
+          frame_color = "#f5a97f";
           timeout = 3;
         };
 
         brightness-control = {
           summary = "brightctl";
-          format = "\"<span size='large' weight='bold' foreground='#f9e2af'>󰃟</span> <b>%s</b>\n<span size='small'>%b</span>\"";
-          frame_color = "#f9e2af";
+          format = "\"<span size='large' weight='bold' foreground='#eed49f'>󰃟</span> <b>%s</b>\n<span size='small'>%b</span>\"";
+          frame_color = "#eed49f";
           timeout = 3;
         };
 
         theme-switch = {
           summary = "theme";
-          format = "\"<span size='large' weight='bold' foreground='#cba6f7'>󰐱</span> <b>%s</b>\n<span size='small'>%b</span>\"";
-          frame_color = "#cba6f7";
+          format = "\"<span size='large' weight='bold' foreground='#c6a0f6'>󰐱</span> <b>%s</b>\n<span size='small'>%b</span>\"";
+          frame_color = "#c6a0f6";
           timeout = 5;
         };
 
         network = {
           summary = "*Network*";
-          format = "\"<span size='large' weight='bold' foreground='#89b4fa'>󰖩</span> <b>%s</b>\n<span size='small'>%b</span>\"";
-          frame_color = "#89b4fa";
+          format = "\"<span size='large' weight='bold' foreground='#8aadf4'>󰖩</span> <b>%s</b>\n<span size='small'>%b</span>\"";
+          frame_color = "#8aadf4";
         };
 
         battery = {
           summary = "*Battery*";
-          format = "\"<span size='large' weight='bold' foreground='#a6e3a1'>󰁹</span> <b>%s</b>\n<span size='small'>%b</span>\"";
-          frame_color = "#a6e3a1";
+          format = "\"<span size='large' weight='bold' foreground='#a6da95'>󰁹</span> <b>%s</b>\n<span size='small'>%b</span>\"";
+          frame_color = "#a6da95";
         };
       };
     };

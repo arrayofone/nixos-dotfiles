@@ -74,8 +74,16 @@
       };
       historySubstringSearch = {
         enable = true;
-        # searchDownKey = "$key[Down]";
-        # searchUpKey = "$key[Up]";
+        # zle puts the terminal in application cursor mode (smkx), where terminals that honor
+        # DECCKM (ghostty) send ^[OA/^[OB for arrows instead of ^[[A/^[[B — bind both forms
+        searchUpKey = [
+          "^[[A"
+          "^[OA"
+        ];
+        searchDownKey = [
+          "^[[B"
+          "^[OB"
+        ];
       };
       # initcontent
       # export LANG=C.UTF-8
