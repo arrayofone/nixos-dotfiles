@@ -79,6 +79,12 @@
         dns = config.${namespace}.wireguard.dns;
         privateKeyFile = config.${namespace}.wireguard.privateKeyFile;
 
+        # Never start the tunnel at boot: with allowedIPs 0.0.0.0/0, wg-quick up
+        # succeeds even when the endpoint is unreachable and blackholes all
+        # traffic (and DNS). The tunnel comes up on demand via the waybar VPN
+        # button only.
+        autostart = false;
+
         peers = map (
           peer:
           {

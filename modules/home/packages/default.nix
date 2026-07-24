@@ -16,11 +16,9 @@ let
     inherit (pkgs.stdenv.hostPlatform) system;
     config = {
       allowUnfree = true;
-      permittedInsecurePackages = [
-        "electron-38.8.4"
-        "nodejs-20.20.2"
-        "nodejs-slim-20.20.2"
-      ];
+      permittedInsecurePackages = import (
+        lib.snowfall.fs.get-file "data/permitted-insecure-packages.nix"
+      );
     };
   };
 
@@ -60,7 +58,9 @@ in
         jq
         k9s
         kitty
-        kubectl
+        # minikube bundles its own /bin/kubectl; give the standalone one priority
+        # so buildEnv resolves the collision in its favor instead of erroring.
+        (lib.hiPrio kubectl)
         kubectx
         kubernetes-helm
         lf

@@ -93,14 +93,15 @@ in
         dots_spacing = 0.25
         dots_center = true
         dots_rounding = -1
-        outer_color = rgba(198, 160, 246, 0.8)
-        inner_color = rgba(36, 39, 58, 0.8)
+        # Mauve → teal → blue gradient ring, matching the Hyprland active border
+        outer_color = rgba(198, 160, 246, 0.9) rgba(139, 213, 202, 0.9) rgba(138, 173, 244, 0.9) 45deg
+        inner_color = rgba(30, 32, 48, 0.85)
         font_color = rgba(202, 211, 245, 1.0)
         fade_on_empty = true
         fade_timeout = 1000
         placeholder_text = <span foreground="##c6a0f6"><i>Keep it secret, keep it safe...</i></span>
         hide_input = false
-        rounding = 12
+        rounding = 14
         check_color = rgba(166, 218, 149, 0.8)
         fail_color = rgba(237, 135, 150, 0.8)
         fail_text = <i>The way is shut</i>

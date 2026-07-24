@@ -1,0 +1,101 @@
+/* Catppuccin Macchiato glass — translucent card frosted by the Hyprland
+ * rofi layer_rule blur; mauve→blue gradient selection row matching the
+ * compositor's active window border. */
+* {
+    bg:      rgba(30, 32, 48, 72%);
+    bg-alt:  rgba(24, 25, 38, 85%);
+    text:    #cad3f5;
+    muted:   #a5adcb;
+    mauve:   #c6a0f6;
+    teal:    #8bd5ca;
+    blue:    #8aadf4;
+    red:     #ed8796;
+    crust:   #181926;
+
+    background-color: transparent;
+    text-color: @text;
+}
+
+window {
+    transparency: "real";
+    location: center;
+    width: 640px;
+    background-color: @bg;
+    border: 2px;
+    border-color: rgba(198, 160, 246, 55%);
+    border-radius: 17px;
+    padding: 18px;
+}
+
+mainbox {
+    spacing: 14px;
+    children: [ inputbar, listview ];
+}
+
+inputbar {
+    spacing: 10px;
+    padding: 10px 16px;
+    background-color: @bg-alt;
+    border-radius: 999px;
+    children: [ prompt, entry ];
+}
+
+prompt {
+    text-color: @mauve;
+}
+
+entry {
+    placeholder: "Search…";
+    placeholder-color: @muted;
+    cursor: text;
+}
+
+listview {
+    lines: 7;
+    fixed-height: false;
+    spacing: 6px;
+    scrollbar: false;
+}
+
+element {
+    padding: 9px 14px;
+    border-radius: 12px;
+    spacing: 12px;
+}
+
+element-icon {
+    size: 26px;
+    background-color: transparent;
+}
+
+element-text {
+    background-color: transparent;
+    text-color: inherit;
+    vertical-align: 0.5;
+}
+
+element normal.normal,
+element alternate.normal {
+    background-color: transparent;
+}
+
+element selected.normal {
+    background-image: linear-gradient(to right, rgba(198, 160, 246, 90%), rgba(138, 173, 244, 90%));
+    text-color: @crust;
+}
+
+element urgent {
+    text-color: @red;
+}
+
+element active {
+    text-color: @teal;
+}
+
+message {
+    padding: 8px;
+}
+
+textbox {
+    text-color: @muted;
+}

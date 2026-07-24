@@ -1,8 +1,20 @@
 { pkgs, ... }:
 {
-  boot.kernelPackages =
-    (import (builtins.fetchTarball "https://gitlab.com/vriska/nix-rpi5/-/archive/main.tar.gz"))
-    .legacyPackages.aarch64-linux.linuxPackages_rpi5;
+  # Mainline kernel for now. The previous unpinned fetchTarball of a
+  # third-party nix-rpi5 repo broke pure evaluation; the vendor Pi 5
+  # kernel/firmware returns via nixos-raspberrypi in the pi-netboot plan's
+  # Phase 5 (see flake.nix note on the current upstream incompatibility).
+
+  # SD boot via the firmware's extlinux path, as on the stock aarch64 sd-image
+  boot.loader.grub.enable = false;
+  boot.loader.generic-extlinux-compatible.enable = true;
+
+  # Standard Pi sd-image layout; superseded by the fellowship.worker root
+  # modes when the netboot plan's Phase 5 lands.
+  fileSystems."/" = {
+    device = "/dev/disk/by-label/NIXOS_SD";
+    fsType = "ext4";
+  };
 
   networking = { };
 

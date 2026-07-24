@@ -19,6 +19,7 @@
     gc = {
       automatic = true;
       dates = [ "05:00" ];
+      options = "--delete-older-than 14d";
     };
   };
 
@@ -27,7 +28,16 @@
   networking.hostName = "baradur";
 
   boot = {
-    kernelPackages = pkgs.linuxPackages_6_6;
+    kernelPackages = pkgs.linuxPackages_latest;
+
+    # MSI board Super I/O (NCT6687) — exposes motherboard fan headers + temps to lm_sensors/coolercontrol
+    extraModulePackages = [ config.boot.kernelPackages.nct6687d ];
+    kernelModules = [ "nct6687" ];
+
+    # teo ignores iowait counts; menu keeps cores in shallow C-states whenever iowait is pending,
+    # and ghostty's io_uring event loops pin phantom iowait 24/7. Only takes effect once
+    # Global C-state Control is re-enabled in BIOS (cpuidle driver is "none" without it).
+    kernelParams = [ "cpuidle.governor=teo" ];
 
     loader = {
       systemd-boot.enable = false;
@@ -42,6 +52,7 @@
         device = "nodev";
         useOSProber = true;
         efiSupport = true;
+        configurationLimit = 10;
       };
     };
   };
@@ -110,20 +121,20 @@
 
   environment = {
     systemPackages = with pkgs; [
-      dconf
       ghostty
-      libqalculate
       mdadm
       pciutils
       proton-pass
       qalculate-gtk
       shotman
       usbutils
+      lm_sensors
       libsecret
       gimp
       cherry-studio
       nvitop
       zoom-us
+      python3 # on PATH for Claude Code stop hooks that shell out to python3
     ];
 
     sessionVariables = {
@@ -132,6 +143,11 @@
   };
 
   services = {
+    # Holds the Corsair Commander ST (AIO) in software lighting mode and drives the LEDs,
+    # which stops CoolerControl's once-per-poll hardware-lighting blink (liquidctl#448:
+    # unfixable in liquidctl; software-mode lighting is immune while OpenRGB runs).
+    hardware.openrgb.enable = true;
+
     openssh.enable = true;
     printing.enable = true;
     pipewire = {
@@ -139,22 +155,10 @@
       alsa.enable = true;
       alsa.support32Bit = true;
       pulse.enable = true;
-
-      extraConfig.pipewire-pulse = {
-        "99-disable-suspend" = {
-          "pulse.cmd" = [
-            {
-              cmd = "unload-module";
-              args = "module-suspend-on-idle";
-              flags = [ "nofail" ];
-            }
-          ];
-        };
-      };
     };
 
     ollama = {
-      enable = true;
+      enable = false;
       package = pkgs.ollama-cuda;
       loadModels = [
         "deepseek-r1:14b"
@@ -165,7 +169,7 @@
     };
 
     open-webui = {
-      enable = true;
+      enable = false;
       host = "0.0.0.0";
       port = 1111;
       environment = {
@@ -196,6 +200,10 @@
           command = "/run/current-system/sw/bin/systemctl stop wg-quick-wg0.service";
           options = [ "NOPASSWD" ];
         }
+        {
+          command = "/run/current-system/sw/bin/wg show wg0 latest-handshakes";
+          options = [ "NOPASSWD" ];
+        }
       ];
     }
   ];
@@ -205,6 +213,9 @@
     dconf.enable = true;
     thunar.enable = true;
 
+    # Fan curve control for the Lian Li UNI hub + Corsair Commander Core (L-Connect/iCUE equivalent)
+    coolercontrol.enable = true;
+
     steam = {
       enable = true;
       remotePlay.openFirewall = true;
@@ -213,14 +224,38 @@
     };
   };
 
+  # Lian Li UNI FAN SL v1.2 hub: firmware ignores HID writes, so CoolerControl/liquidctl
+  # can't drive it (liquidctl#858). This fork speaks the vendor control-transfer protocol
+  # and applies /etc/uni-sync/uni-sync.json at boot. First run generates the file with
+  # detected devices; set each channel to mode "Manual" + speed (percent), then restart.
+  systemd.services.uni-sync = {
+    description = "Apply Lian Li Uni fan hub speeds";
+    wantedBy = [ "multi-user.target" ];
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = "${pkgs.${namespace}.uni-sync}/bin/uni-sync";
+    };
+  };
+
+  hardware = {
+    nvidia-container-toolkit.enable = true;
+
+    enableAllFirmware = true;
+    enableRedistributableFirmware = true;
+
+    bluetooth = {
+      enable = true;
+      powerOnBoot = true;
+    };
+  };
+
+  services.blueman.enable = true;
+
   virtualisation = {
     oci-containers.backend = "podman";
 
     containers.enable = true;
-    docker = {
-    	enable = true;
-	enableNvidia = true;
-	};
+    docker.enable = true;
   };
 
   nixpkgs.config.allowUnfree = true;

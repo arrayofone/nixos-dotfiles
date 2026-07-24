@@ -7,10 +7,145 @@
 }:
 let
   cfg = config.${namespace}.waybar;
+
+  vpnControl = pkgs.writeShellApplication {
+    name = "waybar-vpn-control";
+    runtimeInputs = with pkgs; [
+      iproute2
+      libnotify
+      coreutils
+      util-linux
+    ];
+    text = ''
+      set -u
+      ACTION="''${1:-status}"
+      FLAG_DIR="''${XDG_RUNTIME_DIR:-/tmp}"
+      FAIL_FLAG="$FLAG_DIR/waybar-vpn-failed"
+      PID_FLAG="$FLAG_DIR/waybar-vpn-connecting.pid"
+      LOG_FILE="$FLAG_DIR/waybar-vpn.log"
+      BUDGET=120
+      # sudo'd commands must use these exact paths: the NOPASSWD sudoers rules
+      # match on them, and sudo (NixOS sets no secure_path) would otherwise
+      # resolve PATH to /nix/store binaries and demand a password — which fails
+      # silently under waybar's TTY-less exec.
+      SYSTEMCTL=/run/current-system/sw/bin/systemctl
+      WG=/run/current-system/sw/bin/wg
+
+      is_up() {
+        ip link show wg0 >/dev/null 2>&1 || return 1
+        # Interface exists but verify a handshake actually completed
+        local ts
+        ts=$(sudo "$WG" show wg0 latest-handshakes 2>/dev/null | head -1 | cut -f2)
+        [ -n "$ts" ] && [ "$ts" != "0" ]
+      }
+
+      connecting_pid() {
+        [ -f "$PID_FLAG" ] || return 1
+        local pid
+        pid=$(cat "$PID_FLAG" 2>/dev/null) || return 1
+        [ -n "$pid" ] && kill -0 "$pid" 2>/dev/null && echo "$pid"
+      }
+
+      kill_connect() {
+        local pid
+        pid=$(connecting_pid) && kill -- "-$pid" 2>/dev/null
+        rm -f "$PID_FLAG"
+        timeout 5 sudo "$SYSTEMCTL" stop wg-quick-wg0.service 2>/dev/null || true
+      }
+
+      case "$ACTION" in
+        status)
+          if [ -f "$FAIL_FLAG" ]; then
+            printf '%s\n' '{"text": "󱎘", "tooltip": "VPN disabled — right-click to reset", "class": "failed"}'
+          elif connecting_pid >/dev/null; then
+            printf '%s\n' '{"text": "󱎫", "tooltip": "VPN connecting… click to cancel", "class": "connecting"}'
+          elif is_up; then
+            printf '%s\n' '{"text": "󰌾", "tooltip": "VPN connected (wg0)", "class": "connected"}'
+          else
+            printf '%s\n' '{"text": "󰿆", "tooltip": "VPN disconnected", "class": "disconnected"}'
+          fi
+          ;;
+        toggle)
+          if [ -f "$FAIL_FLAG" ]; then
+            : # disabled — use right-click to reset
+          elif connecting_pid >/dev/null; then
+            kill_connect
+            notify-send -a vpn -t 3000 "VPN" "Cancelled" || true
+          elif is_up; then
+            sudo "$SYSTEMCTL" stop wg-quick-wg0.service
+            rm -f "$PID_FLAG" "$FAIL_FLAG"
+          else
+            setsid -f "$0" connect >>"$LOG_FILE" 2>&1
+          fi
+          ;;
+        reset)
+          kill_connect
+          rm -f "$FAIL_FLAG" "$PID_FLAG"
+          notify-send -a vpn -t 3000 "VPN" "Reset — ready to connect" || true
+          ;;
+        connect)
+          if connecting_pid >/dev/null; then exit 0; fi
+          echo $$ > "$PID_FLAG"
+          trap 'rm -f "$PID_FLAG"' EXIT
+          rm -f "$FAIL_FLAG"
+
+          notify-send -a vpn -t 3000 "VPN" "Connecting…" || true
+
+          SECONDS=0
+          delays=(5 10 20 30 30 30)
+          attempt=0
+          for delay in "''${delays[@]}"; do
+            if [ "$SECONDS" -ge "$BUDGET" ]; then break; fi
+            attempt=$((attempt + 1))
+            timeout 15 sudo "$SYSTEMCTL" start wg-quick-wg0.service 2>/dev/null || true
+            sleep 2
+            if is_up; then
+              notify-send -a vpn -t 3000 "VPN" "Connected" || true
+              exit 0
+            fi
+            timeout 5 sudo "$SYSTEMCTL" stop wg-quick-wg0.service 2>/dev/null || true
+            echo "[$(date -Iseconds)] attempt $attempt failed; sleeping ''${delay}s" >&2
+            sleep "$delay"
+          done
+
+          timeout 5 sudo "$SYSTEMCTL" stop wg-quick-wg0.service 2>/dev/null || true
+          touch "$FAIL_FLAG"
+          notify-send -a vpn -u critical -t 8000 \
+            "VPN" "Connection failed — button disabled. Right-click to reset." || true
+          exit 1
+          ;;
+        *)
+          echo "usage: $(basename "$0") {status|toggle|connect|reset}" >&2
+          exit 2
+          ;;
+      esac
+    '';
+  };
 in
 {
   options.${namespace}.waybar = {
     enable = lib.mkEnableOption "waybar";
+
+    timezone = lib.mkOption {
+      type = lib.types.nullOr lib.types.str;
+      default = null;
+      description = "Clock timezone; null = system local time.";
+    };
+
+    thermalZone = lib.mkOption {
+      type = lib.types.int;
+      default = 2;
+      description = "Thermal zone index used by the temperature module.";
+    };
+
+    hwmonPaths = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [
+        "/sys/class/hwmon/hwmon1/temp1_input"
+        "/sys/class/hwmon/hwmon2/temp1_input"
+      ];
+      description = "hwmon paths used by the temperature module.";
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -21,23 +156,24 @@ in
       # Use external configuration files for better maintainability
       settings = {
         mainBar = {
-          # Waybar configuration for Hyprland + Stylix + Catppuccin Mocha
+          # Macchiato-glass three-island bar: workspaces+window | clock | system
           layer = "top";
           position = "top";
-          height = 35;
-          spacing = 4;
+          height = 34;
+          spacing = 0;
           margin-top = 10;
-          margin-left = 15;
-          margin-right = 15;
+          margin-left = 16;
+          margin-right = 16;
           margin-bottom = 0;
 
           # Module layout
           modules-left = [
             "hyprland/workspaces"
             "hyprland/submap"
+            "hyprland/window"
           ];
           modules-center = [
-            "hyprland/window"
+            "clock"
           ];
           modules-right = [
             "tray"
@@ -49,47 +185,38 @@ in
             "memory"
             "temperature"
             "battery"
-            "clock"
           ];
 
-          # Hyprland workspaces
+          # Hyprland workspaces — icons keyed by the named workspaces
+          # (term/ide/browser/social) with a dot fallback for numbered ones
           "hyprland/workspaces" = {
             disable-scroll = true;
             all-outputs = true;
             warp-on-scroll = false;
             format = "{icon}";
             format-icons = {
-              "1" = "󰲠";
-              "2" = "󰲢";
-              "3" = "󰲤";
-              "4" = "󰲦";
-              "5" = "󰲨";
-              "6" = "󰲪";
-              "7" = "󰲬";
-              "8" = "󰲮";
-              "9" = "󰲰";
-              "10" = "󰿬";
+              term = "";
+              ide = "󰅩";
+              browser = "󰇧";
+              social = "󰭹";
               urgent = "󰀪";
-              active = "󰮯";
               default = "󰧞";
-            };
-            persistent-workspaces = {
-              "*" = 5;
             };
           };
 
           # Hyprland window title
           "hyprland/window" = {
             format = "{}";
-            max-length = 60;
+            max-length = 40;
             separate-outputs = true;
             rewrite = {
               "(.*) — Mozilla Firefox" = "󰈹 $1";
-              "(.*) - Visual Studio Code" = "󰨞 $1";
+              "(.*) - Brave" = "󰇧 $1";
+              "(.*) — Zed" = "󰅩 $1";
               "(.*) - vim" = " $1";
               "(.*) - nvim" = " $1";
-              "(.*)Spotify" = "󰓇 $1";
-              "(.*) - Discord" = "󰙯 $1";
+              "(.*) - Slack" = "󰒱 $1";
+              "(.*) - Obsidian(.*)" = "󱓧 $1";
             };
           };
 
@@ -107,25 +234,28 @@ in
           };
 
           # Clock
-          clock = {
-            timezone = "America/Vancouver";
-            tooltip-format = "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>";
-            format = "{:%H:%M}";
-            format-alt = "{:%a, %b %d, %Y}";
-            calendar = {
-              mode = "year";
-              mode-mon-col = 3;
-              weeks-pos = "right";
-              on-scroll = 1;
-              format = {
-                months = "<span color='#c6a0f6'><b>{}</b></span>";
-                days = "<span color='#cad3f5'><b>{}</b></span>";
-                weeks = "<span color='#8bd5ca'><b>W{}</b></span>";
-                weekdays = "<span color='#f5a97f'><b>{}</b></span>";
-                today = "<span color='#ed8796'><b><u>{}</u></b></span>";
+          clock =
+            lib.optionalAttrs (cfg.timezone != null) {
+              timezone = cfg.timezone;
+            }
+            // {
+              tooltip-format = "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>";
+              format = "{:%H:%M}";
+              format-alt = "{:%a, %b %d, %Y}";
+              calendar = {
+                mode = "year";
+                mode-mon-col = 3;
+                weeks-pos = "right";
+                on-scroll = 1;
+                format = {
+                  months = "<span color='#c6a0f6'><b>{}</b></span>";
+                  days = "<span color='#cad3f5'><b>{}</b></span>";
+                  weeks = "<span color='#8bd5ca'><b>W{}</b></span>";
+                  weekdays = "<span color='#f5a97f'><b>{}</b></span>";
+                  today = "<span color='#ed8796'><b><u>{}</u></b></span>";
+                };
               };
             };
-          };
 
           # CPU usage
           cpu = {
@@ -151,11 +281,8 @@ in
 
           # Temperature monitoring
           temperature = {
-            thermal-zone = 2;
-            hwmon-path = [
-              "/sys/class/hwmon/hwmon1/temp1_input"
-              "/sys/class/hwmon/hwmon2/temp1_input"
-            ];
+            thermal-zone = cfg.thermalZone;
+            hwmon-path = cfg.hwmonPaths;
             critical-threshold = 80;
             format-critical = "󰸁 {temperatureC}°C";
             format = "󰔏 {temperatureC}°C";
@@ -240,29 +367,21 @@ in
             tooltip-format-deactivated = "Idle inhibitor is inactive";
           };
 
-          # WireGuard VPN toggle
+          # WireGuard VPN toggle with backoff retry and auto-disable on failure
           "custom/vpn" = {
             format = "{}";
-            interval = 5;
-            exec = ''
-              if ip link show wg0 &>/dev/null; then
-                echo '{"text": "󰌾", "tooltip": "VPN Connected (wg0)", "class": "connected"}'
-              else
-                echo '{"text": "󰿆", "tooltip": "VPN Disconnected", "class": "disconnected"}'
-              fi
-            '';
+            interval = 2;
+            exec = "${vpnControl}/bin/waybar-vpn-control status";
             return-type = "json";
-            on-click = ''
-              if ip link show wg0 &>/dev/null; then
-                sudo systemctl stop wg-quick-wg0.service
-              else
-                sudo systemctl start wg-quick-wg0.service
-              fi
-            '';
+            on-click = "${vpnControl}/bin/waybar-vpn-control toggle";
+            on-click-right = "${vpnControl}/bin/waybar-vpn-control reset";
           };
         };
       };
 
+      # Macchiato-glass: transparent bar, three frosted islands (Hyprland
+      # layer_rule blurs the waybar namespace), state-only colors, gradient
+      # reserved for the active workspace. Numerals set in IntoneMono.
       style = ''
         /* Catppuccin Macchiato Palette */
         @define-color base #24273a;
@@ -290,39 +409,43 @@ in
         @define-color rosewater #f4dbd6;
 
         * {
-          font-family: "Ubuntu Sans", "Ubuntu", "Font Awesome 6 Free", sans-serif;
-          font-size: 14px;
+          font-family: "Ubuntu Sans", "Symbols Nerd Font", "Font Awesome 6 Free", sans-serif;
+          font-size: 13px;
           font-weight: 600;
           min-height: 0;
         }
 
         window#waybar {
           background: transparent;
+          color: @text;
         }
 
-        window#waybar > box {
-          background: alpha(@base, 0.85);
-          border: 2px solid alpha(@surface1, 0.8);
-          border-radius: 16px;
-          margin: 0;
-          padding: 0 8px;
+        /* Glass islands */
+        .modules-left,
+        .modules-center,
+        .modules-right {
+          background: alpha(@mantle, 0.72);
+          border: 1px solid alpha(@surface1, 0.55);
+          border-radius: 17px;
+          padding: 0 6px;
         }
 
         tooltip {
-          background: @mantle;
-          border: 2px solid @mauve;
+          background: alpha(@crust, 0.95);
+          border: 1px solid alpha(@surface1, 0.8);
           border-radius: 12px;
         }
 
         tooltip label {
           color: @text;
-          padding: 4px 8px;
+          padding: 6px 10px;
         }
 
-        /* Module styling */
-        #workspaces,
+        /* Quiet module baseline — pills appear only for state */
         #window,
+        #submap,
         #tray,
+        #custom-vpn,
         #idle_inhibitor,
         #pulseaudio,
         #network,
@@ -331,70 +454,79 @@ in
         #temperature,
         #battery,
         #clock {
-          padding: 4px 12px;
-          margin: 4px 2px;
-          border-radius: 10px;
-          background: alpha(@surface0, 0.6);
-          color: @text;
-          transition: all 0.3s ease;
+          background: transparent;
+          color: @subtext1;
+          padding: 2px 10px;
+          margin: 3px 1px;
+          border-radius: 999px;
+          transition: background-color 0.2s ease, color 0.2s ease;
+        }
+
+        /* Mono numerals for the system cluster and clock */
+        #pulseaudio,
+        #network,
+        #cpu,
+        #memory,
+        #temperature,
+        #battery,
+        #clock {
+          font-family: "IntoneMono Nerd Font Mono", "IntoneMono Nerd Font", "Ubuntu Sans", monospace;
+          font-weight: 500;
         }
 
         /* Workspaces */
         #workspaces {
           background: transparent;
-          padding: 0;
-          margin: 4px 4px;
+          padding: 0 2px;
+          margin: 3px 0;
         }
 
         #workspaces button {
-          padding: 4px 8px;
+          padding: 2px 10px;
           margin: 0 2px;
-          border-radius: 8px;
-          background: alpha(@surface0, 0.5);
-          color: @subtext0;
+          border-radius: 999px;
+          background: transparent;
+          color: alpha(@subtext0, 0.75);
           border: none;
-          transition: all 0.3s ease;
+          font-size: 15px;
+          transition: background-color 0.2s ease, color 0.2s ease;
         }
 
         #workspaces button:hover {
-          background: alpha(@surface1, 0.8);
+          background: alpha(@surface0, 0.85);
           color: @text;
         }
 
         #workspaces button.active {
-          background: linear-gradient(135deg, alpha(@mauve, 0.8), alpha(@lavender, 0.6));
-          color: @base;
-          font-weight: 800;
-          text-shadow: 0 0 2px alpha(@base, 0.3);
+          background: linear-gradient(135deg, alpha(@mauve, 0.95), alpha(@teal, 0.8), alpha(@blue, 0.95));
+          color: @crust;
+          padding: 2px 16px;
         }
 
         #workspaces button.urgent {
           background: linear-gradient(135deg, @red, @maroon);
-          color: @base;
+          color: @crust;
           animation: pulse 1s ease-in-out infinite;
         }
 
         @keyframes pulse {
           0% { opacity: 1; }
-          50% { opacity: 0.7; }
+          50% { opacity: 0.65; }
           100% { opacity: 1; }
         }
 
         /* Window title */
         #window {
-          color: @lavender;
+          color: @subtext0;
           font-weight: 500;
-          background: alpha(@surface0, 0.4);
         }
 
-        /* Submap */
+        /* Submap — the one loud element besides the active workspace */
         #submap {
-          padding: 4px 14px;
-          margin: 4px 2px;
-          border-radius: 10px;
           background: linear-gradient(135deg, @mauve, @pink);
-          color: @base;
+          color: @crust;
           font-weight: 800;
+          padding: 2px 14px;
           animation: breathe 2s ease-in-out infinite;
         }
 
@@ -404,9 +536,17 @@ in
           100% { opacity: 1; }
         }
 
+        /* Clock — center island */
+        #clock {
+          color: @mauve;
+          font-weight: 700;
+          font-size: 14px;
+          padding: 2px 18px;
+        }
+
         /* System tray */
         #tray {
-          background: alpha(@surface0, 0.4);
+          padding: 2px 8px;
         }
 
         #tray > .passive {
@@ -415,164 +555,48 @@ in
 
         #tray > .needs-attention {
           -gtk-icon-effect: highlight;
-          background: alpha(@red, 0.3);
-        }
-
-        /* Idle inhibitor */
-        #idle_inhibitor {
-          color: @subtext0;
-          background: alpha(@surface0, 0.4);
-        }
-
-        #idle_inhibitor.activated {
-          color: @green;
-          background: alpha(@green, 0.2);
-        }
-
-        /* VPN */
-        #custom-vpn {
-          color: @subtext0;
-          background: alpha(@surface0, 0.4);
-          padding: 4px 12px;
-          margin: 4px 2px;
-          border-radius: 10px;
-          transition: all 0.3s ease;
-        }
-
-        #custom-vpn.connected {
-          color: @green;
-          background: alpha(@green, 0.2);
-        }
-
-        #custom-vpn.disconnected {
-          color: @surface2;
-          background: alpha(@surface0, 0.4);
-        }
-
-        #custom-vpn:hover {
-          background: alpha(@surface1, 0.8);
-        }
-
-        /* Clock */
-        #clock {
-          color: @rosewater;
-          background: linear-gradient(135deg, alpha(@mauve, 0.3), alpha(@surface0, 0.6));
-          font-weight: 700;
-          padding: 4px 16px;
-        }
-
-        /* CPU */
-        #cpu {
-          color: @blue;
-          background: alpha(@blue, 0.15);
-        }
-
-        #cpu.warning {
-          color: @yellow;
-          background: alpha(@yellow, 0.2);
-        }
-
-        #cpu.critical {
-          color: @red;
-          background: alpha(@red, 0.2);
-          animation: pulse 1s ease-in-out infinite;
-        }
-
-        /* Memory */
-        #memory {
-          color: @green;
-          background: alpha(@green, 0.15);
-        }
-
-        #memory.warning {
-          color: @yellow;
-          background: alpha(@yellow, 0.2);
-        }
-
-        #memory.critical {
-          color: @red;
-          background: alpha(@red, 0.2);
-          animation: pulse 1s ease-in-out infinite;
-        }
-
-        /* Temperature */
-        #temperature {
-          color: @yellow;
-          background: alpha(@yellow, 0.15);
-        }
-
-        #temperature.critical {
-          color: @red;
           background: alpha(@red, 0.25);
-          animation: pulse 0.8s ease-in-out infinite;
+          border-radius: 999px;
         }
 
-        /* Network */
-        #network {
-          color: @teal;
-          background: alpha(@teal, 0.15);
-        }
+        /* State colors only */
+        #custom-vpn.connected { color: @teal; }
+        #custom-vpn.connecting { color: @peach; }
+        #custom-vpn.disconnected { color: alpha(@subtext0, 0.5); }
+        #custom-vpn.failed { color: @red; }
 
-        #network.disconnected {
-          color: @surface2;
-          background: alpha(@surface0, 0.4);
-        }
+        #idle_inhibitor.activated { color: @peach; }
 
-        #network.linked {
-          color: @yellow;
-          background: alpha(@yellow, 0.15);
-        }
+        #pulseaudio.muted { color: alpha(@subtext0, 0.5); }
+        #pulseaudio.bluetooth { color: @blue; }
 
-        /* Audio */
-        #pulseaudio {
-          color: @peach;
-          background: alpha(@peach, 0.15);
-        }
+        #network.disconnected { color: @red; }
+        #network.linked { color: @yellow; }
 
-        #pulseaudio.muted {
-          color: @surface2;
-          background: alpha(@surface0, 0.4);
-        }
-
-        #pulseaudio.bluetooth {
-          color: @blue;
-          background: alpha(@blue, 0.15);
-        }
-
-        /* Battery */
-        #battery {
-          color: @green;
-          background: alpha(@green, 0.15);
-        }
-
-        #battery.good {
-          color: @green;
-          background: alpha(@green, 0.15);
-        }
-
+        #cpu.warning,
+        #memory.warning,
         #battery.warning:not(.charging) {
           color: @yellow;
-          background: alpha(@yellow, 0.2);
+          background: alpha(@yellow, 0.15);
         }
 
+        #cpu.critical,
+        #memory.critical,
+        #temperature.critical,
         #battery.critical:not(.charging) {
           color: @red;
-          background: linear-gradient(135deg, alpha(@red, 0.3), alpha(@maroon, 0.2));
+          background: alpha(@red, 0.18);
           animation: pulse 1s ease-in-out infinite;
         }
 
-        #battery.charging {
-          color: @green;
-          background: alpha(@green, 0.2);
-        }
-
+        #battery.charging,
         #battery.plugged {
-          color: @teal;
-          background: alpha(@teal, 0.15);
+          color: @green;
         }
 
-        /* Hover effects for all modules */
+        /* Hover */
         #tray:hover,
+        #custom-vpn:hover,
         #idle_inhibitor:hover,
         #pulseaudio:hover,
         #network:hover,
@@ -581,8 +605,8 @@ in
         #temperature:hover,
         #battery:hover,
         #clock:hover {
-          background: alpha(@surface1, 0.8);
-          border-radius: 10px;
+          background: alpha(@surface0, 0.8);
+          color: @text;
         }
       '';
     };
