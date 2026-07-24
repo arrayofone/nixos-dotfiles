@@ -61,11 +61,7 @@ in
 
     networking.firewall.allowedTCPPorts = lib.optionals cfg.agent.openFirewall [ 9100 ];
 
-    services.alloy.enable = cfg.agent.lokiUrl != null;
-
-    # alloy runs with DynamicUser; journal read requires the group
-    systemd.services.alloy.serviceConfig.SupplementaryGroups =
-      lib.mkIf (cfg.agent.lokiUrl != null) [ "systemd-journal" ];
+    services.alloy.enable = lib.mkIf (cfg.agent.lokiUrl != null) true;
 
     environment.etc."alloy/config.alloy" = lib.mkIf (cfg.agent.lokiUrl != null) {
       text = ''

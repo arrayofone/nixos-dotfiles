@@ -10,11 +10,13 @@ let
     url = "https://grafana.com/api/dashboards/14574/revisions/4/download";
     hash = "sha256-P2klydQSVc+P5RBBXE+OS4D1D0nJzC49gQYI//qTaZ8=";
   };
-  # community dashboards ship "${DS_PROMETHEUS}" input placeholders; pin them to our uid
+  # nvidia ships "${DS_PROMETHEUS}" input placeholders; node-exporter-full uses "${datasource}"
+  # template vars that resolve via the isDefault datasource. Pin placeholders AND the legacy
+  # hard-coded "000000001" row uids to our uid so future revision bumps can't dangle.
   dashboardsDir = pkgs.runCommand "grafana-dashboards" { } ''
     mkdir -p $out
-    sed -e 's/''${DS_PROMETHEUS}/prometheus/g' ${nodeExporterDashboard} > $out/node-exporter-full.json
-    sed -e 's/''${DS_PROMETHEUS}/prometheus/g' ${nvidiaDashboard}       > $out/nvidia-gpu.json
+    sed -e 's/''${DS_PROMETHEUS}/prometheus/g' -e 's/"000000001"/"prometheus"/g' ${nodeExporterDashboard} > $out/node-exporter-full.json
+    sed -e 's/''${DS_PROMETHEUS}/prometheus/g' -e 's/"000000001"/"prometheus"/g' ${nvidiaDashboard}       > $out/nvidia-gpu.json
   '';
 in
 {
