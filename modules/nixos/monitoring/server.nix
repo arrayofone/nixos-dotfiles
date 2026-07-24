@@ -1,6 +1,21 @@
 { lib, config, namespace, pkgs, ... }:
 let
   cfg = config.${namespace}.monitoring;
+
+  nodeExporterDashboard = pkgs.fetchurl {
+    url = "https://grafana.com/api/dashboards/1860/revisions/37/download";
+    hash = "sha256-1DE1aaanRHHeCOMWDGdOS1wBXxOF84UXAjJzT5Ek6mM=";
+  };
+  nvidiaDashboard = pkgs.fetchurl {
+    url = "https://grafana.com/api/dashboards/14574/revisions/4/download";
+    hash = "sha256-P2klydQSVc+P5RBBXE+OS4D1D0nJzC49gQYI//qTaZ8=";
+  };
+  # community dashboards ship "${DS_PROMETHEUS}" input placeholders; pin them to our uid
+  dashboardsDir = pkgs.runCommand "grafana-dashboards" { } ''
+    mkdir -p $out
+    sed -e 's/''${DS_PROMETHEUS}/prometheus/g' ${nodeExporterDashboard} > $out/node-exporter-full.json
+    sed -e 's/''${DS_PROMETHEUS}/prometheus/g' ${nvidiaDashboard}       > $out/nvidia-gpu.json
+  '';
 in
 {
   config = lib.mkIf cfg.server.enable {
@@ -84,5 +99,85 @@ in
     # removed on this pinned nixpkgs (mkRemovedOptionModule, see systemd.nix); cgroup CPU/memory/
     # tasks accounting is on by default in modern systemd, and NixOS now sets
     # DefaultIOAccounting/DefaultIPAccounting = true itself, so no replacement setting is needed.
+
+    services.loki = {
+      enable = true;
+      configuration = {
+        auth_enabled = false;
+        server = {
+          http_listen_address = "0.0.0.0";
+          http_listen_port = 3100;
+          grpc_listen_address = "127.0.0.1";
+        };
+        common = {
+          replication_factor = 1;
+          path_prefix = "/var/lib/loki";
+          ring = {
+            kvstore.store = "inmemory";
+            instance_addr = "127.0.0.1";
+          };
+        };
+        schema_config.configs = [
+          {
+            from = "2026-01-01";
+            store = "tsdb";
+            object_store = "filesystem";
+            schema = "v13";
+            index = { prefix = "index_"; period = "24h"; };
+          }
+        ];
+        storage_config.filesystem.directory = "/var/lib/loki/chunks";
+        compactor = {
+          working_directory = "/var/lib/loki/compactor";
+          retention_enabled = true;
+          delete_request_store = "filesystem";
+        };
+        limits_config.retention_period = cfg.server.logRetention;
+      };
+    };
+
+    services.grafana = {
+      enable = true;
+      settings = {
+        server = {
+          http_addr = "0.0.0.0";
+          http_port = cfg.server.grafanaPort;
+        };
+        analytics.reporting_enabled = false;
+        # nixpkgs 26.05 removed the default for security.secret_key (was previously implicit).
+        # Neither provisioned datasource carries credentials, so there is nothing in the DB
+        # yet that this key protects; using the documented legacy default is upstream's own
+        # zero-risk path for that case. Before storing any datasource secrets in Grafana,
+        # replace this with a generated key via a file-provider (e.g. sops-nix), since keys
+        # cannot be rotated without re-encrypting existing secrets.
+        security.secret_key = "SW2YcwTIb9zpOOhoPsMm";
+      };
+      provision = {
+        enable = true;
+        datasources.settings.datasources = [
+          {
+            name = "Prometheus";
+            uid = "prometheus";
+            type = "prometheus";
+            url = "http://127.0.0.1:9090";
+            isDefault = true;
+          }
+          {
+            name = "Loki";
+            uid = "loki";
+            type = "loki";
+            url = "http://127.0.0.1:3100";
+          }
+        ];
+        dashboards.settings.providers = [
+          {
+            name = "vendored";
+            options.path = dashboardsDir;
+          }
+        ];
+      };
+    };
+
+    networking.firewall.allowedTCPPorts = [ cfg.server.grafanaPort 3100 ];
   };
 }
