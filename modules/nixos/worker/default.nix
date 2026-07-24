@@ -70,6 +70,11 @@ in
   };
 
   config = lib.mkIf cfg.enable {
+    ${namespace}.monitoring.agent = {
+      enable = lib.mkDefault true;
+      lokiUrl = lib.mkDefault "http://${cfg.bootServer}:3100";
+    };
+
     assertions = [
       {
         assertion = cfg.k3s.role == "server" -> cfg.k3s.target == null;

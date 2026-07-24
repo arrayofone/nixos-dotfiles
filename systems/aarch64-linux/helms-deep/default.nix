@@ -62,6 +62,9 @@
       uplinkInterface = "eth0";
     };
 
+    monitoring.agent.enable = true;
+    # lokiUrl stays null until baradur has a static LAN address helms-deep can reach
+
     microvm = {
       enable = true;
       bridgeInterface = "br0";
