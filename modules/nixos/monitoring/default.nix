@@ -87,7 +87,7 @@ in
           labels        = {job = "systemd-journal", host = "${config.networking.hostName}"}
         }
 
-        loki.write.default {
+        loki.write "default" {
           endpoint {
             url = "${cfg.agent.lokiUrl}/loki/api/v1/push"
           }
