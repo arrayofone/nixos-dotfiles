@@ -117,6 +117,18 @@
       ];
       privateKeyFile = config.sops.secrets."vpn/wg/privateKey".path;
     };
+
+    monitoring = {
+      agent = {
+        enable = true;
+        openFirewall = false;              # scraper is local
+        lokiUrl = "http://127.0.0.1:3100"; # Loki lands in Task 3
+      };
+      server = {
+        enable = true;
+        nodeTargets = [ ]; # follow-up: helms-deep + pi workers once static addresses exist
+      };
+    };
   };
 
   environment = {
