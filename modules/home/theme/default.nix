@@ -2,98 +2,112 @@
 # all home-manager targets. Opacity, fonts, wallpaper, and polarity are set here.
 # Stylix auto-enables on most targets; Zed is explicitly disabled (uses its own theme).
 {
+  lib,
+  config,
   inputs,
   pkgs,
+  namespace,
   ...
 }:
+let
+  cfg = config.${namespace}.theme;
+in
 {
+  options.${namespace}.theme = {
+    enable = lib.mkEnableOption "theme" // {
+      default = true;
+    };
+  };
+
   imports = [ inputs.stylix.homeModules.stylix ];
 
-  home.packages = with pkgs; [
-    # Icon fonts
-    font-awesome
-    material-design-icons
+  config = lib.mkIf cfg.enable {
+    home.packages = with pkgs; [
+      # Icon fonts
+      font-awesome
+      material-design-icons
 
-    # Nerd fonts for terminal/editor icons
-    nerd-fonts.intone-mono
-    nerd-fonts.symbols-only
-  ];
+      # Nerd fonts for terminal/editor icons
+      nerd-fonts.intone-mono
+      nerd-fonts.symbols-only
+    ];
 
-  stylix = {
-    enable = true;
+    stylix = {
+      enable = true;
 
-    autoEnable = true;
+      autoEnable = true;
 
-    opacity = {
-      applications = 0.96;
-      desktop = 1.0;
-      popups = 0.94;
-      terminal = 0.92;
-    };
-
-    base16Scheme = ./theme/base16/catppuccin/macciato.yaml;
-
-    fonts = {
-      monospace = {
-        name = "IntoneMono Nerd Font Mono";
-        package = pkgs.nerd-fonts.intone-mono;
+      opacity = {
+        applications = 0.96;
+        desktop = 1.0;
+        popups = 0.94;
+        terminal = 0.92;
       };
 
-      sansSerif = {
-        name = "Ubuntu Sans";
-        package = pkgs.ubuntu-sans;
+      base16Scheme = ./theme/base16/catppuccin/macciato.yaml;
+
+      fonts = {
+        monospace = {
+          name = "IntoneMono Nerd Font Mono";
+          package = pkgs.nerd-fonts.intone-mono;
+        };
+
+        sansSerif = {
+          name = "Ubuntu Sans";
+          package = pkgs.ubuntu-sans;
+        };
+
+        serif = {
+          name = "Ubuntu";
+          package = pkgs.ubuntu-classic;
+        };
+
+        emoji = {
+          name = "Noto Color Emoji";
+          package = pkgs.noto-fonts-color-emoji;
+        };
+
+        sizes = {
+          applications = 11;
+          desktop = 11;
+          popups = 11;
+          terminal = 13;
+        };
       };
 
-      serif = {
-        name = "Ubuntu";
-        package = pkgs.ubuntu-classic;
+      image = ./theme/wallpapers/rx7.png;
+
+      polarity = "dark";
+
+      targets = {
+        firefox.profileNames = [ "default" ];
+        librewolf.profileNames = [ "default" ];
+        zed.enable = false;
+
+        # Stylix still injects hyprlang-style dotted keys ("col.active_border") into
+        # wayland.windowManager.hyprland.settings, which are invalid under the Lua
+        # config (configType = "lua"); the hyprland module carries the same
+        # Catppuccin Macchiato palette itself.
+        hyprland.enable = false;
+
+        # Rofi and dunst carry hand-crafted Macchiato-glass themes in their own
+        # modules; stylix's generic targets would fight them (theme option
+        # conflict for rofi, color overrides for dunst).
+        rofi.enable = false;
+        dunst.enable = false;
+
+        # GTK theming
+        gtk.enable = true;
+
+        # Foot terminal
+        foot.enable = true;
+
+        # Bat (cat replacement)
+        bat.enable = true;
+
+        # fzf
+        fzf.enable = true;
       };
-
-      emoji = {
-        name = "Noto Color Emoji";
-        package = pkgs.noto-fonts-color-emoji;
-      };
-
-      sizes = {
-        applications = 11;
-        desktop = 11;
-        popups = 11;
-        terminal = 13;
-      };
-    };
-
-    image = ./theme/wallpapers/rx7.png;
-
-    polarity = "dark";
-
-    targets = {
-      firefox.profileNames = [ "default" ];
-      librewolf.profileNames = [ "default" ];
-      zed.enable = false;
-
-      # Stylix still injects hyprlang-style dotted keys ("col.active_border") into
-      # wayland.windowManager.hyprland.settings, which are invalid under the Lua
-      # config (configType = "lua"); the hyprland module carries the same
-      # Catppuccin Macchiato palette itself.
-      hyprland.enable = false;
-
-      # Rofi and dunst carry hand-crafted Macchiato-glass themes in their own
-      # modules; stylix's generic targets would fight them (theme option
-      # conflict for rofi, color overrides for dunst).
-      rofi.enable = false;
-      dunst.enable = false;
-
-      # GTK theming
-      gtk.enable = true;
-
-      # Foot terminal
-      foot.enable = true;
-
-      # Bat (cat replacement)
-      bat.enable = true;
-
-      # fzf
-      fzf.enable = true;
     };
   };
 }

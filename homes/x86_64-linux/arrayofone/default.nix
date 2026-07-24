@@ -25,6 +25,7 @@ in
     hyprlock.enable = true;
     rofi.enable = true;
     waybar.enable = true;
+    waybar.timezone = "America/Vancouver";
 
     brave.enable = true;
     firefox.enable = true;

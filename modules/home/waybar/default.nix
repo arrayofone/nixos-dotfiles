@@ -125,6 +125,27 @@ in
 {
   options.${namespace}.waybar = {
     enable = lib.mkEnableOption "waybar";
+
+    timezone = lib.mkOption {
+      type = lib.types.nullOr lib.types.str;
+      default = null;
+      description = "Clock timezone; null = system local time.";
+    };
+
+    thermalZone = lib.mkOption {
+      type = lib.types.int;
+      default = 2;
+      description = "Thermal zone index used by the temperature module.";
+    };
+
+    hwmonPaths = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [
+        "/sys/class/hwmon/hwmon1/temp1_input"
+        "/sys/class/hwmon/hwmon2/temp1_input"
+      ];
+      description = "hwmon paths used by the temperature module.";
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -213,25 +234,28 @@ in
           };
 
           # Clock
-          clock = {
-            timezone = "America/Vancouver";
-            tooltip-format = "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>";
-            format = "{:%H:%M}";
-            format-alt = "{:%a, %b %d, %Y}";
-            calendar = {
-              mode = "year";
-              mode-mon-col = 3;
-              weeks-pos = "right";
-              on-scroll = 1;
-              format = {
-                months = "<span color='#c6a0f6'><b>{}</b></span>";
-                days = "<span color='#cad3f5'><b>{}</b></span>";
-                weeks = "<span color='#8bd5ca'><b>W{}</b></span>";
-                weekdays = "<span color='#f5a97f'><b>{}</b></span>";
-                today = "<span color='#ed8796'><b><u>{}</u></b></span>";
+          clock =
+            lib.optionalAttrs (cfg.timezone != null) {
+              timezone = cfg.timezone;
+            }
+            // {
+              tooltip-format = "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>";
+              format = "{:%H:%M}";
+              format-alt = "{:%a, %b %d, %Y}";
+              calendar = {
+                mode = "year";
+                mode-mon-col = 3;
+                weeks-pos = "right";
+                on-scroll = 1;
+                format = {
+                  months = "<span color='#c6a0f6'><b>{}</b></span>";
+                  days = "<span color='#cad3f5'><b>{}</b></span>";
+                  weeks = "<span color='#8bd5ca'><b>W{}</b></span>";
+                  weekdays = "<span color='#f5a97f'><b>{}</b></span>";
+                  today = "<span color='#ed8796'><b><u>{}</u></b></span>";
+                };
               };
             };
-          };
 
           # CPU usage
           cpu = {
@@ -257,11 +281,8 @@ in
 
           # Temperature monitoring
           temperature = {
-            thermal-zone = 2;
-            hwmon-path = [
-              "/sys/class/hwmon/hwmon1/temp1_input"
-              "/sys/class/hwmon/hwmon2/temp1_input"
-            ];
+            thermal-zone = cfg.thermalZone;
+            hwmon-path = cfg.hwmonPaths;
             critical-threshold = 80;
             format-critical = "󰸁 {temperatureC}°C";
             format = "󰔏 {temperatureC}°C";
