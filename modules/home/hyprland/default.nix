@@ -96,7 +96,6 @@ in
 
           # GTK
           (mkEnv "GDK_BACKEND" "wayland,x11,*")
-          (mkEnv "GTK_THEME" "Catppuccin-Macchiato-Standard-Mauve-Dark")
         ];
 
         # "curve" is in home-manager's default importantPrefixes, so these
@@ -358,9 +357,9 @@ in
               round_only_edges = true;
               gradient_round_only_edges = true;
               # Glacier text colors
-              text_color = lib.mkDefault "rgba(E8F1FAff)";
+              text_color = lib.mkDefault "rgba(101828ff)";
               text_color_inactive = lib.mkDefault "rgba(A8BCD4cc)";
-              text_color_locked_active = lib.mkDefault "rgba(E67E8Aff)";
+              text_color_locked_active = lib.mkDefault "rgba(101828ff)";
               text_color_locked_inactive = lib.mkDefault "rgba(E88C9Acc)";
               # Glacier bar colors
               col = {

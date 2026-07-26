@@ -128,7 +128,7 @@ in
       # Bottom quote
       label {
         text = "One does not simply walk into Mordor"
-        color = rgba(44, 62, 92, 0.8)
+        color = rgba(70, 88, 122, 0.8)
         font_size = 14
         font_family = Ubuntu Sans
         position = 0, 30
