@@ -26,7 +26,7 @@ in
       }
 
       background {
-        path = ${./lockscreen.png}
+        path = ${../theme/theme/wallpapers/glacier.jpg}
         blur_size = 4
         blur_passes = 3
         contrast = 0.9
@@ -38,7 +38,7 @@ in
       # Time
       label {
         text = cmd[update:1000] echo "$(date +"%H:%M")"
-        color = rgba(202, 211, 245, 1.0)
+        color = rgba(232, 241, 250, 1.0)
         font_size = 90
         font_family = Ubuntu Sans
         position = 0, 280
@@ -52,7 +52,7 @@ in
       # Date
       label {
         text = cmd[update:60000] echo "$(date +"%A, %B %d")"
-        color = rgba(183, 189, 248, 0.9)
+        color = rgba(139, 158, 232, 0.9)
         font_size = 18
         font_family = Ubuntu Sans
         position = 0, 180
@@ -63,7 +63,7 @@ in
       # Barad-dûr title
       label {
         text = ━━━━━━━━  𝔅𝔞𝔯𝔞𝔡-𝔡𝔲̂𝔯  ━━━━━━━━
-        color = rgba(198, 160, 246, 1.0)
+        color = rgba(159, 232, 255, 1.0)
         font_size = 32
         font_family = Ubuntu Sans
         position = 0, 100
@@ -71,13 +71,13 @@ in
         valign = center
         shadow_passes = 3
         shadow_size = 5
-        shadow_color = rgba(30, 32, 48, 0.8)
+        shadow_color = rgba(10, 16, 28, 0.8)
       }
 
       # Subtitle
       label {
         text = The Dark Tower of Mordor
-        color = rgba(165, 173, 203, 0.7)
+        color = rgba(168, 188, 212, 0.7)
         font_size = 14
         font_family = Ubuntu Sans
         position = 0, 60
@@ -93,19 +93,19 @@ in
         dots_spacing = 0.25
         dots_center = true
         dots_rounding = -1
-        # Mauve → teal → blue gradient ring, matching the Hyprland active border
-        outer_color = rgba(198, 160, 246, 0.9) rgba(139, 213, 202, 0.9) rgba(138, 173, 244, 0.9) 45deg
-        inner_color = rgba(30, 32, 48, 0.85)
-        font_color = rgba(202, 211, 245, 1.0)
+        # Ice → sapphire gradient ring, matching the Hyprland active border
+        outer_color = rgba(159, 232, 255, 0.9) rgba(74, 144, 217, 0.9) 45deg
+        inner_color = rgba(10, 16, 28, 0.85)
+        font_color = rgba(232, 241, 250, 1.0)
         fade_on_empty = true
         fade_timeout = 1000
-        placeholder_text = <span foreground="##c6a0f6"><i>Keep it secret, keep it safe...</i></span>
+        placeholder_text = <span foreground="##9FE8FF"><i>Keep it secret, keep it safe...</i></span>
         hide_input = false
         rounding = 14
-        check_color = rgba(166, 218, 149, 0.8)
-        fail_color = rgba(237, 135, 150, 0.8)
+        check_color = rgba(127, 217, 185, 0.8)
+        fail_color = rgba(230, 126, 138, 0.8)
         fail_text = <i>The way is shut</i>
-        capslock_color = rgba(238, 212, 159, 0.8)
+        capslock_color = rgba(232, 206, 140, 0.8)
         position = 0, -50
         halign = center
         valign = center
@@ -117,7 +117,7 @@ in
       # User info
       label {
         text =     $USER
-        color = rgba(139, 213, 202, 0.9)
+        color = rgba(111, 216, 208, 0.9)
         font_size = 16
         font_family = Ubuntu Sans
         position = 0, -140
@@ -128,7 +128,7 @@ in
       # Bottom quote
       label {
         text = "One does not simply walk into Mordor"
-        color = rgba(91, 96, 120, 0.8)
+        color = rgba(44, 62, 92, 0.8)
         font_size = 14
         font_family = Ubuntu Sans
         position = 0, 30
