@@ -41,7 +41,7 @@ pkgs.stdenv.mkDerivation {
 
     BlurRadius=\"80\"
 
-    ## [Design Customizations - Catppuccin Macchiato + LotR Theme]
+    ## [Design Customizations - Glacier + LotR Theme]
 
     HaveFormBackground=\"true\"
 
@@ -50,17 +50,17 @@ pkgs.stdenv.mkDerivation {
     BackgroundImageHAlignment=\"center\"
     BackgroundImageVAlignment=\"center\"
 
-    MainColour=\"#cad3f5\"
-    ## Catppuccin Macchiato text color
+    MainColour=\"#E8F1FA\"
+    ## Glacier text color
 
-    AccentColour=\"#c6a0f6\"
-    ## Catppuccin Macchiato mauve - matches hyprlock/waybar theme
+    AccentColour=\"#9FE8FF\"
+    ## Glacier ice accent - matches hyprlock/waybar theme
 
-    BackgroundColour=\"#24273a\"
-    ## Catppuccin Macchiato base
+    BackgroundColour=\"#101828\"
+    ## Glacier base
 
-    OverrideLoginButtonTextColour=\"#24273a\"
-    ## Dark text on mauve button for contrast
+    OverrideLoginButtonTextColour=\"#101828\"
+    ## Dark text on ice button for contrast
 
     InterfaceShadowSize=\"6\"
     InterfaceShadowOpacity=\"0.7\"

@@ -156,7 +156,7 @@ in
       # Use external configuration files for better maintainability
       settings = {
         mainBar = {
-          # Macchiato-glass three-island bar: workspaces+window | clock | system
+          # Glacier-glass three-island bar: workspaces+window | clock | system
           layer = "top";
           position = "top";
           height = 34;
@@ -248,11 +248,11 @@ in
                 weeks-pos = "right";
                 on-scroll = 1;
                 format = {
-                  months = "<span color='#c6a0f6'><b>{}</b></span>";
-                  days = "<span color='#cad3f5'><b>{}</b></span>";
-                  weeks = "<span color='#8bd5ca'><b>W{}</b></span>";
-                  weekdays = "<span color='#f5a97f'><b>{}</b></span>";
-                  today = "<span color='#ed8796'><b><u>{}</u></b></span>";
+                  months = "<span color='#9FE8FF'><b>{}</b></span>";
+                  days = "<span color='#E8F1FA'><b>{}</b></span>";
+                  weeks = "<span color='#6FD8D0'><b>W{}</b></span>";
+                  weekdays = "<span color='#F0C674'><b>{}</b></span>";
+                  today = "<span color='#E67E8A'><b><u>{}</u></b></span>";
                 };
               };
             };
@@ -379,34 +379,34 @@ in
         };
       };
 
-      # Macchiato-glass: transparent bar, three frosted islands (Hyprland
+      # Glacier-glass: transparent bar, three frosted islands (Hyprland
       # layer_rule blurs the waybar namespace), state-only colors, gradient
       # reserved for the active workspace. Numerals set in IntoneMono.
       style = ''
-        /* Catppuccin Macchiato Palette */
-        @define-color base #24273a;
-        @define-color mantle #1e2030;
-        @define-color crust #181926;
-        @define-color surface0 #363a4f;
-        @define-color surface1 #494d64;
-        @define-color surface2 #5b6078;
-        @define-color text #cad3f5;
-        @define-color subtext0 #a5adcb;
-        @define-color subtext1 #b8c0e0;
-        @define-color lavender #b7bdf8;
-        @define-color blue #8aadf4;
-        @define-color sapphire #7dc4e4;
-        @define-color sky #91d7e3;
-        @define-color teal #8bd5ca;
-        @define-color green #a6da95;
-        @define-color yellow #eed49f;
-        @define-color peach #f5a97f;
-        @define-color maroon #ee99a0;
-        @define-color red #ed8796;
-        @define-color mauve #c6a0f6;
-        @define-color pink #f5bde6;
-        @define-color flamingo #f0c6c6;
-        @define-color rosewater #f4dbd6;
+        /* Glacier Palette */
+        @define-color base #101828;
+        @define-color mantle #0A101C;
+        @define-color crust #060B14;
+        @define-color surface0 #182338;
+        @define-color surface1 #223048;
+        @define-color surface2 #2C3E5C;
+        @define-color text #E8F1FA;
+        @define-color subtext0 #A8BCD4;
+        @define-color subtext1 #C8D9EA;
+        @define-color lavender #8B9EE8;
+        @define-color blue #7DC4F0;
+        @define-color sapphire #4A90D9;
+        @define-color sky #9FE8FF;
+        @define-color teal #6FD8D0;
+        @define-color green #7FD9B9;
+        @define-color yellow #E8CE8C;
+        @define-color peach #F0C674;
+        @define-color maroon #E88C9A;
+        @define-color red #E67E8A;
+        @define-color mauve #8B9EE8;
+        @define-color pink #B8C8F0;
+        @define-color flamingo #C8D9EA;
+        @define-color rosewater #E8F1FA;
 
         * {
           font-family: "Ubuntu Sans", "Symbols Nerd Font", "Font Awesome 6 Free", sans-serif;
@@ -426,14 +426,14 @@ in
         .modules-right {
           background: alpha(@mantle, 0.72);
           border: 1px solid alpha(@surface1, 0.55);
-          border-radius: 17px;
+          border-radius: 8px;
           padding: 0 6px;
         }
 
         tooltip {
           background: alpha(@crust, 0.95);
           border: 1px solid alpha(@surface1, 0.8);
-          border-radius: 12px;
+          border-radius: 8px;
         }
 
         tooltip label {
@@ -498,7 +498,7 @@ in
         }
 
         #workspaces button.active {
-          background: linear-gradient(135deg, alpha(@mauve, 0.95), alpha(@teal, 0.8), alpha(@blue, 0.95));
+          background: linear-gradient(135deg, alpha(#9FE8FF, 0.95), alpha(#4A90D9, 0.95));
           color: @crust;
           padding: 2px 16px;
         }
@@ -523,7 +523,7 @@ in
 
         /* Submap — the one loud element besides the active workspace */
         #submap {
-          background: linear-gradient(135deg, @mauve, @pink);
+          background: linear-gradient(135deg, #9FE8FF, #B8C8F0);
           color: @crust;
           font-weight: 800;
           padding: 2px 14px;
@@ -538,7 +538,7 @@ in
 
         /* Clock — center island */
         #clock {
-          color: @mauve;
+          color: #9FE8FF;
           font-weight: 700;
           font-size: 14px;
           padding: 2px 18px;

@@ -44,7 +44,7 @@ in
         terminal = 0.92;
       };
 
-      base16Scheme = ./theme/base16/catppuccin/macciato.yaml;
+      base16Scheme = ./theme/base16/glacier.yaml;
 
       fonts = {
         monospace = {
@@ -75,7 +75,7 @@ in
         };
       };
 
-      image = ./theme/wallpapers/rx7.png;
+      image = ./theme/wallpapers/glacier.jpg;
 
       polarity = "dark";
 

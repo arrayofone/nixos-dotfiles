@@ -79,15 +79,15 @@ in
           # notification_limit).
           indicate_hidden = "yes";
 
-          ### Colors (Catppuccin Macchiato glass) ###
+          ### Colors (Glacier glass) ###
 
           # Glass card: mantle at ~90% alpha; the Hyprland dunst layer_rule
           # blur frosts whatever is behind the notification.
-          background = "#1e2030E6";
-          foreground = "#cad3f5";
+          background = "#0A101CE6";
+          foreground = "#E8F1FA";
 
-          # Progress bar: mauve → blue accent gradient
-          highlight = "#c6a0f6, #8aadf4";
+          # Progress bar: ice → sapphire accent gradient
+          highlight = "#9FE8FF, #4A90D9";
 
           # Draw a line of "separator_height" pixel height between two
           # notifications.
@@ -109,7 +109,7 @@ in
           frame_width = 2;
 
           # Defines color of the frame around the notification window.
-          frame_color = "#c6a0f6";
+          frame_color = "#9FE8FF";
 
           # Size of gap to display between notifications - requires a compositor.
           # If value is greater than 0, separator_height will be ignored and a border
@@ -317,59 +317,59 @@ in
           per_monitor_dpi = false;
         };
         # Urgency tiers: same glass card, frame color carries the severity —
-        # muted surface for low, mauve accent for normal, red (and a touch
+        # steel surface for low, ice accent for normal, rose (and a touch
         # more opacity) for critical.
         urgency_low = {
-          background = "#1e2030E6";
-          foreground = "#a5adcb";
-          frame_color = "#5b6078";
+          background = "#0A101CE6";
+          foreground = "#A8BCD4";
+          frame_color = "#2C3E5C";
           timeout = 6;
         };
         urgency_normal = {
-          background = "#1e2030E6";
-          foreground = "#cad3f5";
-          frame_color = "#c6a0f6";
+          background = "#0A101CE6";
+          foreground = "#E8F1FA";
+          frame_color = "#9FE8FF";
           timeout = 10;
         };
         urgency_critical = {
-          background = "#1e2030F2";
-          foreground = "#cad3f5";
-          frame_color = "#ed8796";
-          highlight = "#ed8796";
+          background = "#0A101CF2";
+          foreground = "#E8F1FA";
+          frame_color = "#E67E8A";
+          highlight = "#E67E8A";
           timeout = 0;
         };
-        # Per-app accents (Macchiato: peach/yellow/mauve/blue/green)
+        # Per-app accents (Glacier: peach/yellow/aurora/sky/green)
         volume-control = {
           summary = "volctl";
-          format = "\"<span size='large' weight='bold' foreground='#f5a97f'>󰕾</span> <b>%s</b>\n<span size='small'>%b</span>\"";
-          frame_color = "#f5a97f";
+          format = "\"<span size='large' weight='bold' foreground='#F0C674'>󰕾</span> <b>%s</b>\n<span size='small'>%b</span>\"";
+          frame_color = "#F0C674";
           timeout = 3;
         };
 
         brightness-control = {
           summary = "brightctl";
-          format = "\"<span size='large' weight='bold' foreground='#eed49f'>󰃟</span> <b>%s</b>\n<span size='small'>%b</span>\"";
-          frame_color = "#eed49f";
+          format = "\"<span size='large' weight='bold' foreground='#E8CE8C'>󰃟</span> <b>%s</b>\n<span size='small'>%b</span>\"";
+          frame_color = "#E8CE8C";
           timeout = 3;
         };
 
         theme-switch = {
           summary = "theme";
-          format = "\"<span size='large' weight='bold' foreground='#c6a0f6'>󰐱</span> <b>%s</b>\n<span size='small'>%b</span>\"";
-          frame_color = "#c6a0f6";
+          format = "\"<span size='large' weight='bold' foreground='#8B9EE8'>󰐱</span> <b>%s</b>\n<span size='small'>%b</span>\"";
+          frame_color = "#8B9EE8";
           timeout = 5;
         };
 
         network = {
           summary = "*Network*";
-          format = "\"<span size='large' weight='bold' foreground='#8aadf4'>󰖩</span> <b>%s</b>\n<span size='small'>%b</span>\"";
-          frame_color = "#8aadf4";
+          format = "\"<span size='large' weight='bold' foreground='#7DC4F0'>󰖩</span> <b>%s</b>\n<span size='small'>%b</span>\"";
+          frame_color = "#7DC4F0";
         };
 
         battery = {
           summary = "*Battery*";
-          format = "\"<span size='large' weight='bold' foreground='#a6da95'>󰁹</span> <b>%s</b>\n<span size='small'>%b</span>\"";
-          frame_color = "#a6da95";
+          format = "\"<span size='large' weight='bold' foreground='#7FD9B9'>󰁹</span> <b>%s</b>\n<span size='small'>%b</span>\"";
+          frame_color = "#7FD9B9";
         };
       };
     };

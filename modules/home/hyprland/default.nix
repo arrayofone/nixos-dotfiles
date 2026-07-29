@@ -96,7 +96,6 @@ in
 
           # GTK
           (mkEnv "GDK_BACKEND" "wayland,x11,*")
-          (mkEnv "GTK_THEME" "Catppuccin-Macchiato-Standard-Mauve-Dark")
         ];
 
         # "curve" is in home-manager's default importantPrefixes, so these
@@ -162,19 +161,18 @@ in
             float_gaps = 0;
             gaps_workspaces = 50;
 
-            # Catppuccin Macchiato gradient border
+            # Glacier gradient border
             col = {
-              inactive_border = lib.mkDefault "rgba(363a4f88)";
+              inactive_border = lib.mkDefault "rgba(22304888)";
               active_border = lib.mkDefault {
                 colors = [
-                  "rgba(c6a0f6ff)"
-                  "rgba(8bd5caff)"
-                  "rgba(8aadf4ff)"
+                  "rgba(9FE8FFee)"
+                  "rgba(4A90D9ee)"
                 ];
                 angle = 45;
               };
-              nogroup_border = lib.mkDefault "rgba(494d6488)";
-              nogroup_border_active = lib.mkDefault "rgba(ed8796ff)";
+              nogroup_border = lib.mkDefault "rgba(22304888)";
+              nogroup_border_active = lib.mkDefault "rgba(E67E8Aff)";
             };
 
             layout = "dwindle";
@@ -195,8 +193,8 @@ in
           };
 
           decoration = {
-            rounding = 14;
-            rounding_power = 2.2;
+            rounding = 8;
+            rounding_power = 2.0;
             active_opacity = 1.0;
             inactive_opacity = 0.92;
             fullscreen_opacity = 1.0;
@@ -231,8 +229,8 @@ in
               range = 20;
               render_power = 4;
               sharp = false;
-              color = lib.mkDefault "rgba(1a1a2ecc)";
-              color_inactive = lib.mkDefault "rgba(1a1a2e99)";
+              color = lib.mkDefault "rgba(060B14cc)";
+              color_inactive = lib.mkDefault "rgba(060B1499)";
               offset = "0 12";
               scale = 0.95;
             };
@@ -331,12 +329,12 @@ in
             merge_floated_into_tiled_on_groupbar = false;
             group_on_movetoworkspace = false;
 
-            # Catppuccin Macchiato group colors
+            # Glacier group colors
             col = {
-              border_active = lib.mkDefault "rgba(c6a0f6ff)";
-              border_inactive = lib.mkDefault "rgba(494d6488)";
-              border_locked_active = lib.mkDefault "rgba(ed8796ff)";
-              border_locked_inactive = lib.mkDefault "rgba(5b607888)";
+              border_active = lib.mkDefault "rgba(7DC4F0ff)";
+              border_inactive = lib.mkDefault "rgba(22304888)";
+              border_locked_active = lib.mkDefault "rgba(E67E8Aff)";
+              border_locked_inactive = lib.mkDefault "rgba(2C3E5C88)";
             };
 
             groupbar = {
@@ -354,21 +352,21 @@ in
               render_titles = true;
               text_offset = 0;
               scrolling = true;
-              rounding = 10;
-              gradient_rounding = 8;
+              rounding = 6;
+              gradient_rounding = 4;
               round_only_edges = true;
               gradient_round_only_edges = true;
-              # Catppuccin Macchiato text colors
-              text_color = lib.mkDefault "rgba(cad3f5ff)";
-              text_color_inactive = lib.mkDefault "rgba(a5adcbcc)";
-              text_color_locked_active = lib.mkDefault "rgba(ed8796ff)";
-              text_color_locked_inactive = lib.mkDefault "rgba(ee99a0cc)";
-              # Catppuccin Macchiato bar colors
+              # Glacier text colors
+              text_color = lib.mkDefault "rgba(101828ff)";
+              text_color_inactive = lib.mkDefault "rgba(A8BCD4cc)";
+              text_color_locked_active = lib.mkDefault "rgba(101828ff)";
+              text_color_locked_inactive = lib.mkDefault "rgba(E88C9Acc)";
+              # Glacier bar colors
               col = {
-                active = lib.mkDefault "rgba(c6a0f6cc)";
-                inactive = lib.mkDefault "rgba(363a4fcc)";
-                locked_active = lib.mkDefault "rgba(ed8796cc)";
-                locked_inactive = lib.mkDefault "rgba(494d64cc)";
+                active = lib.mkDefault "rgba(9FE8FFcc)";
+                inactive = lib.mkDefault "rgba(182338cc)";
+                locked_active = lib.mkDefault "rgba(E67E8Acc)";
+                locked_inactive = lib.mkDefault "rgba(223048cc)";
               };
               gaps_in = 3;
               gaps_out = 3;
@@ -380,7 +378,7 @@ in
             disable_hyprland_logo = true;
             disable_splash_rendering = true;
             col = {
-              splash = "rgba(c6a0f6ff)";
+              splash = "rgba(9FE8FFff)";
             };
             font_family = lib.mkDefault "Ubuntu";
             splash_font_family = "Ubuntu Sans";
@@ -400,7 +398,7 @@ in
             focus_on_activate = false;
             mouse_move_focuses_monitor = true;
             allow_session_lock_restore = false;
-            background_color = lib.mkDefault "0x24273a";
+            background_color = lib.mkDefault "0x101828";
             close_special_on_empty = true;
             exit_window_retains_fullscreen = false;
             initial_workspace_tracking = 1;

@@ -1,0 +1,18 @@
+scheme: "Glacier"
+author: "arrayofone"
+base00: "0a101c" # void
+base01: "101828" # depth
+base02: "182338" # surface
+base03: "46587a" # muted
+base04: "7a8ca8" # subtle
+base05: "e8f1fa" # text
+base06: "f2f8fd" # bright
+base07: "ffffff" # white
+base08: "e67e8a" # rose
+base09: "f0c674" # amber
+base0A: "e8ce8c" # gold
+base0B: "7fd9b9" # mint
+base0C: "9fe8ff" # ice
+base0D: "7dc4f0" # sky
+base0E: "8b9ee8" # aurora
+base0F: "4a90d9" # sapphire

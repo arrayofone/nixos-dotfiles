@@ -1,16 +1,16 @@
-/* Catppuccin Macchiato glass — translucent card frosted by the Hyprland
- * rofi layer_rule blur; mauve→blue gradient selection row matching the
+/* Glacier glass — translucent card frosted by the Hyprland rofi
+ * layer_rule blur; ice→sapphire gradient selection row matching the
  * compositor's active window border. */
 * {
-    bg:      rgba(30, 32, 48, 72%);
-    bg-alt:  rgba(24, 25, 38, 85%);
-    text:    #cad3f5;
-    muted:   #a5adcb;
-    mauve:   #c6a0f6;
-    teal:    #8bd5ca;
-    blue:    #8aadf4;
-    red:     #ed8796;
-    crust:   #181926;
+    bg:      rgba(10, 16, 28, 72%);
+    bg-alt:  rgba(6, 11, 20, 85%);
+    text:    #E8F1FA;
+    muted:   #A8BCD4;
+    mauve:   #8B9EE8;
+    teal:    #6FD8D0;
+    blue:    #7DC4F0;
+    red:     #E67E8A;
+    crust:   #060B14;
 
     background-color: transparent;
     text-color: @text;
@@ -22,8 +22,8 @@ window {
     width: 640px;
     background-color: @bg;
     border: 2px;
-    border-color: rgba(198, 160, 246, 55%);
-    border-radius: 17px;
+    border-color: rgba(159, 232, 255, 55%);
+    border-radius: 8px;
     padding: 18px;
 }
 
@@ -41,7 +41,7 @@ inputbar {
 }
 
 prompt {
-    text-color: @mauve;
+    text-color: #4A90D9;
 }
 
 entry {
@@ -59,7 +59,7 @@ listview {
 
 element {
     padding: 9px 14px;
-    border-radius: 12px;
+    border-radius: 8px;
     spacing: 12px;
 }
 
@@ -74,13 +74,16 @@ element-text {
     vertical-align: 0.5;
 }
 
-element normal.normal,
-element alternate.normal {
+element normal.normal {
     background-color: transparent;
 }
 
+element alternate.normal {
+    background-color: rgba(125, 196, 240, 8%);
+}
+
 element selected.normal {
-    background-image: linear-gradient(to right, rgba(198, 160, 246, 90%), rgba(138, 173, 244, 90%));
+    background-image: linear-gradient(to right, rgba(159, 232, 255, 90%), rgba(74, 144, 217, 90%));
     text-color: @crust;
 }
 
@@ -89,7 +92,7 @@ element urgent {
 }
 
 element active {
-    text-color: @teal;
+    text-color: #9FE8FF;
 }
 
 message {

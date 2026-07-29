@@ -1,6 +1,6 @@
-# @gitian:module Rofi launcher with a hand-crafted "macchiato-glass" rasi theme —
+# @gitian:module Rofi launcher with a hand-crafted "glacier-glass" rasi theme —
 # centered translucent card (frosted by the Hyprland rofi layer_rule blur), pill
-# input bar, and a mauve→blue gradient selection row matching the window borders.
+# input bar, and an ice→sapphire gradient selection row matching the window borders.
 # Replaces the generic stylix rofi target, which is disabled in the theme module.
 {
   lib,
@@ -22,7 +22,7 @@ in
       enable = true;
       font = "Ubuntu Sans 13";
       terminal = "ghostty";
-      theme = ./macchiato-glass.rasi;
+      theme = ./glacier-glass.rasi;
       extraConfig = {
         modi = "drun,run";
         show-icons = true;
