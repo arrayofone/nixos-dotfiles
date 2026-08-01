@@ -30,8 +30,13 @@ in
       target = if rootMode == "local" then "/dev/disk/by-label/NIXOS_SD"
                else "10.0.30.2:/mnt/node/netboot-roots/worker";
     };
-    k3s = { role = "server"; stateDevice = "/dev/disk/by-label/K3S_STATE"; };
+    k3s = {
+      role = "server";
+      stateDevice = "/dev/disk/by-label/K3S_STATE";
+      tokenFile = config.sops.secrets."k3s/token".path;
+    };
   };
+  sops.secrets."k3s/token".sopsFile = ../../../secrets/k3s-cluster.yaml;
   # modules/nixos/worker's bind mounts (/etc/ssh, /var/lib/sops-nix,
   # /var/lib/rancher/k3s — PR #5, out of T1's file scope) predate current
   # nixpkgs requiring fileSystems.<name>.fsType explicitly (no more "auto"
