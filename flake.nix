@@ -136,6 +136,16 @@
         )
       ];
 
+      # @gitian:host worker — aarch64-linux RPi4, diskless k3s server. Retested
+      # 2026-08-01 against nixos-raspberrypi HEAD (67616c2, 2026-08-01):
+      # `raspberry-pi-4.base` still fails to evaluate on a bare `with inputs;`
+      # module injection — the vendor module itself requires a `nixos-raspberrypi`
+      # special arg bound to its own flake `self` (its own flake.nix wires
+      # `specialArgs = inputs // { nixos-raspberrypi = self; }`), which Snowfall
+      # Lib's system builder does not provide (it nests inputs under
+      # `specialArgs.inputs`, not a flat `nixos-raspberrypi` arg). Mainline
+      # kernel stands; see the worker host's commit body for the exact error.
+
       # @gitian:host agent — aarch64-linux RPi5, currently on the mainline
       # kernel (its unpinned third-party nix-rpi5 fetchTarball broke pure
       # evaluation and was removed). The vendor kernel/firmware comes back via
