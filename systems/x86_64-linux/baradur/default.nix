@@ -126,7 +126,20 @@
       };
       server = {
         enable = true;
-        nodeTargets = [ ]; # follow-up: helms-deep + pi workers once static addresses exist
+        nodeTargets = [ "10.0.30.11:9100" "10.0.30.12:9100" ]; # follow-up: helms-deep once static address exists
+      };
+    };
+
+    netboot = {
+      enable = true;
+      parentInterface = "enp42s0";
+      vlan = 30;
+      serverAddress = "10.0.30.2/24";
+      rootStore = "/mnt/node/netboot-roots";
+      pvcExport = "/mnt/node/k8s-pvcs";
+      clients = {
+        worker = { mac = ""; address = "10.0.30.11"; };  # mac filled at bootstrap (dnsmasq logs it)
+        agent  = { mac = ""; address = "10.0.30.12"; };
       };
     };
   };
