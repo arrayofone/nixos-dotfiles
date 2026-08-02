@@ -95,16 +95,19 @@ in
     };
     fileSystems."/etc/ssh" = {
       device = "/state/ssh";
+      fsType = "none";
       options = [ "bind" ];
       neededForBoot = true;
     };
     fileSystems."/var/lib/sops-nix" = {
       device = "/state/sops-nix";
+      fsType = "none";
       options = [ "bind" ];
       neededForBoot = true;
     };
     fileSystems."/var/lib/rancher/k3s" = {
       device = "/state/rancher";
+      fsType = "none";
       options = [ "bind" ];
     };
 
@@ -136,6 +139,7 @@ in
               namespace = "kube-system";
             };
             spec = {
+              # chart version floats — pin after the first successful install (ON-HARDWARE)
               chart = "csi-driver-nfs";
               repo = "https://raw.githubusercontent.com/kubernetes-csi/csi-driver-nfs/master/charts";
               targetNamespace = "kube-system";
@@ -165,7 +169,7 @@ in
       description = "k3s embedded etcd snapshot";
       serviceConfig = {
         Type = "oneshot";
-        ExecStart = "${pkgs.k3s}/bin/k3s etcd-snapshot save --snapshot-dir /mnt/etcd-snapshots";
+        ExecStart = "${pkgs.k3s}/bin/k3s etcd-snapshot save --dir /mnt/etcd-snapshots";
       };
     };
     systemd.timers.k3s-etcd-snapshot = lib.mkIf (cfg.k3s.role == "server") {

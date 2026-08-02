@@ -61,7 +61,10 @@ in
             type = lib.types.str;
             default = ""; # meaningless for EFI clients
           };
-          mac = lib.mkOption { type = lib.types.str; };
+          mac = lib.mkOption {
+            type = lib.types.str;
+            description = "Client MAC, lowercase dash-separated (dnsmasq tftp-unique-root form, e.g. dc-a6-32-01-02-03).";
+          };
           address = lib.mkOption {
             type = lib.types.str;
             description = "UniFi-reserved IP for this Pi.";
@@ -118,14 +121,19 @@ in
         port = 0; # DHCP + TFTP only, no DNS
         dhcp-range = [ "${netAddr},proxy" ];
         # ON-HARDWARE-TUNABLE: proxy-DHCP + UEFI PXE is firmware-sensitive; validated when the x86_64 box arrives.
+        # tag negation on pxe-service + user-class match is the standard dnsmasq iPXE break-out
+        # (without it, iPXE re-DHCPs, matches client-arch again, and is handed ipxe.efi forever
+        # instead of netboot.ipxe) — validate on the real box.
         dhcp-match = [
           "set:rpi,option:client-arch,0"
           "set:efi64,option:client-arch,7"
           "set:efi64,option:client-arch,9"
+          "set:ipxe,option:user-class,iPXE"
         ];
         pxe-service = [
           "tag:rpi,0,Raspberry Pi Boot"
-          "tag:efi64,x86-64_EFI,\"iPXE\",ipxe.efi"
+          "tag:efi64,tag:!ipxe,x86-64_EFI,\"iPXE\",ipxe.efi"
+          "tag:ipxe,x86-64_EFI,\"netboot config\",netboot.ipxe"
         ];
         enable-tftp = true;
         tftp-root = toString cfg.tftpRoot;

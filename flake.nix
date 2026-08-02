@@ -145,6 +145,10 @@
       # Lib's system builder does not provide (it nests inputs under
       # `specialArgs.inputs`, not a flat `nixos-raspberrypi` arg). Mainline
       # kernel stands; see the worker host's commit body for the exact error.
+      # Deep-review shim test: injecting `{ _module.args.nixos-raspberrypi = nixos-raspberrypi; }`
+      # clears the missing-arg error, but evaluation then fails with
+      # `attribute 'buildDTBs' missing` (device-tree.nix vs the vendor kernel) — the July
+      # incompatibility persists at HEAD 67616c2, so mainline stands on both layers.
 
       # @gitian:host agent — aarch64-linux RPi5, currently on the mainline
       # kernel (its unpinned third-party nix-rpi5 fetchTarball broke pure

@@ -34,13 +34,6 @@ in
     };
   };
   sops.secrets."k3s/token".sopsFile = ../../../secrets/k3s-cluster.yaml;
-  # modules/nixos/worker's bind mounts (/etc/ssh, /var/lib/sops-nix,
-  # /var/lib/rancher/k3s — PR #5, out of this task's file scope) predate current
-  # nixpkgs requiring fileSystems.<name>.fsType explicitly (no more "auto"
-  # default); host-level override, standard bind-mount idiom (same fix as worker).
-  fileSystems."/etc/ssh".fsType = "none";
-  fileSystems."/var/lib/sops-nix".fsType = "none";
-  fileSystems."/var/lib/rancher/k3s".fsType = "none";
 
   networking.hostName = "agent";
   system.stateVersion = "24.05";

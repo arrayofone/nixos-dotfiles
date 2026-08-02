@@ -138,7 +138,7 @@
       rootStore = "/mnt/node/netboot-roots";
       pvcExport = "/mnt/node/k8s-pvcs";
       clients = {
-        worker = { mac = ""; address = "10.0.30.11"; };  # mac filled at bootstrap (dnsmasq logs it)
+        worker = { mac = ""; address = "10.0.30.11"; };  # mac filled at bootstrap, lowercase dash-separated (dnsmasq logs it)
         agent  = { mac = ""; address = "10.0.30.12"; };
       };
     };
