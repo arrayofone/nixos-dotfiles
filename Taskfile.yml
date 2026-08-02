@@ -431,6 +431,101 @@ tasks:
       - nixos-rebuild switch --flake {{.FLAKE_DIR}}#{{.MICROVM_HOST}} --target-host root@{{.MICROVM_HOST}} --show-trace --verbose
 
   # =============================================================================
+  # NETBOOT ARTIFACT PIPELINE (worker fleet)
+  # =============================================================================
+
+  netboot:host:
+    desc: "Build a worker's netboot artifacts and atomically publish to TFTP"
+    # MODE = nfs | ram. The host must set boot.loader.raspberry-pi.bootloader = "kernel".
+    vars: { HOST: '{{.HOST}}', MAC: '{{.MAC}}', MODE: '{{.MODE}}' }
+    cmds:
+      - |
+        set -euo pipefail
+        test -e /proc/sys/fs/binfmt_misc/qemu-aarch64 || { echo "binfmt inactive — switch baradur first"; exit 1; }
+
+        C=".#nixosConfigurations.{{.HOST}}.config"
+        DST=/srv/netboot/{{.MAC}}            # matches tftp-unique-root=mac (lowercase, colon-sep)
+        GEN="$DST/$(date +%s)"; mkdir -p "$GEN"
+
+        # kernel (REAL attr); initrd differs by mode: ram = netbootRamdisk (store baked in).
+        KERNEL=$(nix build --no-link --print-out-paths "$C.system.build.kernel")
+        if [ "{{.MODE}}" = "ram" ]; then
+          INITRD=$(nix build --no-link --print-out-paths "$C.system.build.netbootRamdisk")
+        else
+          INITRD=$(nix build --no-link --print-out-paths "$C.system.build.initialRamdisk")
+        fi
+        install -Dm644 "$KERNEL/Image"  "$GEN/Image"
+        install -Dm644 "$INITRD/initrd" "$GEN/initrd"
+
+        # firmware blobs (start4.elf, fixup4.dat, *.dtb, overlays/) — NO `|| true`, fail loudly.
+        # Vendor-vs-mainline is host-specific (see T1/T5 commit bodies) — try the vendor
+        # firmwarePackage first; if it doesn't evaluate, fall back to nixpkgs#raspberrypifw and
+        # hand-write config.txt (raspberrypifw ships no config.txt of its own).
+        if FW=$(nix build --no-link --print-out-paths "$C.boot.loader.raspberry-pi.firmwarePackage" 2>/dev/null); then
+          cp -r "$FW"/share/raspberrypi/boot/* "$GEN/"
+          CFG=$(nix build --no-link --print-out-paths "$C.boot.loader.raspberry-pi.configTxtPackage")
+          cp "$CFG/config.txt" "$GEN/config.txt"
+        else
+          echo "vendor firmwarePackage did not evaluate for {{.HOST}} — falling back to nixpkgs#raspberrypifw"
+          FW=$(nix build --no-link --print-out-paths nixpkgs#raspberrypifw)
+          cp -r "$FW"/share/raspberrypi/boot/* "$GEN/"
+          cat > "$GEN/config.txt" <<'CFGEOF'
+        kernel=Image
+        initramfs initrd followkernel
+        enable_uart=1
+        arm_64bit=1
+        CFGEOF
+        fi
+
+        # ensure config.txt names the kernel we installed ("Image") + the initrd:
+        grep -q '^kernel=Image' "$GEN/config.txt" || echo "kernel=Image"            >> "$GEN/config.txt"
+        grep -q '^initramfs initrd' "$GEN/config.txt" || echo "initramfs initrd followkernel" >> "$GEN/config.txt"
+
+        # cmdline.txt — DRY: derive from the host's own kernelParams (set by root.nix nfs branch).
+        nix eval --raw "$C.boot.kernelParams" --apply 'ps: builtins.concatStringsSep " " ps' \
+          | sed 's/$/ console=tty1 console=serial0,115200/' > "$GEN/cmdline.txt"
+
+        # HARD ASSERT a bootable set before publishing — never flip `current` to a broken tree.
+        for f in start4.elf fixup4.dat config.txt cmdline.txt Image initrd; do
+          test -s "$GEN/$f" || { echo "MISSING $f — refusing to publish"; exit 1; }
+        done
+
+        ln -sfn "$GEN" "$DST/current"        # atomic publish
+        ls -dt "$DST"/[0-9]* | tail -n +4 | xargs -r rm -rf   # keep last 3 generations
+
+  netboot:sdimage:
+    desc: "Build a host's sdImage artifact and print the flashing hint"
+    # ON-HARDWARE-VALIDATE: under the vendor modules confirm the sdImage attr and that its boot
+    # partition layout matches Pi 4/5 firmware expectations.
+    vars: { HOST: '{{.HOST}}' }
+    cmds:
+      - |
+        set -euo pipefail
+        test -e /proc/sys/fs/binfmt_misc/qemu-aarch64 || { echo "binfmt inactive — switch baradur first"; exit 1; }
+        IMG=$(nix build --no-link --print-out-paths .#nixosConfigurations.{{.HOST}}.config.system.build.sdImage)
+        echo "sdImage built: $IMG"
+        echo "Flash: sudo dd if=$IMG/sd-image/*.img of=/dev/sdX bs=4M status=progress conv=fsync"
+        echo "See docs/superpowers/plans/2026-06-21-pi-netboot-runbook.md for the full flashing/EEPROM procedure."
+
+  netboot:seed:
+    desc: "Pre-seed a host's SSH host key + age identity before first boot"
+    vars: { HOST: '{{.HOST}}' }
+    cmds:
+      - mkdir -p /tmp/{{.HOST}}-seed && ssh-keygen -t ed25519 -N "" -f /tmp/{{.HOST}}-seed/ssh_host_ed25519_key && nix shell nixpkgs#ssh-to-age -c sh -c 'ssh-to-age < /tmp/{{.HOST}}-seed/ssh_host_ed25519_key.pub'
+      - echo "Follow-ups — replace the .sops.yaml placeholder for {{.HOST}} with the age key printed above, then:"
+      - echo "  sops updatekeys secrets/k3s-cluster.yaml"
+      - echo "  create secrets/{{.HOST}}.yaml (per the runbook)"
+      - echo "  copy /tmp/{{.HOST}}-seed/ssh_host_ed25519_key(.pub) into the state device's ssh/ dir"
+
+  kubeconfig:fetch:
+    desc: "Pull k3s kubeconfig from the worker and point it at the VLAN IP"
+    vars: { IP: '{{.IP}}' } # worker VLAN IP
+    cmds:
+      - mkdir -p ~/.kube
+      - ssh arrayofone@{{.IP}} sudo cat /etc/rancher/k3s/k3s.yaml | sed 's#https://127.0.0.1:6443#https://{{.IP}}:6443#' > ~/.kube/worker.yaml
+      - echo "export KUBECONFIG=~/.kube/worker.yaml"
+
+  # =============================================================================
   # HELP & SHORTCUTS
   # =============================================================================
 
