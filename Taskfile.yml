@@ -447,7 +447,7 @@ tasks:
         DST=/srv/netboot/{{.MAC}}            # matches tftp-unique-root=mac (lowercase, colon-sep)
         GEN="$DST/$(date +%s)"; mkdir -p "$GEN"
 
-        # kernel (REAL attr); initrd differs by mode: ram = netbootRamdisk (store baked in).
+        # kernel (REAL attr); initrd differs by mode: ram = netbootRamdisk (store baked in).  [fix: re#F1/F2]
         KERNEL=$(nix build --no-link --print-out-paths "$C.system.build.kernel")
         if [ "{{.MODE}}" = "ram" ]; then
           INITRD=$(nix build --no-link --print-out-paths "$C.system.build.netbootRamdisk")
@@ -457,7 +457,7 @@ tasks:
         install -Dm644 "$KERNEL/Image"  "$GEN/Image"
         install -Dm644 "$INITRD/initrd" "$GEN/initrd"
 
-        # firmware blobs (start4.elf, fixup4.dat, *.dtb, overlays/) — NO `|| true`, fail loudly.
+        # firmware blobs (start4.elf, fixup4.dat, *.dtb, overlays/) — NO `|| true`, fail loudly.  [fix: re#B1]
         # Vendor-vs-mainline is host-specific (see T1/T5 commit bodies) — try the vendor
         # firmwarePackage first; if it doesn't evaluate, fall back to nixpkgs#raspberrypifw and
         # hand-write config.txt (raspberrypifw ships no config.txt of its own).
@@ -481,17 +481,17 @@ tasks:
         grep -q '^kernel=Image' "$GEN/config.txt" || echo "kernel=Image"            >> "$GEN/config.txt"
         grep -q '^initramfs initrd' "$GEN/config.txt" || echo "initramfs initrd followkernel" >> "$GEN/config.txt"
 
-        # cmdline.txt — DRY: derive from the host's own kernelParams (set by root.nix nfs branch).
+        # cmdline.txt — DRY: derive from the host's own kernelParams (set by root.nix nfs branch).  [fix: re#F4]
         nix eval --raw "$C.boot.kernelParams" --apply 'ps: builtins.concatStringsSep " " ps' \
           | sed 's/$/ console=tty1 console=serial0,115200/' > "$GEN/cmdline.txt"
 
-        # HARD ASSERT a bootable set before publishing — never flip `current` to a broken tree.
+        # HARD ASSERT a bootable set before publishing — never flip `current` to a broken tree.  [fix: re#B1]
         for f in start4.elf fixup4.dat config.txt cmdline.txt Image initrd; do
           test -s "$GEN/$f" || { echo "MISSING $f — refusing to publish"; exit 1; }
         done
 
         ln -sfn "$GEN" "$DST/current"        # atomic publish
-        ls -dt "$DST"/[0-9]* | tail -n +4 | xargs -r rm -rf   # keep last 3 generations
+        ls -dt "$DST"/[0-9]* | tail -n +4 | xargs -r rm -rf   # keep last 3 generations  [fix: re#B6]
 
   netboot:sdimage:
     desc: "Build a host's sdImage artifact and print the flashing hint"
@@ -522,7 +522,7 @@ tasks:
     vars: { IP: '{{.IP}}' } # worker VLAN IP
     cmds:
       - mkdir -p ~/.kube
-      - ssh arrayofone@{{.IP}} sudo cat /etc/rancher/k3s/k3s.yaml | sed 's#https://127.0.0.1:6443#https://{{.IP}}:6443#' > ~/.kube/worker.yaml
+      - ssh arrayofone@{{.IP}} sudo cat /etc/rancher/k3s/k3s.yaml | sed 's#https://127.0.0.1:6443#https://{{.IP}}:6443#' > ~/.kube/worker.yaml   # [fix: re#B2]
       - echo "export KUBECONFIG=~/.kube/worker.yaml"
 
   # =============================================================================
