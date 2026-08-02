@@ -436,7 +436,9 @@ tasks:
 
   netboot:host:
     desc: "Build a worker's netboot artifacts and atomically publish to TFTP"
-    # MODE = nfs | ram. The host must set boot.loader.raspberry-pi.bootloader = "kernel".
+    # MODE = nfs | ram. Vendor hosts would set boot.loader.raspberry-pi.bootloader = "kernel";
+    # under the 2026-08-01 mainline verdict the firmware boots kernel=Image directly and no
+    # bootloader option applies.
     vars: { HOST: '{{.HOST}}', MAC: '{{.MAC}}', MODE: '{{.MODE}}' }
     cmds:
       - |
@@ -444,7 +446,7 @@ tasks:
         test -e /proc/sys/fs/binfmt_misc/qemu-aarch64 || { echo "binfmt inactive — switch baradur first"; exit 1; }
 
         C=".#nixosConfigurations.{{.HOST}}.config"
-        DST=/srv/netboot/{{.MAC}}            # matches tftp-unique-root=mac (lowercase, colon-sep)
+        DST=/srv/netboot/{{.MAC}}            # matches tftp-unique-root=mac (lowercase, dash-separated — dnsmasq appends e.g. dc-a6-32-01-02-03)
         GEN="$DST/$(date +%s)"; mkdir -p "$GEN"
 
         # kernel (REAL attr); initrd differs by mode: ram = netbootRamdisk (store baked in).  [fix: re#F1/F2]
@@ -456,6 +458,9 @@ tasks:
         fi
         install -Dm644 "$KERNEL/Image"  "$GEN/Image"
         install -Dm644 "$INITRD/initrd" "$GEN/initrd"
+
+        # toplevel — needed for init= on the kernel cmdline (stage-1 execs it).  [fix: re#F3]
+        TOPLEVEL=$(nix build --no-link --print-out-paths "$C.system.build.toplevel")
 
         # firmware blobs (start4.elf, fixup4.dat, *.dtb, overlays/) — NO `|| true`, fail loudly.  [fix: re#B1]
         # Vendor-vs-mainline is host-specific (see T1/T5 commit bodies) — try the vendor
@@ -469,6 +474,9 @@ tasks:
           echo "vendor firmwarePackage did not evaluate for {{.HOST}} — falling back to nixpkgs#raspberrypifw"
           FW=$(nix build --no-link --print-out-paths nixpkgs#raspberrypifw)
           cp -r "$FW"/share/raspberrypi/boot/* "$GEN/"
+          # mainline kernel pairs with mainline DTBs — overwrite the vendor blobs' copies; the
+          # firmware patches whichever DTB sits in the boot dir. ON-HARDWARE-VALIDATE (Pi 5 especially).  [deep-review]
+          find "$KERNEL/dtbs/broadcom" \( -name 'bcm2711-rpi-4-*.dtb' -o -name 'bcm2712-rpi-5-*.dtb' \) -exec cp -f {} "$GEN/" \;
           cat > "$GEN/config.txt" <<'CFGEOF'
         kernel=Image
         initramfs initrd followkernel
@@ -482,8 +490,9 @@ tasks:
         grep -q '^initramfs initrd' "$GEN/config.txt" || echo "initramfs initrd followkernel" >> "$GEN/config.txt"
 
         # cmdline.txt — DRY: derive from the host's own kernelParams (set by root.nix nfs branch).  [fix: re#F4]
+        # init= is mandatory — stage-1 execs the toplevel's init; without it the boot dead-ends.  [deep-review]
         nix eval --raw "$C.boot.kernelParams" --apply 'ps: builtins.concatStringsSep " " ps' \
-          | sed 's/$/ console=tty1 console=serial0,115200/' > "$GEN/cmdline.txt"
+          | sed "s|\$| console=tty1 console=serial0,115200 init=$TOPLEVEL/init|" > "$GEN/cmdline.txt"
 
         # HARD ASSERT a bootable set before publishing — never flip `current` to a broken tree.  [fix: re#B1]
         for f in start4.elf fixup4.dat config.txt cmdline.txt Image initrd; do
