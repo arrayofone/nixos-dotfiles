@@ -54,10 +54,12 @@ a Pi once it's off `local`.
 
 Nothing aarch64 builds on baradur — not `worker`/`agent` toplevel, not sdImages, not netboot
 artifacts — until **baradur's own first `switch`** activates `fellowship.netboot`'s binfmt
-registration (`/proc/sys/fs/binfmt_misc/qemu-aarch64` is empty until then). Every
-`task netboot:*` target checks that path first and exits 1 if it's missing. So the first
-hardware step, always, is switching baradur (UniFi step 5 / bootstrap step 1 below) —
-everything aarch64 depends on it transitively.
+registration (`/proc/sys/fs/binfmt_misc/qemu-aarch64` is empty until then). Of the `netboot:*`
+targets, `task netboot:host` and `task netboot:sdimage` check that path first and exit 1 if
+it's missing (both build aarch64 closures); `task netboot:seed` needs no gate — it only
+generates a host key + age identity, no aarch64 build involved. So the first hardware step,
+always, is switching baradur (UniFi step 5 / bootstrap step 1 below) — everything aarch64
+depends on it transitively.
 
 ## UniFi / switch (Phase 1)
 
@@ -105,7 +107,7 @@ Run once per Pi (`<host>` = `worker` or `agent`), after UniFi step 6 above:
    Insert into the Pi and boot.
 8. EEPROM (one-time, while SD-booted):
    ```bash
-   sudo rpi-eeprom-config --edit   # BOOT_ORDER=0xf21 (SD then network), TFTP_PREFIX=1 (MAC subdir)
+   sudo rpi-eeprom-config --edit   # BOOT_ORDER=0xf21 (SD then network), TFTP_PREFIX=1 (no client-side prefix; dnsmasq adds the per-MAC subdir server-side)
    ```
    **Pi 5 (`agent`) only:** confirm the bootloader EEPROM is netboot-capable before relying on
    the `nfs`/`ram` rungs — `sudo rpi-eeprom-update -a` reports current vs. latest; run
@@ -119,8 +121,10 @@ Run once per Pi (`<host>` = `worker` or `agent`), after UniFi step 6 above:
 
 - **local** — build + `nixos-rebuild switch --flake .#<host>` ON the Pi (normal on-disk).
 - **nfs / ram** — apply changes on **baradur**: `task netboot:host HOST=<host> MODE=<nfs|ram>
-  MAC=<lowercase:colon:mac>` rebuilds the closure, repopulates `/srv/netboot/<mac>/<gen>/`,
+  MAC=<lowercase-dash-mac>` rebuilds the closure, repopulates `/srv/netboot/<mac>/<gen>/`,
   flips the `current` symlink, then **power-cycle the Pi**. Never `switch` on the Pi.
+  `MAC` is dnsmasq's `tftp-unique-root=mac` form — lowercase, dash-separated
+  (e.g. `dc-a6-32-01-02-03`), not colon-separated.
 
 ## Brick recovery
 
