@@ -1,4 +1,4 @@
-{ lib, config, namespace, ... }:
+{ lib, config, pkgs, namespace, ... }:
 let
   cfg = config.${namespace}.netboot;
   vlanIface = "${cfg.parentInterface}.${toString cfg.vlan}";
@@ -6,6 +6,19 @@ let
   prefix = lib.toInt (lib.last (lib.splitString "/" cfg.serverAddress));
   octets = lib.splitString "." hostIp;
   netAddr = "${lib.concatStringsSep "." (lib.take 3 octets)}.0"; # /24 only — asserted below
+
+  # EFI clients boot iPXE from <tftpRoot>/<mac>/ (tftp-unique-root=mac). The chainload script is
+  # identical for every EFI client — it just hands off to config.ipxe, which THIS module does not
+  # create: the artifact pipeline (T6, and the future x86 target) owns it, same contract as the
+  # Pis' `current` symlink.
+  netbootIpxeScript = pkgs.writeText "netboot.ipxe" "#!ipxe\nchain --autofree config.ipxe\n";
+  efiClients = lib.filterAttrs (_: c: c.arch == "x86_64-efi") cfg.clients;
+  efiTftpRules = lib.concatMap
+    (c: [
+      "L+ ${toString cfg.tftpRoot}/${c.mac}/ipxe.efi - - - - ${pkgs.ipxe}/ipxe.efi"
+      "L+ ${toString cfg.tftpRoot}/${c.mac}/netboot.ipxe - - - - ${netbootIpxeScript}"
+    ])
+    (lib.attrValues efiClients);
 in
 {
   options.${namespace}.netboot = {
@@ -44,11 +57,22 @@ in
       description = "Known Pi netboot clients keyed by hostname.";
       type = lib.types.attrsOf (lib.types.submodule {
         options = {
-          serial = lib.mkOption { type = lib.types.str; };
-          mac = lib.mkOption { type = lib.types.str; };
+          serial = lib.mkOption {
+            type = lib.types.str;
+            default = ""; # meaningless for EFI clients
+          };
+          mac = lib.mkOption {
+            type = lib.types.str;
+            description = "Client MAC, lowercase dash-separated (dnsmasq tftp-unique-root form, e.g. dc-a6-32-01-02-03).";
+          };
           address = lib.mkOption {
             type = lib.types.str;
             description = "UniFi-reserved IP for this Pi.";
+          };
+          arch = lib.mkOption {
+            type = lib.types.enum [ "rpi" "x86_64-efi" ];
+            default = "rpi";
+            description = "Client boot path: Raspberry Pi Boot firmware, or UEFI HTTP/TFTP PXE.";
           };
         };
       });
@@ -96,8 +120,21 @@ in
         bind-interfaces = true;
         port = 0; # DHCP + TFTP only, no DNS
         dhcp-range = [ "${netAddr},proxy" ];
-        dhcp-match = [ "set:rpi,option:client-arch,0" ];
-        pxe-service = [ "tag:rpi,0,Raspberry Pi Boot" ];
+        # ON-HARDWARE-TUNABLE: proxy-DHCP + UEFI PXE is firmware-sensitive; validated when the x86_64 box arrives.
+        # tag negation on pxe-service + user-class match is the standard dnsmasq iPXE break-out
+        # (without it, iPXE re-DHCPs, matches client-arch again, and is handed ipxe.efi forever
+        # instead of netboot.ipxe) — validate on the real box.
+        dhcp-match = [
+          "set:rpi,option:client-arch,0"
+          "set:efi64,option:client-arch,7"
+          "set:efi64,option:client-arch,9"
+          "set:ipxe,option:user-class,iPXE"
+        ];
+        pxe-service = [
+          "tag:rpi,0,Raspberry Pi Boot"
+          "tag:efi64,tag:!ipxe,x86-64_EFI,\"iPXE\",ipxe.efi"
+          "tag:ipxe,x86-64_EFI,\"netboot config\",netboot.ipxe"
+        ];
         enable-tftp = true;
         tftp-root = toString cfg.tftpRoot;
         tftp-unique-root = "mac"; # serve <tftpRoot>/<mac>/ per client (pair with EEPROM TFTP_PREFIX=1)
@@ -126,13 +163,16 @@ in
         69 # TFTP
         4011 # proxy-DHCP
       ];
-      allowedTCPPorts = [ 2049 ]; # NFSv4
+      allowedTCPPorts = [
+        2049 # NFSv4
+        3100 # Loki push — fellowship.worker targets http://<bootServer>:3100
+      ];
     };
 
     systemd.tmpfiles.rules = [
       "d ${toString cfg.tftpRoot} 0755 dnsmasq dnsmasq - -"
       "d ${toString cfg.rootStore} 0755 root root - -"
       "d ${toString cfg.pvcExport} 0777 root root - -"
-    ];
+    ] ++ efiTftpRules;
   };
 }

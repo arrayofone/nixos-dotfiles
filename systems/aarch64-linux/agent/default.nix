@@ -1,40 +1,40 @@
-{ pkgs, ... }:
+{ config, lib, modulesPath, ... }:
+let
+  # BOOTSTRAP LADDER — flip "local" -> "nfs" -> "ram" per the runbook, one rung per commit.
+  rootMode = "local";
+in
 {
-  # Mainline kernel for now. The previous unpinned fetchTarball of a
-  # third-party nix-rpi5 repo broke pure evaluation; the vendor Pi 5
-  # kernel/firmware returns via nixos-raspberrypi in the pi-netboot plan's
-  # Phase 5 (see flake.nix note on the current upstream incompatibility).
+  imports =
+    lib.optional (rootMode == "local") "${modulesPath}/installer/sd-card/sd-image-aarch64.nix"
+    ++ lib.optional (rootMode == "ram") "${modulesPath}/installer/netboot/netboot.nix";
 
-  # SD boot via the firmware's extlinux path, as on the stock aarch64 sd-image
+  # RETEST VERDICT (2026-08-01, mirrored from the worker/pi4 host — see its commit body
+  # for the exact eval error): nixos-raspberrypi's `raspberry-pi-5.base` module carries the
+  # same Snowfall specialArgs incompatibility as `raspberry-pi-4.base` (requires a
+  # `nixos-raspberrypi` special arg bound to its own flake `self`, which Snowfall Lib's
+  # system builder does not provide). Mainline kernel stands, same as before this migration
+  # — the worker profile is kernel-agnostic, so no flake.nix injection is added.
   boot.loader.grub.enable = false;
   boot.loader.generic-extlinux-compatible.enable = true;
 
-  # Standard Pi sd-image layout; superseded by the fellowship.worker root
-  # modes when the netboot plan's Phase 5 lands.
-  fileSystems."/" = {
-    device = "/dev/disk/by-label/NIXOS_SD";
-    fsType = "ext4";
-  };
-
-  networking = { };
-
-  fellowship.monitoring.agent.enable = true;
-
-  nix = {
-    settings.experimental-features = "nix-command flakes";
-    gc = {
-      automatic = true;
-      dates = "03:15";
+  fellowship.worker = {
+    enable = true;
+    board = "pi5";
+    bootServer = "10.0.30.2";
+    root = {
+      mode = rootMode;
+      target = if rootMode == "local" then "/dev/disk/by-label/NIXOS_SD"
+               else "10.0.30.2:/mnt/node/netboot-roots/agent";
+    };
+    k3s = {
+      role = "agent";
+      target = "https://10.0.30.11:6443";
+      tokenFile = config.sops.secrets."k3s/token".path;
+      stateDevice = "/dev/disk/by-label/K3S_STATE";
     };
   };
+  sops.secrets."k3s/token".sopsFile = ../../../secrets/k3s-cluster.yaml;
 
-  nixpkgs.config.allowUnfree = true;
-
-  services.openssh.enable = true;
-
-  i18n.defaultLocale = "en_CA.UTF-8";
-
-  time.timeZone = "America/Vancouver";
-
+  networking.hostName = "agent";
   system.stateVersion = "24.05";
 }

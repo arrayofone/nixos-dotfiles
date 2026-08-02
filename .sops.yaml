@@ -6,6 +6,8 @@ keys:
   - &mingabook age14ejy4tppggtacyzxfhtnagqhtr60zyf6l6euh5vxlf8uh9vcef3s2clada
   - &darrenbangsund age1fyndjw4ucc39hh2kyuxth2pyevl2h5zh9lmfq7v9h8neq9csnc9qrcm4zq
   - &helms-deep PLACEHOLDER_AGE_PUBLIC_KEY
+  - &worker PLACEHOLDER_AGE_PUBLIC_KEY
+  - &agent PLACEHOLDER_AGE_PUBLIC_KEY
 creation_rules:
   - path_regex: secrets/arrayofone.yaml$
     key_groups:
@@ -35,3 +37,16 @@ creation_rules:
     key_groups:
       - age:
           - *helms-deep
+  - path_regex: secrets/worker.yaml$
+    key_groups:
+      - age:
+          - *worker
+  - path_regex: secrets/agent.yaml$
+    key_groups:
+      - age:
+          - *agent
+  # bootstrap: add *worker, *agent to this group + sops updatekeys
+  - path_regex: secrets/k3s-cluster.yaml$
+    key_groups:
+      - age:
+          - *arrayofone

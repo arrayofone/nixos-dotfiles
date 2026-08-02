@@ -95,16 +95,19 @@ in
     };
     fileSystems."/etc/ssh" = {
       device = "/state/ssh";
+      fsType = "none";
       options = [ "bind" ];
       neededForBoot = true;
     };
     fileSystems."/var/lib/sops-nix" = {
       device = "/state/sops-nix";
+      fsType = "none";
       options = [ "bind" ];
       neededForBoot = true;
     };
     fileSystems."/var/lib/rancher/k3s" = {
       device = "/state/rancher";
+      fsType = "none";
       options = [ "bind" ];
     };
 
@@ -124,10 +127,62 @@ in
           "--write-kubeconfig-mode=0600" # admin creds not world-readable
           "--cluster-init" # embedded etcd so `etcd-snapshot` works
         ];
+        # In-cluster NFS provisioner client — csi-driver-nfs via k3s auto-deploy manifest, plus
+        # the StorageClass PVCs bind against. Server-only: agents don't run the k3s
+        # apiserver/controller that consumes manifests/.
+        manifests.nfs-csi.content = [
+          {
+            apiVersion = "helm.cattle.io/v1";
+            kind = "HelmChart";
+            metadata = {
+              name = "csi-driver-nfs";
+              namespace = "kube-system";
+            };
+            spec = {
+              # chart version floats — pin after the first successful install (ON-HARDWARE)
+              chart = "csi-driver-nfs";
+              repo = "https://raw.githubusercontent.com/kubernetes-csi/csi-driver-nfs/master/charts";
+              targetNamespace = "kube-system";
+            };
+          }
+          {
+            apiVersion = "storage.k8s.io/v1";
+            kind = "StorageClass";
+            metadata.name = "nfs";
+            provisioner = "nfs.csi.k8s.io";
+            parameters = {
+              server = cfg.bootServer;
+              share = "/k8s-pvcs"; # ON-HARDWARE-VALIDATE: NFSv4 pseudo-root path vs absolute export path
+            };
+            reclaimPolicy = "Delete";
+            mountOptions = [ "nfsvers=4.1" ];
+          }
+        ];
       })
       cfg.k3s.extraConfig
     ];
     networking.firewall.allowedTCPPorts = lib.mkIf (cfg.k3s.role == "server") [ 6443 ];
+
+    # etcd snapshots must live OFF the K3S_STATE device (its loss is what they insure against),
+    # hence NFS to baradur. Server-only: agents run no etcd to snapshot.
+    systemd.services.k3s-etcd-snapshot = lib.mkIf (cfg.k3s.role == "server") {
+      description = "k3s embedded etcd snapshot";
+      serviceConfig = {
+        Type = "oneshot";
+        ExecStart = "${pkgs.k3s}/bin/k3s etcd-snapshot save --dir /mnt/etcd-snapshots";
+      };
+    };
+    systemd.timers.k3s-etcd-snapshot = lib.mkIf (cfg.k3s.role == "server") {
+      description = "Daily k3s embedded etcd snapshot";
+      wantedBy = [ "timers.target" ];
+      timerConfig.OnCalendar = "03:30";
+    };
+    # soft+automount so an unreachable baradur can't hang boots.
+    fileSystems."/mnt/etcd-snapshots" = lib.mkIf (cfg.k3s.role == "server") {
+      device = "${cfg.bootServer}:/k8s-pvcs/etcd-snapshots"; # ON-HARDWARE-VALIDATE: same pseudo-root caveat as the StorageClass share.
+      fsType = "nfs";
+      options = [ "nfsvers=4.1" "soft" "x-systemd.automount" "x-systemd.idle-timeout=300" "noauto" ];
+    };
 
     environment.systemPackages = [
       pkgs.k3s
