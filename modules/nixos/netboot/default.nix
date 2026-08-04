@@ -115,6 +115,10 @@ in
     # Proxy-DHCP (coexists with UniFi DHCP) + TFTP, bound to the VLAN iface.
     services.dnsmasq = {
       enable = true;
+      # port = 0 below disables DNS entirely, but the NixOS module still defaults
+      # resolveLocalQueries to true — which rewrites /etc/resolv.conf to 127.0.0.1,
+      # where nothing answers. Took out all of baradur's DNS on first switch.
+      resolveLocalQueries = false;
       settings = {
         interface = vlanIface;
         bind-interfaces = true;
@@ -141,10 +145,14 @@ in
         log-dhcp = true;
       };
     };
-    # Order dnsmasq after the VLAN device exists (systemd keeps the literal dot in NIC unit names).
+    # Order dnsmasq after scripted networking has created AND addressed the VLAN
+    # iface (systemd keeps the literal dot in these unit names). Ordering against
+    # the passive .device unit alone was insufficient: bind-interfaces raced udev
+    # and dnsmasq's first start died with "unknown interface enp42s0.30".
     systemd.services.dnsmasq.after = [
       "network.target"
-      "sys-subsystem-net-devices-${vlanIface}.device"
+      "${vlanIface}-netdev.service"
+      "network-addresses-${vlanIface}.service"
     ];
 
     # NFSv4-only: the worker netboot root (ro) and the PVC store (rw, root-squashed).
